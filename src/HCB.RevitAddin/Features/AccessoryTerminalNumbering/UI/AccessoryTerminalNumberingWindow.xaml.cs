@@ -7,6 +7,8 @@ namespace HCB.RevitAddin.Features.AccessoryTerminalNumbering.UI;
 
 public partial class AccessoryTerminalNumberingWindow : Window
 {
+    private const string DefaultTargetParameterName = "LIN_POSITION_NUMBER_A";
+
     public AccessoryTerminalNumberingWindow(
         IReadOnlyList<string> availableTargetParameters,
         IReadOnlyList<string> availableAccessoryTypeParameters,
@@ -16,7 +18,9 @@ public partial class AccessoryTerminalNumberingWindow : Window
     {
         InitializeComponent();
         TargetParameterComboBox.ItemsSource = availableTargetParameters;
-        TargetParameterComboBox.SelectedIndex = availableTargetParameters.Count > 0 ? 0 : -1;
+        TargetParameterComboBox.SelectedItem = availableTargetParameters.Contains(DefaultTargetParameterName)
+            ? DefaultTargetParameterName
+            : availableTargetParameters.Count > 0 ? availableTargetParameters[0] : null;
 
         List<string> accessoryTypeOptions = ["(brak)"];
         accessoryTypeOptions.AddRange(availableAccessoryTypeParameters);
@@ -38,6 +42,7 @@ public partial class AccessoryTerminalNumberingWindow : Window
     {
         TargetParameterName = GetSelectedString(TargetParameterComboBox),
         StartNumber = int.TryParse(GetText(StartNumberTextBox), out int value) ? value : 0,
+        UseLastProjectNumber = UseLastProjectNumberCheckBox?.IsChecked == true,
         DuctAccessoryPrefix = GetText(DuctAccessoryPrefixTextBox),
         PipeAccessoryPrefix = GetText(PipeAccessoryPrefixTextBox),
         TerminalPrefix = GetText(TerminalPrefixTextBox),
@@ -52,9 +57,9 @@ public partial class AccessoryTerminalNumberingWindow : Window
             return;
         }
 
-        if (Options.StartNumber <= 0)
+        if (!Options.UseLastProjectNumber && Options.StartNumber <= 0)
         {
-            FooterBar.StatusText = "Podaj dodatni numer startowy.";
+            FooterBar.StatusText = "Podaj dodatni numer startowy albo zaznacz pobieranie ostatniego numeru z projektu.";
             return;
         }
 
@@ -90,6 +95,14 @@ public partial class AccessoryTerminalNumberingWindow : Window
 
     private void UpdatePreview()
     {
+        if (PreviewTextBlock == null ||
+            DuctAccessoryPrefixPanel == null ||
+            PipeAccessoryPrefixPanel == null ||
+            TerminalPrefixPanel == null)
+        {
+            return;
+        }
+
         AccessoryTerminalNumberingOptions options = Options;
         string accessoryTypePart = string.IsNullOrWhiteSpace(options.AccessoryTypeParameterName)
             ? string.Empty
@@ -129,6 +142,11 @@ public partial class AccessoryTerminalNumberingWindow : Window
 
     private string GetPreviewNumber()
     {
+        if (Options.UseLastProjectNumber)
+        {
+            return "ostatni+1";
+        }
+
         return Options.StartNumber > 0 ? Options.StartNumber.ToString() : "1";
     }
 

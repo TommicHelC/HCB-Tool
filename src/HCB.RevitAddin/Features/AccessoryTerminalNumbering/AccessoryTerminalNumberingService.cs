@@ -16,39 +16,63 @@ public sealed class AccessoryTerminalNumberingService
             return selectedIds
                 .Select(document.GetElement)
                 .Where(IsSupported)
-                .Where(element => !IsFabricAir(document, element))
+                .Where(element => !IsFabricAir(document, element!))
+                .Cast<Element>()
                 .ToList();
         }
 
         return new FilteredElementCollector(document)
             .WhereElementIsNotElementType()
             .Where(element =>
-                element.Category?.Id.Value == (long)BuiltInCategory.OST_DuctAccessory ||
-                element.Category?.Id.Value == (long)BuiltInCategory.OST_PipeAccessory ||
-                element.Category?.Id.Value == (long)BuiltInCategory.OST_DuctTerminal)
+                GetCategoryId(element) == (long)BuiltInCategory.OST_DuctAccessory ||
+                GetCategoryId(element) == (long)BuiltInCategory.OST_PipeAccessory ||
+                GetCategoryId(element) == (long)BuiltInCategory.OST_DuctTerminal)
             .Where(element => !IsFabricAir(document, element))
             .ToList();
     }
 
     public IReadOnlyList<string> GetWritableStringTargetParameters(IEnumerable<Element> elements)
     {
-        return elements
-            .SelectMany(element => element.Parameters.Cast<Parameter>())
-            .Where(parameter => !parameter.IsReadOnly && parameter.StorageType == StorageType.String)
-            .Select(parameter => parameter.Definition?.Name)
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct(StringComparer.CurrentCultureIgnoreCase)
-            .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
-            .Cast<string>()
-            .ToList();
+        List<Element> targetList = elements.ToList();
+        if (targetList.Count == 0)
+        {
+            return [];
+        }
+
+        HashSet<string>? commonNames = null;
+        foreach (Element element in targetList)
+        {
+            HashSet<string> elementNames = element.Parameters
+                .Cast<Parameter>()
+                .Where(parameter => !parameter.IsReadOnly && parameter.StorageType == StorageType.String)
+                .Select(parameter => parameter.Definition?.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Cast<string>()
+                .ToHashSet(StringComparer.CurrentCultureIgnoreCase);
+
+            commonNames = commonNames == null
+                ? elementNames
+                : commonNames.Intersect(elementNames, StringComparer.CurrentCultureIgnoreCase).ToHashSet(StringComparer.CurrentCultureIgnoreCase);
+
+            if (commonNames.Count == 0)
+            {
+                break;
+            }
+        }
+
+        return commonNames == null
+            ? []
+            : commonNames
+                .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
     }
 
     public IReadOnlyList<string> GetAccessoryTypeParameterNames(Document document, IEnumerable<Element> elements)
     {
         return elements
             .Where(element =>
-                element.Category?.Id.Value == (long)BuiltInCategory.OST_DuctAccessory ||
-                element.Category?.Id.Value == (long)BuiltInCategory.OST_PipeAccessory)
+                GetCategoryId(element) == (long)BuiltInCategory.OST_DuctAccessory ||
+                GetCategoryId(element) == (long)BuiltInCategory.OST_PipeAccessory)
             .Select(element => document.GetElement(element.GetTypeId()))
             .Where(typeElement => typeElement != null)
             .SelectMany(typeElement => typeElement!.Parameters.Cast<Parameter>())
@@ -77,20 +101,26 @@ public sealed class AccessoryTerminalNumberingService
         foreach (string systemAbbreviation in groups.Keys.OrderBy(key => key, StringComparer.CurrentCultureIgnoreCase))
         {
             SystemGroup group = groups[systemAbbreviation];
-            int currentNumber = options.StartNumber;
+            int currentNumber = options.UseLastProjectNumber
+                ? GetNextProjectNumber(document, options.TargetParameterName, systemAbbreviation)
+                : options.StartNumber;
 
             foreach (var pair in group.DuctAccessories.OrderBy(pair => pair.Key, AccessoryKeyComparer.Instance))
             {
                 string accessoryTypeValue = GetAccessoryTypeValue(document, pair.Value[0], options.AccessoryTypeParameterName);
                 string value = FormatAccessoryNumber(systemAbbreviation, options.DuctAccessoryPrefix, currentNumber, accessoryTypeValue);
+                int writtenCount = 0;
                 foreach (Element element in pair.Value)
                 {
-                    SetPositionNumber(element, options.TargetParameterName, value);
+                    if (TrySetPositionNumber(element, options.TargetParameterName, value))
+                    {
+                        writtenCount++;
+                    }
                 }
 
-                result.DuctAccessoryCount += pair.Value.Count;
-                result.TotalCount += pair.Value.Count;
-                result.SharedNumberCount += Math.Max(0, pair.Value.Count - 1);
+                result.DuctAccessoryCount += writtenCount;
+                result.TotalCount += writtenCount;
+                result.SharedNumberCount += Math.Max(0, writtenCount - 1);
                 currentNumber++;
             }
 
@@ -98,40 +128,99 @@ public sealed class AccessoryTerminalNumberingService
             {
                 string accessoryTypeValue = GetAccessoryTypeValue(document, pair.Value[0], options.AccessoryTypeParameterName);
                 string value = FormatAccessoryNumber(systemAbbreviation, options.PipeAccessoryPrefix, currentNumber, accessoryTypeValue);
+                int writtenCount = 0;
                 foreach (Element element in pair.Value)
                 {
-                    SetPositionNumber(element, options.TargetParameterName, value);
+                    if (TrySetPositionNumber(element, options.TargetParameterName, value))
+                    {
+                        writtenCount++;
+                    }
                 }
 
-                result.PipeAccessoryCount += pair.Value.Count;
-                result.TotalCount += pair.Value.Count;
-                result.SharedNumberCount += Math.Max(0, pair.Value.Count - 1);
+                result.PipeAccessoryCount += writtenCount;
+                result.TotalCount += writtenCount;
+                result.SharedNumberCount += Math.Max(0, writtenCount - 1);
                 currentNumber++;
             }
 
             foreach (var pair in group.Terminals.OrderBy(pair => pair.Key, AirTerminalKeyComparer.Instance))
             {
-                string value = $"{options.TerminalPrefix}.{currentNumber}";
+                string value = BuildTerminalNumber(systemAbbreviation, options.TerminalPrefix, currentNumber);
+                int writtenCount = 0;
                 foreach (Element element in pair.Value)
                 {
-                    SetPositionNumber(element, options.TargetParameterName, value);
+                    if (TrySetPositionNumber(element, options.TargetParameterName, value))
+                    {
+                        writtenCount++;
+                    }
                 }
 
-                result.TerminalCount += pair.Value.Count;
-                result.TotalCount += pair.Value.Count;
-                result.SharedNumberCount += Math.Max(0, pair.Value.Count - 1);
+                result.TerminalCount += writtenCount;
+                result.TotalCount += writtenCount;
+                result.SharedNumberCount += Math.Max(0, writtenCount - 1);
                 currentNumber++;
             }
         }
 
         transaction.Commit();
         result.Messages.Add("Pominieto typy z Manufacturer = 'FabricAir'.");
+        if (result.TotalCount == 0)
+        {
+            result.Messages.Add("Nie zapisano zadnej wartosci. Wybrany parametr docelowy nie byl dostepny do zapisu na elementach.");
+        }
+
         return result;
+    }
+
+    private static int GetNextProjectNumber(Document document, string targetParameterName, string systemAbbreviation)
+    {
+        int maxNumber = 0;
+
+        IEnumerable<Element> elements = new FilteredElementCollector(document)
+            .WhereElementIsNotElementType()
+            .Where(IsSupported);
+
+        foreach (Element element in elements)
+        {
+            if (!string.Equals(GetSystemAbbreviation(document, element), systemAbbreviation, StringComparison.CurrentCultureIgnoreCase))
+            {
+                continue;
+            }
+
+            Parameter? parameter = element.LookupParameter(targetParameterName);
+            string text = (parameter?.AsString() ?? parameter?.AsValueString() ?? string.Empty).Trim();
+            int? parsed = ExtractLastNumber(text);
+            if (parsed.HasValue && parsed.Value > maxNumber)
+            {
+                maxNumber = parsed.Value;
+            }
+        }
+
+        return maxNumber + 1;
+    }
+
+    private static int? ExtractLastNumber(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        string[] parts = text.Split(['.', '-', '/', ' ', '_'], StringSplitOptions.RemoveEmptyEntries);
+        for (int index = parts.Length - 1; index >= 0; index--)
+        {
+            if (int.TryParse(parts[index], out int value))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 
     private static bool IsSupported(Element? element)
     {
-        long? categoryId = element?.Category?.Id.Value;
+        long? categoryId = GetCategoryId(element);
         return categoryId == (long)BuiltInCategory.OST_DuctAccessory ||
                categoryId == (long)BuiltInCategory.OST_PipeAccessory ||
                categoryId == (long)BuiltInCategory.OST_DuctTerminal;
@@ -150,7 +239,7 @@ public sealed class AccessoryTerminalNumberingService
                 groups[systemAbbreviation] = group;
             }
 
-            long? categoryId = element.Category?.Id.Value;
+            long? categoryId = GetCategoryId(element);
             if (categoryId == (long)BuiltInCategory.OST_DuctAccessory)
             {
                 AccessoryKey key = new(GetText(element, "Size"), GetTypeName(document, element));
@@ -230,6 +319,22 @@ public sealed class AccessoryTerminalNumberingService
         return parts.Count == 0 ? number.ToString() : $"{string.Join(".", parts)}.{number}";
     }
 
+    private static string BuildTerminalNumber(string systemAbbreviation, string prefix, int number)
+    {
+        List<string> parts = [];
+        if (!string.IsNullOrWhiteSpace(systemAbbreviation))
+        {
+            parts.Add(systemAbbreviation);
+        }
+
+        if (!string.IsNullOrWhiteSpace(prefix))
+        {
+            parts.Add(prefix);
+        }
+
+        return parts.Count == 0 ? number.ToString() : $"{string.Join(".", parts)}.{number}";
+    }
+
     private static string GetSystemAbbreviation(Document document, Element element)
     {
         try
@@ -248,10 +353,25 @@ public sealed class AccessoryTerminalNumberingService
         MEPSystem? system = null;
         if (element is FamilyInstance familyInstance)
         {
-            system = familyInstance.MEPModel?.ConnectorManager?.Connectors
-                .Cast<Connector>()
-                .Select(connector => connector.MEPSystem)
-                .FirstOrDefault(candidate => candidate != null);
+            try
+            {
+                ConnectorSet? connectors = familyInstance.MEPModel?.ConnectorManager?.Connectors;
+                if (connectors != null)
+                {
+                    foreach (Connector connector in connectors)
+                    {
+                        MEPSystem? candidate = connector?.MEPSystem;
+                        if (candidate != null)
+                        {
+                            system = candidate;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
 
         if (system == null)
@@ -283,15 +403,16 @@ public sealed class AccessoryTerminalNumberingService
         return (parameter.AsString() ?? parameter.AsValueString() ?? string.Empty).Trim();
     }
 
-    private static void SetPositionNumber(Element element, string targetParameterName, string value)
+    private static bool TrySetPositionNumber(Element element, string targetParameterName, string value)
     {
         Parameter? parameter = element.LookupParameter(targetParameterName);
         if (parameter == null || parameter.IsReadOnly || parameter.StorageType != StorageType.String)
         {
-            return;
+            return false;
         }
 
         parameter.Set(value);
+        return true;
     }
 
     private sealed class SystemGroup
@@ -373,5 +494,10 @@ public sealed class AccessoryTerminalNumberingService
 
             return string.Compare(x.Airflow ?? string.Empty, y.Airflow ?? string.Empty, StringComparison.CurrentCultureIgnoreCase);
         }
+    }
+
+    private static long? GetCategoryId(Element? element)
+    {
+        return element?.Category?.Id?.Value;
     }
 }

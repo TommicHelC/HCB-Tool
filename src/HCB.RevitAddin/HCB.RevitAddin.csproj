@@ -87,6 +87,9 @@
     <Compile Include="Features\BatchAddSharedFamilyParameters\Models\FamilyParameterGroupOption.cs" />
     <Compile Include="Features\BatchAddSharedFamilyParameters\Models\SharedParameterDefinitionItem.cs" />
     <Compile Include="Features\BatchAddSharedFamilyParameters\UI\BatchAddSharedFamilyParametersWindow.xaml.cs" />
+    <Compile Include="Features\CadLinkGraphicsCopy\CadLinkGraphicsCopyCommand.cs" />
+    <Compile Include="Features\CadLinkGraphicsCopy\CadLinkGraphicsCopyService.cs" />
+    <Compile Include="Features\CadLinkGraphicsCopy\Models\CadLinkGraphicsCopyResult.cs" />
     <Compile Include="Features\RenameFamilyContent\RenameFamilyContentCommand.cs" />
     <Compile Include="Features\RenameFamilyContent\RenameFamilyContentService.cs" />
     <Compile Include="Features\RenameFamilyContent\Models\RenameFamilyContentResult.cs" />
@@ -122,6 +125,8 @@
     <Compile Include="Features\DuctFittingsArea\Models\DuctFittingsAreaResult.cs" />
     <Compile Include="Features\DuctFittingsArea\UI\DuctFittingsAreaOptionsWindow.xaml.cs" />
     <Compile Include="Features\DuctFittingNumbering\DuctFittingNumberingCommand.cs" />
+    <Compile Include="Features\DuctFittingNumbering\DuctNumberingCommand.cs" />
+    <Compile Include="Features\DuctFittingNumbering\DuctFittingsNumberingCommand.cs" />
     <Compile Include="Features\DuctFittingNumbering\DuctFittingNumberingService.cs" />
     <Compile Include="Features\DuctFittingNumbering\Models\DuctFittingNumberingResult.cs" />
     <Compile Include="Features\DuctFittingNumbering\UI\DuctFittingNumberingWindow.xaml.cs" />
@@ -177,6 +182,11 @@
     <Compile Include="Features\SharedParameters\SharedParametersCommand.cs" />
     <Compile Include="Features\SharedParameters\SharedParametersService.cs" />
     <Compile Include="Features\SharedParameters\UI\SharedParametersWindow.xaml.cs" />
+    <Compile Include="Features\Splitter\Models\SplitterOptions.cs" />
+    <Compile Include="Features\Splitter\Models\SplitterResult.cs" />
+    <Compile Include="Features\Splitter\SplitterCommand.cs" />
+    <Compile Include="Features\Splitter\SplitterService.cs" />
+    <Compile Include="Features\Splitter\UI\SplitterWindow.xaml.cs" />
     <Compile Include="Features\SpaceParamLinked\Models\SpaceParamLinkedResult.cs" />
     <Compile Include="Features\SpaceParamLinked\SpaceParamLinkedCommand.cs" />
     <Compile Include="Features\SpaceParamLinked\SpaceParamLinkedService.cs" />
@@ -188,6 +198,7 @@
     <Compile Include="Features\SystemAssigner\SystemAssignerCommand.cs" />
     <Compile Include="Features\SystemAssigner\SystemAssignerService.cs" />
     <Compile Include="Features\TransferViewTemplates\Models\TransferViewTemplatesResult.cs" />
+    <Compile Include="Features\TransferViewTemplates\TransferScheduleTemplatesCommand.cs" />
     <Compile Include="Features\TransferViewTemplates\TransferViewTemplatesCommand.cs" />
     <Compile Include="Features\TransferViewTemplates\TransferViewTemplatesService.cs" />
     <Compile Include="Features\TransferViewTemplates\UI\TransferViewTemplatesWindow.xaml.cs" />
@@ -236,6 +247,7 @@
     <Page Include="Features\Levels\UI\LevelsOptionsWindow.xaml" />
     <Page Include="Features\RenameMaterials\UI\RenameMaterialsPreviewWindow.xaml" />
     <Page Include="Features\SharedParameters\UI\SharedParametersWindow.xaml" />
+    <Page Include="Features\Splitter\UI\SplitterWindow.xaml" />
     <Page Include="Features\StylePreview\UI\StylePreviewWindow.xaml" />
     <Page Include="Features\TransferViewTemplates\UI\TransferViewTemplatesWindow.xaml" />
     <Page Include="Features\ViewFiltersBulkEdit\UI\ViewFiltersBulkEditWindow.xaml" />
@@ -289,15 +301,6 @@
 
   </Target>
 </Project>
-
-
-
-
-
-
-
-
-
 
 
 

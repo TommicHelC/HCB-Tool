@@ -20,7 +20,7 @@ public sealed class TransferViewTemplatesCommand : IExternalCommand
             return Result.Succeeded;
         }
 
-        TransferViewTemplatesWindow window = new(documents);
+        TransferViewTemplatesWindow window = new(documents, schedulesOnly: false);
         if (window.ShowDialog() != true || window.SourceDocument == null || window.TargetDocument == null)
         {
             return Result.Cancelled;
