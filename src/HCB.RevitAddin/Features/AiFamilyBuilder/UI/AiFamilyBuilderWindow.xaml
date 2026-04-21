@@ -1,0 +1,74 @@
+<Window x:Class="HCB.RevitAddin.Features.AiFamilyBuilder.UI.AiFamilyBuilderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="AI Family Builder"
+        Width="1120"
+        Height="900"
+        MinWidth="980"
+        MinHeight="780"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+        <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="AI Family Builder"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,16,0,12"
+                    Orientation="Horizontal">
+            <Button Width="140"
+                    Margin="0,0,8,0"
+                    Content="Wczytaj plik"
+                    Click="LoadFileButton_OnClick" />
+            <Button Width="160"
+                    Margin="0,0,8,0"
+                    Content="Validate JSON"
+                    Click="ValidateJsonButton_OnClick" />
+            <Button Width="160"
+                    Margin="0,0,8,0"
+                    Content="Format JSON"
+                    Click="FormatJsonButton_OnClick" />
+            <Button Width="160"
+                    Margin="0,0,12,0"
+                    Content="Wstaw przyklad"
+                    Click="InsertSampleButton_OnClick" />
+            <TextBlock VerticalAlignment="Center"
+                       TextWrapping="Wrap"
+                       Style="{StaticResource StatusTextStyle}"
+                       Text="MVP obsluguje parametry family/shared, typy oraz extrusion_rectangle. Dlugosci w JSON podawaj w milimetrach." />
+        </StackPanel>
+
+        <TextBox x:Name="JsonTextBox"
+                 Grid.Row="2"
+                 Padding="10"
+                 AcceptsReturn="True"
+                 AcceptsTab="True"
+                 HorizontalScrollBarVisibility="Auto"
+                 VerticalScrollBarVisibility="Auto"
+                 TextWrapping="NoWrap"
+                 FontFamily="Consolas"
+                 FontSize="14" />
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Grid.Row="3"
+                                  Margin="0,16,0,0"
+                                  PrimaryButtonText="Build"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="ConfirmButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </Grid>
+</Window>

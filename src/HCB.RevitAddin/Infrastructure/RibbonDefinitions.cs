@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace HCB.RevitAddin
@@ -41,8 +41,6 @@ namespace HCB.RevitAddin
                                     "Masowo zmienia stan i widocznosc wspolnych filtrow na wielu widokach.",
                                     "Co robi: masowo zmienia stan i widocznosc wspolnych filtrow na wielu widokach. Jak uzyc: 1. Wybierz widoki. 2. Zaznacz wspolne filtry. 3. Ustaw akcje, np. ON, OFF albo ukrycie. Zakres: szybkie porzadkowanie wielu widokow jednoczesnie.")
                             ]),
-                        new RibbonStackDefinition(
-                            [
                                 new RibbonPushButtonDefinition(
                                     "HcbLevelsButton",
                                     "Levels",
@@ -119,13 +117,6 @@ namespace HCB.RevitAddin
                                             null,
                                             "Resources\\Ribbon\\Numbering\\MepItems")
                                     ])
-                            ]),
-                        new RibbonPushButtonDefinition(
-                            "HcbEstimateButton",
-                            "Estimate",
-                            typeof(Features.Estimate.EstimateCommand),
-                            "Wylicza ceny jednostkowe i koszty elementow wentylacji wedlug pliku cennika.",
-                            "Co robi: wylicza ceny jednostkowe i koszty elementow wentylacji. Jak uzyc: 1. Wskaz plik cennika albo uzyj domyslnej konfiguracji. 2. Uruchom przeliczenie. 3. Sprawdz raport dopasowan. Zakres: zapisuje HC_Cena_Jednostkowa oraz HC_Koszt dla obslugiwanych elementow wentylacji.")
                     ]),
                 new RibbonPanelDefinition(
                     "HVAC",
@@ -152,54 +143,57 @@ namespace HCB.RevitAddin
                                     "Co robi: uzupelnia LIN_ROOM_* na podstawie wszystkich lokalnych przestrzeni MEP w modelu. Jak uzyc: 1. Otworz odpowiedni widok. 2. Uruchom narzedzie. 3. Zapisz wynik. Zakres: wszystkie spaces w modelu oraz elementy z obslugiwanych kategorii. Uwagi: to alternatywa dla pracy na roomach z linku.")
                             ])
                         ,
-                        new RibbonStackDefinition(
+                        new RibbonPushButtonDefinition(
+                            "HcbColorUniqueSystemsButton",
+                            "Unique Colors",
+                            typeof(Features.ColorUniqueSystems.ColorUniqueSystemsCommand),
+                            "Naklada kolory dla wybranych systemow wentylacyjnych i rurowych z konfiguracji CSV.",
+                            "Co robi: naklada kolory na wybrane systemy wentylacyjne i rurowe. Jak uzyc: 1. Uruchom narzedzie w aktywnym widoku. 2. Wybierz systemy z pliku CSV. 3. Zatwierdz nadpisania. Zakres: tylko aktywny widok."),
+                        new RibbonPushButtonDefinition(
+                            "HcbFlowChangerButton",
+                            "Flow",
+                            typeof(Features.FlowChanger.FlowChangerCommand),
+                            "Losowo roznicuje przeplywy dla terminali w aktywnym widoku.",
+                            "Co robi: losowo roznicuje przeplywy dla terminali. Jak uzyc: 1. Uruchom narzedzie w aktywnym widoku. 2. Wybierz parametr docelowy i zakres zmiany. 3. Zatwierdz. Zakres: szybkie testowanie wariantow przeplywu na terminalach."),
+                        new RibbonPulldownDefinition(
+                            "HcbHvacToolsPulldown",
+                            "HVAC Tools",
+                            typeof(Features.FittingsAngle.FittingsAngleCommand),
+                            null,
+                            "Dodatkowe narzedzia pomocnicze dla elementow HVAC i MEP.",
+                            "Co zawiera: narzedzia pomocnicze dla HVAC i MEP. Jak uzyc: wybierz polecenie zalezne od zadania, np. kat, poziom, system albo masa. Zakres: operacje na wskazanych elementach albo obslugiwanych kategoriach.",
                             [
                                 new RibbonPushButtonDefinition(
-                                    "HcbColorUniqueSystemsButton",
-                                    "Unique Colors",
-                                    typeof(Features.ColorUniqueSystems.ColorUniqueSystemsCommand),
-                                    "Naklada kolory dla wybranych systemow wentylacyjnych i rurowych z konfiguracji CSV.",
-                                    "Co robi: naklada kolory na wybrane systemy wentylacyjne i rurowe. Jak uzyc: 1. Uruchom narzedzie w aktywnym widoku. 2. Wybierz systemy z pliku CSV. 3. Zatwierdz nadpisania. Zakres: tylko aktywny widok."),
-                                new RibbonPushButtonDefinition(
-                                    "HcbFlowChangerButton",
-                                    "Flow",
-                                    typeof(Features.FlowChanger.FlowChangerCommand),
-                                    "Losowo roznicuje przeplywy dla terminali w aktywnym widoku.",
-                                    "Co robi: losowo roznicuje przeplywy dla terminali. Jak uzyc: 1. Uruchom narzedzie w aktywnym widoku. 2. Wybierz parametr docelowy i zakres zmiany. 3. Zatwierdz. Zakres: szybkie testowanie wariantow przeplywu na terminalach."),
-                                new RibbonPulldownDefinition(
-                                    "HcbHvacToolsPulldown",
-                                    "HVAC Tools",
+                                    "HcbFittingsAngleButton",
+                                    "Fittings Angle",
                                     typeof(Features.FittingsAngle.FittingsAngleCommand),
-                                    null,
-                                    "Dodatkowe narzedzia pomocnicze dla elementow HVAC i MEP.",
-                                    "Co zawiera: narzedzia pomocnicze dla HVAC i MEP. Jak uzyc: wybierz polecenie zalezne od zadania, np. kat, poziom, system albo masa. Zakres: operacje na wskazanych elementach albo obslugiwanych kategoriach.",
-                                    [
-                                        new RibbonPushButtonDefinition(
-                                            "HcbFittingsAngleButton",
-                                            "Fittings Angle",
-                                            typeof(Features.FittingsAngle.FittingsAngleCommand),
-                                            "Kopiuje i zaokragla katy ksztaltek do parametru HC_Kat.",
-                                            "Co robi: kopiuje i zaokragla katy ksztaltek do HC_Kat. Jak uzyc: 1. Zaznacz ksztaltki albo pozwol narzedziu pobrac obslugiwane elementy. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: prostokatne ksztaltki kanalowe sa zaokraglane do 1 stopnia, pozostale do 5 stopni."),
-                                        new RibbonPushButtonDefinition(
-                                            "HcbLevelFromHvacButton",
-                                            "Level From HVAC",
-                                            typeof(Features.LevelFromHVACElements.LevelFromHVACElementsCommand),
-                                            "Kopiuje Level lub Reference Level do wybranego parametru instancyjnego.",
-                                            "Co robi: kopiuje Level albo Reference Level do wybranego parametru. Jak uzyc: 1. Zaznacz elementy HVAC. 2. Wybierz parametr docelowy. 3. Zatwierdz. Zakres: tylko zaznaczenie; obsluguje parametry String i ElementId."),
-                                        new RibbonPushButtonDefinition(
-                                            "HcbSystemAssignerButton",
-                                            "System Assigner",
-                                            typeof(Features.SystemAssigner.SystemAssignerCommand),
-                                            "Propaguje wartosc HC_System z urzadzenia na elementy przypisanych systemow.",
-                                            "Co robi: propaguje wartosc parametru z urzadzenia na elementy przypisanych systemow. Jak uzyc: 1. Zaznacz Mechanical Equipment. 2. Wybierz parametr do propagacji. 3. Zatwierdz. Zakres: dobrze polaczone systemy przypisane do wskazanych urzadzen."),
-                                        new RibbonPushButtonDefinition(
-                                            "HcbMassOfDuctsFittingsButton",
-                                            "Mass",
-                                            typeof(Features.MassOfDuctsFittings.MassOfDuctsFittingsCommand),
-                                            "Oblicza HC_Masa dla kanalow, ksztaltek i akcesoriow wentylacyjnych.",
-                                            "Co robi: oblicza HC_Masa dla kanalow, ksztaltek i akcesoriow wentylacyjnych. Jak uzyc: 1. Wybierz parametr docelowy, jesli jest wymagany. 2. Uruchom obliczenie. 3. Zapisz wynik. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia zbiera obslugiwane elementy wentylacyjne z projektu.")
-                                    ])
+                                    "Kopiuje i zaokragla katy ksztaltek do parametru HC_Kat.",
+                                    "Co robi: kopiuje i zaokragla katy ksztaltek do HC_Kat. Jak uzyc: 1. Zaznacz ksztaltki albo pozwol narzedziu pobrac obslugiwane elementy. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: prostokatne ksztaltki kanalowe sa zaokraglane do 1 stopnia, pozostale do 5 stopni."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbLevelFromHvacButton",
+                                    "Level From HVAC",
+                                    typeof(Features.LevelFromHVACElements.LevelFromHVACElementsCommand),
+                                    "Kopiuje Level lub Reference Level do wybranego parametru instancyjnego.",
+                                    "Co robi: kopiuje Level albo Reference Level do wybranego parametru. Jak uzyc: 1. Zaznacz elementy HVAC. 2. Wybierz parametr docelowy. 3. Zatwierdz. Zakres: tylko zaznaczenie; obsluguje parametry String i ElementId."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbSystemAssignerButton",
+                                    "System Assigner",
+                                    typeof(Features.SystemAssigner.SystemAssignerCommand),
+                                    "Propaguje wartosc HC_System z urzadzenia na elementy przypisanych systemow.",
+                                    "Co robi: propaguje wartosc parametru z urzadzenia na elementy przypisanych systemow. Jak uzyc: 1. Zaznacz Mechanical Equipment. 2. Wybierz parametr do propagacji. 3. Zatwierdz. Zakres: dobrze polaczone systemy przypisane do wskazanych urzadzen."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbMassOfDuctsFittingsButton",
+                                    "Mass",
+                                    typeof(Features.MassOfDuctsFittings.MassOfDuctsFittingsCommand),
+                                    "Oblicza HC_Masa dla kanalow, ksztaltek i akcesoriow wentylacyjnych.",
+                                    "Co robi: oblicza HC_Masa dla kanalow, ksztaltek i akcesoriow wentylacyjnych. Jak uzyc: 1. Wybierz parametr docelowy, jesli jest wymagany. 2. Uruchom obliczenie. 3. Zapisz wynik. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia zbiera obslugiwane elementy wentylacyjne z projektu.")
                             ]),
+                        new RibbonPushButtonDefinition(
+                            "HcbEstimateButton",
+                            "Estimate",
+                            typeof(Features.Estimate.EstimateCommand),
+                            "Wylicza ceny jednostkowe i koszty elementow wentylacji wedlug pliku cennika.",
+                            "Co robi: wylicza ceny jednostkowe i koszty elementow wentylacji. Jak uzyc: 1. Wskaz plik cennika albo uzyj domyslnej konfiguracji. 2. Uruchom przeliczenie. 3. Sprawdz raport dopasowan. Zakres: zapisuje HC_Cena_Jednostkowa oraz HC_Koszt dla obslugiwanych elementow wentylacji."),
                         new RibbonPushButtonDefinition(
                             "HcbSplitterButton",
                             "Splitter",
@@ -348,15 +342,35 @@ namespace HCB.RevitAddin
                                     typeof(Features.SharedParameters.SharedParametersCommand),
                                     "Resources\\Ribbon\\Parameters",
                                     "Narzedzia do pracy z parametrami projektu.",
-                                    "Co zawiera: narzedzia do sprawdzania i uzupelniania parametrow wspoldzielonych. Jak uzyc: wybierz odpowiednie polecenie po ustawieniu poprawnego pliku Shared Parameters. Zakres: parametry HC_* w projekcie.",
+                                    "Co zawiera: narzedzia do sprawdzania, uzupelniania i przeliczania parametrow projektu. Jak uzyc: wybierz odpowiednie polecenie po ustawieniu poprawnego pliku Shared Parameters albo po wskazaniu parametrow do obliczen. Zakres: parametry HC_* i inne parametry liczbowe w projekcie.",
                                     [
                                         new RibbonPushButtonDefinition(
                                             "HcbSharedParametersButton",
                                             "Shared Params",
                                             typeof(Features.SharedParameters.SharedParametersCommand),
                                             "Sprawdza i wczytuje wymagane parametry wspoldzielone.",
-                                            "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu.")
+                                            "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu."),
+                                        new RibbonPushButtonDefinition(
+                                            "HcbParameterCalculatorButton",
+                                            "Calculator",
+                                            typeof(Features.ParameterCalculator.ParameterCalculatorCommand),
+                                            "Wykonuje dzialania matematyczne na wybranych parametrach liczbowych i zapisuje wynik do wskazanego parametru.",
+                                            "Co robi: wykonuje obliczenia na co najmniej dwoch parametrach liczbowych typu Double albo Integer i zapisuje wynik do wybranego parametru. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz parametry zrodlowe, operator oraz parametr docelowy. 3. Ustaw liczbe miejsc po przecinku i uruchom obliczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia analizuje caly model, a elementy bez wszystkich wybranych parametrow sa automatycznie pomijane."),
+                                        new RibbonPushButtonDefinition(
+                                            "HcbParameterClearButton",
+                                            "Clear Param",
+                                            typeof(Features.ParameterClear.ParameterClearCommand),
+                                            "Usuwa wartosci z wybranego parametru tekstowego dla zaznaczenia, kategorii albo calego modelu.",
+                                            "Co robi: czysci wartosci wybranego parametru tekstowego. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz zakres, parametr i ewentualnie kategorie. 3. Potwierdz wyczyszczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia moze pracowac na wybranej kategorii albo w calym modelu dla elementow, ktore maja ten parametr.")
                                     ]),
+                                new RibbonPushButtonDefinition(
+                                    "HcbAiFamilyBuilderButton",
+                                    "AI Family",
+                                    typeof(Features.AiFamilyBuilder.AiFamilyBuilderCommand),
+                                    "Buduje parametry, typy i podstawowa geometrie rodziny na podstawie opisu JSON.",
+                                    "Co robi: czyta opis JSON i dodaje parametry, typy oraz prosta geometrie w otwartym dokumencie rodziny. Jak uzyc: 1. Otworz nowa rodzine na poprawnym szablonie. 2. Wklej JSON wygenerowany przez AI. 3. Uruchom budowanie. Zakres: dokument rodziny; MVP obsluguje family/shared parameters, typy i extrusion_rectangle.",
+                                    typeof(FamilyDocumentCommandAvailability),
+                                    "Resources\\Ribbon\\Parameters"),
                                 new RibbonPushButtonDefinition(
                                     "HcbPurgeAnnotationsButton",
                                     "Purge Anno",
@@ -411,6 +425,7 @@ namespace HCB.RevitAddin
     internal sealed record RibbonStackDefinition(
         IReadOnlyList<RibbonStackItemDefinition> Items) : RibbonItemDefinition;
 }
+
 
 
 

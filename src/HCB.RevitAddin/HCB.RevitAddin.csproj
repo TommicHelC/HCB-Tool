@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configurations>Debug R25;Debug R25 Deploy;Debug R26;Debug R26 Deploy;Release R25;Release R26</Configurations>
     <RevitVersion Condition="'$(RevitVersion)' == '' and $(Configuration.Contains('R25'))">2025</RevitVersion>
@@ -100,6 +100,14 @@
     <Compile Include="Features\AccessoryTerminalNumbering\Models\AccessoryTerminalNumberingOptions.cs" />
     <Compile Include="Features\AccessoryTerminalNumbering\Models\AccessoryTerminalNumberingResult.cs" />
     <Compile Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml.cs" />
+    <Compile Include="Features\AiFamilyBuilder\AiFamilyBuilderCommand.cs" />
+    <Compile Include="Features\AiFamilyBuilder\AiFamilyBuilderService.cs" />
+    <Compile Include="Features\AiFamilyBuilder\AiFamilyBuilderValidationService.cs" />
+    <Compile Include="Features\AiFamilyBuilder\Models\AiFamilyBuilderOptions.cs" />
+    <Compile Include="Features\AiFamilyBuilder\Models\AiFamilyBuilderResult.cs" />
+    <Compile Include="Features\AiFamilyBuilder\Models\AiFamilyBuilderValidationResult.cs" />
+    <Compile Include="Features\AiFamilyBuilder\Models\FamilyDefinitionSpec.cs" />
+    <Compile Include="Features\AiFamilyBuilder\UI\AiFamilyBuilderWindow.xaml.cs" />
     <Compile Include="Features\CopyFilters\CopyFiltersCommand.cs" />
     <Compile Include="Features\CopyFilters\CopyFiltersService.cs" />
     <Compile Include="Features\CopyFilters\Models\CopyFiltersResult.cs" />
@@ -162,6 +170,19 @@
     <Compile Include="Features\NumberingSystemElements\Models\NumberingSystemElementsResult.cs" />
     <Compile Include="Features\NumberingSystemElements\NumberingSystemElementsCommand.cs" />
     <Compile Include="Features\NumberingSystemElements\NumberingSystemElementsService.cs" />
+    <Compile Include="Features\ParameterCalculator\Models\FormulaOperand.cs" />
+    <Compile Include="Features\ParameterCalculator\Models\ParameterCalculatorOptions.cs" />
+    <Compile Include="Features\ParameterCalculator\Models\ParameterCalculatorResult.cs" />
+    <Compile Include="Features\ParameterCalculator\ParameterCalculatorCommand.cs" />
+    <Compile Include="Features\ParameterCalculator\ParameterCalculatorService.cs" />
+    <Compile Include="Features\ParameterCalculator\UI\ParameterCalculatorWindow.xaml.cs" />
+    <Compile Include="Features\ParameterClear\Models\ParameterClearCatalog.cs" />
+    <Compile Include="Features\ParameterClear\Models\ParameterClearOptions.cs" />
+    <Compile Include="Features\ParameterClear\Models\ParameterClearResult.cs" />
+    <Compile Include="Features\ParameterClear\Models\ParameterClearScope.cs" />
+    <Compile Include="Features\ParameterClear\ParameterClearCommand.cs" />
+    <Compile Include="Features\ParameterClear\ParameterClearService.cs" />
+    <Compile Include="Features\ParameterClear\UI\ParameterClearWindow.xaml.cs" />
     <Compile Include="Features\PurgeAnnotations\Models\PurgeAnnotationsResult.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsCommand.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsService.cs" />
@@ -221,7 +242,11 @@
     <Compile Include="Features\ViewsDuplicate\ViewsDuplicateCommand.cs" />
     <Compile Include="Features\ViewsDuplicate\ViewsDuplicateService.cs" />
     <Compile Include="ImageLoader.cs" />
+    <Compile Include="Infrastructure\Mcp\McpExternalEventHandler.cs" />
+    <Compile Include="Infrastructure\Mcp\McpHttpServer.cs" />
+    <Compile Include="Infrastructure\Mcp\McpCommandDispatcher.cs" />
     <Compile Include="Infrastructure\AlwaysAvailableCommandAvailability.cs" />
+    <Compile Include="Infrastructure\FamilyDocumentCommandAvailability.cs" />
     <Compile Include="Infrastructure\RibbonDefinitions.cs" />
     <Compile Include="Infrastructure\RibbonBuilder.cs" />
     <Compile Include="Infrastructure\RibbonIconResolver.cs" />
@@ -240,11 +265,14 @@
     <Page Include="Features\CopyFilters\UI\CopyFiltersWindow.xaml" />
     <Page Include="Features\ColorVentSystems\UI\ColorSetSystemsOptionsWindow.xaml" />
     <Page Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml" />
+    <Page Include="Features\AiFamilyBuilder\UI\AiFamilyBuilderWindow.xaml" />
     <Page Include="Features\DuctFittingNumbering\UI\DuctFittingNumberingWindow.xaml" />
     <Page Include="Features\DuctFittingsArea\UI\DuctFittingsAreaOptionsWindow.xaml" />
     <Page Include="Features\Estimate\UI\EstimateOptionsWindow.xaml" />
     <Page Include="Features\FlowChanger\UI\FlowChangerOptionsWindow.xaml" />
     <Page Include="Features\Levels\UI\LevelsOptionsWindow.xaml" />
+    <Page Include="Features\ParameterCalculator\UI\ParameterCalculatorWindow.xaml" />
+    <Page Include="Features\ParameterClear\UI\ParameterClearWindow.xaml" />
     <Page Include="Features\RenameMaterials\UI\RenameMaterialsPreviewWindow.xaml" />
     <Page Include="Features\SharedParameters\UI\SharedParametersWindow.xaml" />
     <Page Include="Features\Splitter\UI\SplitterWindow.xaml" />
@@ -301,6 +329,7 @@
 
   </Target>
 </Project>
+
 
 
 
