@@ -311,9 +311,6 @@
     <Compile Include="Features\ViewsDuplicate\ViewsDuplicateCommand.cs" />
     <Compile Include="Features\ViewsDuplicate\ViewsDuplicateService.cs" />
     <Compile Include="ImageLoader.cs" />
-    <Compile Include="Infrastructure\Mcp\McpExternalEventHandler.cs" />
-    <Compile Include="Infrastructure\Mcp\McpHttpServer.cs" />
-    <Compile Include="Infrastructure\Mcp\McpCommandDispatcher.cs" />
     <Compile Include="Infrastructure\AlwaysAvailableCommandAvailability.cs" />
     <Compile Include="Infrastructure\FamilyDocumentCommandAvailability.cs" />
     <Compile Include="Infrastructure\RibbonDefinitions.cs" />
