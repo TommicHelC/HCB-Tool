@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Autodesk.Revit.UI;
-using HCB.RevitAddin.Infrastructure.Mcp;
 
 namespace HCB.RevitAddin
 {
@@ -9,38 +8,15 @@ namespace HCB.RevitAddin
         private Queue<RibbonPanelDefinition>? _pendingPanels;
         private bool _tabCreated;
 
-        // MCP — most między Claude CLI a Revitem
-        private McpExternalEventHandler? _mcpEventHandler;
-        private ExternalEvent? _mcpExternalEvent;
-        private McpHttpServer? _mcpHttpServer;
-
         public Result OnStartup(UIControlledApplication application)
         {
             _pendingPanels = new Queue<RibbonPanelDefinition>(RibbonDefinitions.Create(ParseRevitVersion(application)));
             application.Idling += (sender, _) => OnApplicationIdling(application);
-
-            // Inicjalizacja serwera MCP
-            try
-            {
-                _mcpEventHandler = new McpExternalEventHandler();
-                _mcpExternalEvent = ExternalEvent.Create(_mcpEventHandler);
-                var dispatcher = new McpCommandDispatcher(_mcpEventHandler, _mcpExternalEvent);
-                _mcpHttpServer = new McpHttpServer(dispatcher);
-                _mcpHttpServer.Start();
-            }
-            catch (System.Exception ex)
-            {
-                // MCP to opcjonalna funkcja — nie blokujemy startu wtyczki w razie błędu
-                System.Diagnostics.Trace.WriteLine($"[HCB MCP] Nie udało się uruchomić serwera MCP: {ex.Message}");
-            }
-
             return Result.Succeeded;
         }
 
         public Result OnShutdown(UIControlledApplication application)
         {
-            _mcpHttpServer?.Stop();
-            _mcpHttpServer?.Dispose();
             return Result.Succeeded;
         }
 
@@ -82,4 +58,3 @@ namespace HCB.RevitAddin
         }
     }
 }
-
