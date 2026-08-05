@@ -1,0 +1,29 @@
+{
+  "schema": "hcb.ai_family_builder.v3",
+  "meta": {
+    "schema_version": "3.0",
+    "family_name": "Box_600x300x200",
+    "category_hint": "OST_GenericModel",
+    "template_hint": "Metric Generic Model"
+  },
+  "builder": { "name": "GenericBoxBuilder", "domain": "generic" },
+  "parameters": [
+    { "name": "Width", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" },
+    { "name": "Height", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" },
+    { "name": "Depth", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" }
+  ],
+  "types": [
+    { "name": "600x300x200", "values": { "Width": 600, "Height": 300, "Depth": 200 } },
+    { "name": "800x400x250", "values": { "Width": 800, "Height": 400, "Depth": 250 } }
+  ],
+  "geometry": [
+    {
+      "kind": "rectangular_prism",
+      "name": "Body",
+      "solid": true,
+      "width": { "ref": "Width" },
+      "height": { "ref": "Height" },
+      "depth": { "ref": "Depth" }
+    }
+  ]
+}

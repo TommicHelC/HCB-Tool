@@ -1,0 +1,230 @@
+{
+  "schema": "hcb.ai_family_builder.v3",
+  "meta": {
+    "schema_version": "3.0",
+    "family_name": "Wentylator_CF_100",
+    "category_hint": "OST_DuctAccessory",
+    "template_hint": "Metric Duct Accessory"
+  },
+  "builder": {
+    "name": "GenericBoxBuilder",
+    "domain": "hvac"
+  },
+  "parameters": [
+    {
+      "name": "D1",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "D2",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "A",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "B",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "C",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "H",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    },
+    {
+      "name": "E",
+      "source": "family",
+      "data_type": "length",
+      "group": "Geometry",
+      "scope": "type"
+    }
+  ],
+  "parameter_rules": [
+    {
+      "name": "D1",
+      "min": 50,
+      "max": 500,
+      "step": 1
+    },
+    {
+      "name": "D2",
+      "min": 50,
+      "max": 500,
+      "step": 1
+    },
+    {
+      "name": "A",
+      "min": 100,
+      "max": 1000,
+      "step": 1
+    },
+    {
+      "name": "B",
+      "min": 50,
+      "max": 500,
+      "step": 1
+    },
+    {
+      "name": "C",
+      "min": 50,
+      "max": 800,
+      "step": 1
+    },
+    {
+      "name": "H",
+      "min": 20,
+      "max": 500,
+      "step": 1
+    },
+    {
+      "name": "E",
+      "min": 10,
+      "max": 300,
+      "step": 1
+    }
+  ],
+  "types": [
+    {
+      "name": "CF 100",
+      "values": {
+        "D1": 100,
+        "D2": 100,
+        "A": 208,
+        "B": 128,
+        "C": 161,
+        "H": 115,
+        "E": 50
+      }
+    }
+  ],
+  "geometry": [
+    {
+      "kind": "circular_extrusion",
+      "name": "Korpus_okragly",
+      "solid": true,
+      "placement": {
+        "work_plane": "xz"
+      },
+      "radius": {
+        "expr": "A / 2"
+      },
+      "depth": {
+        "ref": "B"
+      },
+      "offsets": {
+        "start": {
+          "expr": "-B / 2"
+        }
+      }
+    },
+    {
+      "kind": "circular_extrusion",
+      "name": "Krociec_D1_gorny",
+      "solid": true,
+      "placement": {
+        "work_plane": "xy"
+      },
+      "radius": {
+        "expr": "D1 / 2"
+      },
+      "depth": {
+        "ref": "E"
+      },
+      "offsets": {
+        "start": {
+          "expr": "C / 2"
+        }
+      }
+    },
+    {
+      "kind": "circular_extrusion",
+      "name": "Krociec_D2_dolny",
+      "solid": true,
+      "placement": {
+        "work_plane": "xy"
+      },
+      "radius": {
+        "expr": "D2 / 2"
+      },
+      "depth": {
+        "ref": "E"
+      },
+      "offsets": {
+        "start": {
+          "expr": "-C / 2 - E"
+        }
+      }
+    }
+  ],
+  "connectors": [
+    {
+      "name": "Kanal_D1",
+      "domain": "hvac",
+      "system_type": "SupplyAir",
+      "shape": "round",
+      "host": {
+        "geometry": "Krociec_D1_gorny",
+        "face": "top"
+      },
+      "size": {
+        "diameter": {
+          "ref": "D1"
+        }
+      },
+      "direction": "in",
+      "is_primary": true,
+      "linked_to": "Kanal_D2"
+    },
+    {
+      "name": "Kanal_D2",
+      "domain": "hvac",
+      "system_type": "SupplyAir",
+      "shape": "round",
+      "host": {
+        "geometry": "Krociec_D2_dolny",
+        "face": "bottom"
+      },
+      "size": {
+        "diameter": {
+          "ref": "D2"
+        }
+      },
+      "direction": "out",
+      "is_primary": false,
+      "linked_to": "Kanal_D1"
+    }
+  ],
+  "flex_tests": [
+    {
+      "name": "CF 100 nominal",
+      "type_name": "CF 100"
+    }
+  ],
+  "validation": {
+    "run_framework_flex": true,
+    "run_final_flex": true,
+    "require_connectors": true
+  }
+}

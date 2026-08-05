@@ -1,58 +1,24 @@
 # AI Family Builder JSON Schema
 
-`AI Family Builder` dziala w juz otwartym dokumencie rodziny Revit. Uzytkownik najpierw otwiera odpowiedni szablon rodziny, a dopiero potem wkleja JSON wygenerowany przez AI.
+`AI Family Builder` dziala w juz otwartym dokumencie rodziny Revit. Narzedzie nie tworzy nowego pliku `.rfa` i nie zmienia szablonu rodziny.
 
-## Cel formatu
+## Zalecany Format
 
-JSON ma byc kontraktem wykonawczym, a nie luźnym opisem. Powinien byc deterministyczny, jednoznaczny i gotowy do walidacji.
-
-Sekcje glowne:
-
-- `meta`
-- `parameters`
-- `types`
-- `reference_planes`
-- `dimensions`
-- `geometry`
-
-## Przykladowy JSON v1.1
+Nowy format wykonawczy to `hcb.ai_family_builder.v2`. Jest kompatybilny z dotychczasowymi sekcjami, ale wymaga jawnych referencji do parametrow w geometrii parametrycznej.
 
 ```json
 {
+  "schema": "hcb.ai_family_builder.v2",
   "meta": {
-    "schema_version": "1.1",
+    "schema_version": "2.0",
     "family_name": "Damper_600x300",
     "category_hint": "OST_DuctAccessory",
-    "template_hint": "Generic Model"
+    "template_hint": "Metric Generic Model"
   },
   "parameters": [
-    {
-      "name": "Width",
-      "kind": "family",
-      "spec_type": "length",
-      "group": "Geometry",
-      "is_instance": false
-    },
-    {
-      "name": "Height",
-      "kind": "family",
-      "spec_type": "length",
-      "group": "Geometry",
-      "is_instance": false
-    },
-    {
-      "name": "Depth",
-      "kind": "family",
-      "spec_type": "length",
-      "group": "Geometry",
-      "is_instance": false
-    },
-    {
-      "name": "HC_Code",
-      "kind": "shared",
-      "group": "IdentityData",
-      "is_instance": false
-    }
+    { "name": "Width", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" },
+    { "name": "Height", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" },
+    { "name": "Depth", "source": "family", "data_type": "length", "group": "Geometry", "scope": "type" }
   ],
   "types": [
     {
@@ -60,64 +26,47 @@ Sekcje glowne:
       "values": {
         "Width": 600,
         "Height": 300,
-        "Depth": 200,
-        "HC_Code": "DAM-600x300"
+        "Depth": 200
       }
     }
   ],
-  "reference_planes": [
-    { "name": "Left", "orientation": "vertical", "offset": -300 },
-    { "name": "Right", "orientation": "vertical", "offset": 300 },
-    { "name": "Bottom", "orientation": "horizontal", "offset": -150 },
-    { "name": "Top", "orientation": "horizontal", "offset": 150 }
-  ],
-  "dimensions": [
-    {
-      "name": "WidthDim",
-      "orientation": "horizontal",
-      "reference_a": "Left",
-      "reference_b": "Right",
-      "parameter": "Width",
-      "offset": -250
-    },
-    {
-      "name": "HeightDim",
-      "orientation": "vertical",
-      "reference_a": "Bottom",
-      "reference_b": "Top",
-      "parameter": "Height",
-      "offset": 450
-    }
-  ],
+  "reference_planes": [],
+  "constraints": [],
   "geometry": [
     {
-      "op": "extrusion_rectangle",
+      "kind": "rectangular_prism",
       "name": "Body",
-      "width": "Width",
-      "height": "Height",
-      "depth": "Depth"
+      "solid": true,
+      "width": { "ref": "Width" },
+      "height": { "ref": "Height" },
+      "depth": { "ref": "Depth" }
     }
   ]
 }
 ```
 
-## `parameters`
+## Jednostki
 
-Obslugiwane pola:
+Wartosci liczbowe w `types.values` i geometrii sa interpretowane tak:
 
-- `name`
-- `kind`
-- `spec_type`
-- `group`
-- `is_instance`
-- `formula`
+- `length`: milimetry
+- `area`: metry kwadratowe
+- `volume`: metry szescienne
+- `angle`: stopnie
+- `number` i `integer`: wartosc bez konwersji
 
-Obslugiwane `kind`:
+## Parameters
 
-- `family`
-- `shared`
+Zalecane pola v2:
 
-Obslugiwane `spec_type`:
+- `name`: nazwa parametru
+- `source`: `family` albo `shared`
+- `data_type`: typ danych
+- `group`: grupa parametru w Revit
+- `scope`: `type` albo `instance`
+- `formula`: opcjonalna formula Revit
+
+Wspierane `data_type`:
 
 - `text`
 - `yesno`
@@ -129,55 +78,37 @@ Obslugiwane `spec_type`:
 - `angle`
 - `material`
 
-Obslugiwane `group`:
+Stare aliasy nadal dzialaja:
 
-- `Data`
-- `Text`
-- `IdentityData`
-- `Construction`
-- `Geometry`
-- `Materials`
-- `Mechanical`
-- `Electrical`
-- `Plumbing`
+- `kind` = `source`
+- `spec_type` = `data_type`
+- `is_instance` = odwrotnosc `scope: "type"`
 
-## `types`
+## Types
 
-Kazdy wpis w `values` mapuje nazwe parametru na wartosc.
+`types[].values` mapuje nazwe parametru na wartosc dla danego typu. Kazdy typ musi miec unikalna nazwe.
 
-Jednostki:
+## Geometry
 
-- `length` podawaj w milimetrach
-- `area` podawaj w metrach kwadratowych
-- `volume` podawaj w metrach szesciennych
-- `angle` podawaj w stopniach
+Preferowana operacja v2:
 
-## `reference_planes`
+- `rectangular_prism`
 
-Sluza do pierwszego kroku prawdziwej parametrycznosci.
+`rectangular_prism` wymaga:
 
-Pola:
+- `width`: referencja do parametru length, np. `{ "ref": "Width" }`
+- `height`: referencja do parametru length
+- `depth`: referencja do parametru length albo stala wartosc
 
-- `name`
-- `orientation`: `vertical` albo `horizontal`
-- `offset`: pozycja w mm wzgledem zera widoku rodziny
+Ta operacja tworzy:
 
-## `dimensions`
+- cztery reference planes profilu w widoku planu
+- dwa constraints opisane parametrami `Width` i `Height`
+- extrusion
+- alignment krawedzi szkicu do reference planes, jesli Revit pozwoli na takie wiazanie w aktywnym szablonie
+- powiazanie glebokosci extrusion z parametrem `Depth`, jesli `depth` jest referencja
 
-Wiazanie wymiaru do parametru rodzinnego.
-
-Pola:
-
-- `name`
-- `orientation`
-- `reference_a`
-- `reference_b`
-- `parameter`
-- `offset`
-
-## `geometry`
-
-Obslugiwane operacje:
+Starsze operacje nadal sa obslugiwane, ale sa traktowane jako prosta geometria:
 
 - `extrusion_rectangle`
 - `void_rectangle`
@@ -185,34 +116,14 @@ Obslugiwane operacje:
 - `void_circle`
 - `blend_rectangle`
 
-### `extrusion_rectangle` / `void_rectangle`
+Te operacje nie gwarantuja pelnej parametrycznosci bryly.
 
-Pola:
+## Reference Planes I Constraints
 
-- `width`
-- `height`
-- `depth`
+Sekcje `reference_planes` i `constraints` moga byc podawane recznie, ale dla prostego prostopadloscianu zalecane jest uzycie `rectangular_prism`, bo narzedzie wygeneruje bazowe planes i constraints automatycznie.
 
-### `extrusion_circle` / `void_circle`
+`constraints` jest nowsza nazwa sekcji. Stary klucz `dimensions` nadal dziala.
 
-Pola:
+## Plik JSON Schema
 
-- `radius`
-- `depth`
-
-### `blend_rectangle`
-
-Pola:
-
-- `top_width`
-- `top_height`
-- `bottom_width`
-- `bottom_height`
-- `depth`
-
-## Ograniczenia obecnej wersji
-
-- Geometria jest juz szersza niz MVP, ale nadal opiera sie na kontrolowanym zestawie operacji.
-- `reference_planes` i `dimensions` wspieraja poczatek parametrycznosci, ale nie pokrywaja jeszcze wszystkich zaleznosci rodzin Revit.
-- Jesli JSON zawiera `shared`, Revit musi miec ustawiony poprawny plik `Shared Parameters`.
-- Narzedzie nie zmienia kategorii rodziny ani nie tworzy nowego dokumentu `.rfa`.
+Formalny schemat pomocniczy jest w [AiFamilyBuilder.v2.schema.json](AiFamilyBuilder.v2.schema.json).

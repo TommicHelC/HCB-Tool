@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`HCB Revit Add-in` is a native C# solution for Autodesk Revit 2025 and 2026. Its purpose is to migrate internal production tools from the legacy `HCB_Tools` Python environment into a maintainable, testable, and distributable add-in architecture.
+`HCB Revit Add-in` is a native C# solution for Autodesk Revit 2025, 2026, and 2027. Its purpose is to migrate internal production tools from the legacy `HCB_Tools` Python environment into a maintainable, testable, and distributable add-in architecture.
 
 The solution is designed around two goals:
 
@@ -15,7 +15,7 @@ The repository is split into two main projects.
 
 ### `src/HCB.RevitAddin`
 
-This is the runtime add-in loaded by Revit. It targets `net8.0-windows`, uses WPF for dialogs, and references the Revit API through the `Nice3point.Revit.Api.*` packages.
+This is the runtime add-in loaded by Revit. It targets `net8.0-windows` for Revit 2025 and 2026, and `net10.0-windows` for Revit 2027. It uses WPF for dialogs and references the Revit API through the `Nice3point.Revit.Api.*` packages.
 
 Core structural rules:
 
@@ -31,7 +31,7 @@ This is a WiX v5 MSI project that packages the add-in for end users.
 
 Installer characteristics:
 
-- builds separate packages for Revit 2025 and Revit 2026
+- builds separate packages for Revit 2025, Revit 2026, and Revit 2027
 - installs per user under `%AppData%\Autodesk\Revit\Addins\<year>\`
 - bundles both the `.addin` manifest and the full `HCB.RevitAddin` payload directory
 - supports major upgrade behavior through stable `UpgradeCode` values per Revit version
@@ -109,8 +109,11 @@ The solution uses configuration names tied to the target Revit version:
 - `Debug R25 Deploy`
 - `Debug R26`
 - `Debug R26 Deploy`
+- `Debug R27`
+- `Debug R27 Deploy`
 - `Release R25`
 - `Release R26`
+- `Release R27`
 
 The add-in project can optionally deploy directly to the user's Revit addins directory during build, which is useful for local testing.
 
@@ -122,6 +125,7 @@ Release artifacts are produced in:
 
 - `src/HCB.RevitInstaller/bin/Release R25/`
 - `src/HCB.RevitInstaller/bin/Release R26/`
+- `src/HCB.RevitInstaller/bin/Release R27/`
 
 The current default MSI product version is `1.0.1`.
 
