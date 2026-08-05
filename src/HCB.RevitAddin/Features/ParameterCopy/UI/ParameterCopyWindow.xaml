@@ -1,0 +1,100 @@
+<Window x:Class="HCB.RevitAddin.Features.ParameterCopy.UI.ParameterCopyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Copy Parameter"
+        Width="620"
+        Height="360"
+        MinWidth="580"
+        MinHeight="340"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Copy Parameter"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+        <GroupBox Grid.Row="1"
+                  Margin="0,16,0,0"
+                  Header="Ustawienia kopiowania">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="190" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Zakres"
+                           VerticalAlignment="Center" />
+
+                <ComboBox x:Name="ScopeComboBox"
+                          Grid.Row="0"
+                          Grid.Column="1"
+                          SelectionChanged="ScopeComboBox_OnSelectionChanged" />
+
+                <TextBlock Grid.Row="2"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Parametr zrodlowy"
+                           VerticalAlignment="Center" />
+
+                <ComboBox x:Name="SourceParameterComboBox"
+                          Grid.Row="2"
+                          Grid.Column="1"
+                          SelectionChanged="SourceParameterComboBox_OnSelectionChanged" />
+
+                <TextBlock Grid.Row="4"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Parametr docelowy"
+                           VerticalAlignment="Center" />
+
+                <ComboBox x:Name="TargetParameterComboBox"
+                          Grid.Row="4"
+                          Grid.Column="1"
+                          SelectionChanged="TargetParameterComboBox_OnSelectionChanged" />
+
+                <TextBlock Grid.Row="6"
+                           Grid.ColumnSpan="2"
+                           Style="{StaticResource StatusTextStyle}"
+                           Text="Lista docelowa jest ograniczona do zapisywalnych parametrow zgodnych typem danych z wybranym parametrem zrodlowym." />
+
+                <TextBlock x:Name="PreviewTextBlock"
+                           Grid.Row="8"
+                           Grid.ColumnSpan="2"
+                           TextWrapping="Wrap"
+                           Style="{StaticResource StatusTextStyle}" />
+            </Grid>
+        </GroupBox>
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Grid.Row="2"
+                                  Margin="0,16,0,0"
+                                  PrimaryButtonText="Kopiuj wartosci"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="ConfirmButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </Grid>
+</Window>

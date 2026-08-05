@@ -16,7 +16,7 @@ public sealed class AccessoryTerminalNumberingCommand : IExternalCommand
         UIDocument? uiDocument = commandData.Application.ActiveUIDocument;
         if (uiDocument?.Document == null)
         {
-            TaskDialog.Show("MEP Item Numbering", "To narzedzie wymaga otwartego projektu.");
+            TaskDialog.Show("Duct Accessory Numbering", "To narzedzie wymaga otwartego projektu.");
             return Result.Succeeded;
         }
 
@@ -30,28 +30,18 @@ public sealed class AccessoryTerminalNumberingCommand : IExternalCommand
             var targets = service.CollectTargets(document, uiDocument.Selection.GetElementIds());
             if (targets.Count == 0)
             {
-                TaskDialog.Show("MEP Item Numbering", "Brak akcesoriow kanalowych, akcesoriow rurowych lub terminali do numeracji.");
+                TaskDialog.Show("Duct Accessory Numbering", "Brak Duct Accessory do numeracji.");
                 return Result.Succeeded;
             }
 
             var availableTargetParameters = service.GetWritableStringTargetParameters(targets);
             if (availableTargetParameters.Count == 0)
             {
-                TaskDialog.Show("MEP Item Numbering", "Brak zapisywalnych parametrow tekstowych dla wybranych elementow.");
+                TaskDialog.Show("Duct Accessory Numbering", "Brak zapisywalnych parametrow tekstowych dla wybranych elementow.");
                 return Result.Succeeded;
             }
 
-            var availableAccessoryTypeParameters = service.GetAccessoryTypeParameterNames(document, targets);
-            bool hasDuctAccessories = targets.Any(element => GetCategoryId(element) == (long)BuiltInCategory.OST_DuctAccessory);
-            bool hasPipeAccessories = targets.Any(element => GetCategoryId(element) == (long)BuiltInCategory.OST_PipeAccessory);
-            bool hasAirTerminals = targets.Any(element => GetCategoryId(element) == (long)BuiltInCategory.OST_DuctTerminal);
-
-            AccessoryTerminalNumberingWindow window = new(
-                availableTargetParameters,
-                availableAccessoryTypeParameters,
-                hasDuctAccessories,
-                hasPipeAccessories,
-                hasAirTerminals);
+            AccessoryTerminalNumberingWindow window = new(availableTargetParameters);
 
             if (window.ShowDialog() != true)
             {
@@ -60,21 +50,17 @@ public sealed class AccessoryTerminalNumberingCommand : IExternalCommand
 
             AccessoryTerminalNumberingResult result = service.Apply(document, targets, window.Options);
             TaskDialog.Show(
-                "MEP Item Numbering",
-                $"Tryb: {scopeLabel}\nPonumerowano: {result.TotalCount}\nAkcesoria kanalowe: {result.DuctAccessoryCount}\nAkcesoria rurowe: {result.PipeAccessoryCount}\nTerminale: {result.TerminalCount}\nWspoldzielony numer: {result.SharedNumberCount}\nSystemy: {result.SystemsCount}\nParametr docelowy: {result.TargetParameterName}\nParametr typu akcesoriow: {(string.IsNullOrWhiteSpace(result.AccessoryTypeParameterName) ? "(brak)" : result.AccessoryTypeParameterName)}");
+                "Duct Accessory Numbering",
+                $"Tryb: {scopeLabel}\nPonumerowano: {result.TotalCount}\nDuct Accessory: {result.DuctAccessoryCount}\nWspoldzielony numer: {result.SharedNumberCount}\nHC_System: {result.SystemsCount}\nParametr docelowy: {result.TargetParameterName}");
 
             return Result.Succeeded;
         }
         catch (Exception ex)
         {
             message = ex.Message;
-            TaskDialog.Show("MEP Item Numbering", $"Nie udalo sie wykonac numeracji.\n\n{ex}");
+            TaskDialog.Show("Duct Accessory Numbering", $"Nie udalo sie wykonac numeracji.\n\n{ex}");
             return Result.Failed;
         }
-    }
-    private static long? GetCategoryId(Element? element)
-    {
-        return element?.Category?.Id?.Value;
     }
 }
 

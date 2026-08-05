@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using HCB.RevitAddin.Features.AccessoryTerminalNumbering.Models;
@@ -9,12 +8,7 @@ public partial class AccessoryTerminalNumberingWindow : Window
 {
     private const string DefaultTargetParameterName = "LIN_POSITION_NUMBER_A";
 
-    public AccessoryTerminalNumberingWindow(
-        IReadOnlyList<string> availableTargetParameters,
-        IReadOnlyList<string> availableAccessoryTypeParameters,
-        bool hasDuctAccessories,
-        bool hasPipeAccessories,
-        bool hasAirTerminals)
+    public AccessoryTerminalNumberingWindow(IReadOnlyList<string> availableTargetParameters)
     {
         InitializeComponent();
         TargetParameterComboBox.ItemsSource = availableTargetParameters;
@@ -22,19 +16,7 @@ public partial class AccessoryTerminalNumberingWindow : Window
             ? DefaultTargetParameterName
             : availableTargetParameters.Count > 0 ? availableTargetParameters[0] : null;
 
-        List<string> accessoryTypeOptions = ["(brak)"];
-        accessoryTypeOptions.AddRange(availableAccessoryTypeParameters);
-        AccessoryTypeParameterComboBox.ItemsSource = accessoryTypeOptions;
-        AccessoryTypeParameterComboBox.SelectedItem = accessoryTypeOptions.Contains("Type Mark")
-            ? "Type Mark"
-            : accessoryTypeOptions[0];
-
-        DuctAccessoryPrefixPanel.Visibility = hasDuctAccessories ? Visibility.Visible : Visibility.Collapsed;
-        PipeAccessoryPrefixPanel.Visibility = hasPipeAccessories ? Visibility.Visible : Visibility.Collapsed;
-        TerminalPrefixPanel.Visibility = hasAirTerminals ? Visibility.Visible : Visibility.Collapsed;
-        AccessoryTypeParameterPanel.Visibility = hasDuctAccessories || hasPipeAccessories ? Visibility.Visible : Visibility.Collapsed;
-
-        FooterBar.StatusText = "Wybierz parametr docelowy i ustawienia numeracji.";
+        FooterBar.StatusText = "Wybierz parametr docelowy i ustawienia numeracji dla Duct Accessory.";
         UpdatePreview();
     }
 
@@ -42,11 +24,7 @@ public partial class AccessoryTerminalNumberingWindow : Window
     {
         TargetParameterName = GetSelectedString(TargetParameterComboBox),
         StartNumber = int.TryParse(GetText(StartNumberTextBox), out int value) ? value : 0,
-        UseLastProjectNumber = UseLastProjectNumberCheckBox?.IsChecked == true,
-        DuctAccessoryPrefix = GetText(DuctAccessoryPrefixTextBox),
-        PipeAccessoryPrefix = GetText(PipeAccessoryPrefixTextBox),
-        TerminalPrefix = GetText(TerminalPrefixTextBox),
-        AccessoryTypeParameterName = NormalizeAccessoryTypeParameterName(GetSelectedString(AccessoryTypeParameterComboBox))
+        UseLastProjectNumber = UseLastProjectNumberCheckBox?.IsChecked == true
     };
 
     private void ConfirmButton_OnClick(object sender, RoutedEventArgs e)
@@ -83,51 +61,14 @@ public partial class AccessoryTerminalNumberingWindow : Window
         UpdatePreview();
     }
 
-    private static string NormalizeAccessoryTypeParameterName(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value) || value == "(brak)")
-        {
-            return string.Empty;
-        }
-
-        return value.Trim();
-    }
-
     private void UpdatePreview()
     {
-        if (PreviewTextBlock == null ||
-            DuctAccessoryPrefixPanel == null ||
-            PipeAccessoryPrefixPanel == null ||
-            TerminalPrefixPanel == null)
+        if (PreviewTextBlock == null)
         {
             return;
         }
 
-        AccessoryTerminalNumberingOptions options = Options;
-        string accessoryTypePart = string.IsNullOrWhiteSpace(options.AccessoryTypeParameterName)
-            ? string.Empty
-            : $".{options.AccessoryTypeParameterName}";
-
-        List<string> lines = [];
-        if (DuctAccessoryPrefixPanel.Visibility == Visibility.Visible)
-        {
-            lines.Add($"duct accessory: SYS{FormatOptionalPart(options.DuctAccessoryPrefix)}{accessoryTypePart}.{GetPreviewNumber()}");
-        }
-
-        if (PipeAccessoryPrefixPanel.Visibility == Visibility.Visible)
-        {
-            lines.Add($"pipe accessory: SYS{FormatOptionalPart(options.PipeAccessoryPrefix)}{accessoryTypePart}.{GetPreviewNumber()}");
-        }
-
-        if (TerminalPrefixPanel.Visibility == Visibility.Visible)
-        {
-            string terminalPrefix = string.IsNullOrWhiteSpace(options.TerminalPrefix) ? "AT" : options.TerminalPrefix;
-            lines.Add($"air terminal: {terminalPrefix}.{GetPreviewNumber()}");
-        }
-
-        PreviewTextBlock.Text = lines.Count == 0
-            ? "brak aktywnych kategorii w biezacej selekcji"
-            : string.Join("\n", lines);
+        PreviewTextBlock.Text = $"TYPEMARK.HC_SYSTEM.{GetPreviewNumber()}";
     }
 
     private static string GetText(TextBox? textBox)
@@ -148,10 +89,5 @@ public partial class AccessoryTerminalNumberingWindow : Window
         }
 
         return Options.StartNumber > 0 ? Options.StartNumber.ToString() : "1";
-    }
-
-    private static string FormatOptionalPart(string value)
-    {
-        return string.IsNullOrWhiteSpace(value) ? string.Empty : $".{value}";
     }
 }

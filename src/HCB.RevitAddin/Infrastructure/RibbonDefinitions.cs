@@ -6,14 +6,18 @@ namespace HCB.RevitAddin
     internal static class RibbonDefinitions
     {
         public const string TabName = "HCB Tools";
-        private static readonly IReadOnlyList<RibbonPanelDefinition> CachedDefinitions = CreateDefinitions();
+
+        public static IReadOnlyList<RibbonPanelDefinition> Create(int revitVersion)
+        {
+            return CreateDefinitions(revitVersion);
+        }
 
         public static IReadOnlyList<RibbonPanelDefinition> Create()
         {
-            return CachedDefinitions;
+            return CreateDefinitions(int.MaxValue);
         }
 
-        private static IReadOnlyList<RibbonPanelDefinition> CreateDefinitions()
+        private static IReadOnlyList<RibbonPanelDefinition> CreateDefinitions(int revitVersion)
         {
             return
             [
@@ -110,10 +114,10 @@ namespace HCB.RevitAddin
                                             "Resources\\Ribbon\\Numbering\\DuctFitting"),
                                         new RibbonPushButtonDefinition(
                                             "HcbAccessoryTerminalNumberingButton",
-                                            "MEP Item Numbering",
+                                            "Duct Acc Num",
                                             typeof(Features.AccessoryTerminalNumbering.AccessoryTerminalNumberingCommand),
-                                            "Numeruje elementy MEP wedlug systemu, kategorii i cech grupujacych.",
-                                            "Co robi: numeruje Duct Accessory, Pipe Accessory i Air Terminal. Jak uzyc: 1. Wybierz parametr docelowy. 2. Ustaw prefiksy i numer startowy. 3. Zatwierdz numeracje. Zakres: przy zaznaczeniu dziala tylko na zaznaczonych elementach tych kategorii; bez zaznaczenia zbiera je z projektu. Uwagi: grupuje po systemie, kategorii i cechach typu oraz pomija typy FabricAir.",
+                                            "Numeruje tylko Duct Accessory wedlug Type Mark i HC_System.",
+                                            "Co robi: numeruje tylko Duct Accessory w formacie TypeMark.HC_System.KolejnyNumer. Jak uzyc: 1. Wybierz parametr docelowy. 2. Ustaw numer startowy albo start od ostatniego numeru w projekcie. 3. Zatwierdz numeracje. Zakres: przy zaznaczeniu dziala tylko na zaznaczonych Duct Accessory; bez zaznaczenia zbiera je z projektu. Uwagi: elementy o tym samym ukladzie w obrebie tego samego HC_System dostaja wspolny numer, a typy FabricAir sa pomijane.",
                                             null,
                                             "Resources\\Ribbon\\Numbering\\MepItems")
                                     ])
@@ -155,6 +159,20 @@ namespace HCB.RevitAddin
                             typeof(Features.FlowChanger.FlowChangerCommand),
                             "Losowo roznicuje przeplywy dla terminali w aktywnym widoku.",
                             "Co robi: losowo roznicuje przeplywy dla terminali. Jak uzyc: 1. Uruchom narzedzie w aktywnym widoku. 2. Wybierz parametr docelowy i zakres zmiany. 3. Zatwierdz. Zakres: szybkie testowanie wariantow przeplywu na terminalach."),
+                        new RibbonPushButtonDefinition(
+                            "HcbVelocitySizerButton",
+                            "Velocity",
+                            typeof(Features.VelocitySizer.VelocitySizerCommand),
+                            "Dobiera srednice okraglych kanalow i rur na podstawie przeplywu oraz pokazuje wynikowe predkosci dla standardowych rozmiarow z projektu.",
+                            "Co robi: dla zaznaczonych okraglych kanalow i rur pokazuje tabele standardowych srednic z projektu oraz wynikowe predkosci dla wpisanego przeplywu. Jak uzyc: 1. Zaznacz elementy. 2. Wpisz przeplyw dla kazdego wiersza. 3. Wybierz srednice z tabeli standardow i zatwierdz. Zakres: zmienia srednice elementu oraz zapisuje LIN_VE_VELOCITY i LIN_VE_FLOWRATE_SUM, a przy istniejacych wartosciach pyta o nadpisanie.",
+                            null,
+                            "Resources\\Ribbon\\Flow"),
+                        new RibbonPushButtonDefinition(
+                            "HcbHvacTaggingButton",
+                            "HVAC Tags",
+                            typeof(Features.HvacTagging.HvacTaggingCommand),
+                            "Tworzy brakujace tagi dla elementow HVAC w aktywnym widoku albo viewportach aktywnego arkusza.",
+                            "Co robi: skanuje aktywny widok albo viewporty aktywnego arkusza, pokazuje preview brakujacych, istniejacych i zduplikowanych tagow, a po zatwierdzeniu tworzy brakujace tagi. Zakres: ducts, flex ducts, duct fittings, duct accessories i duct terminals; uzywa tylko typow tagow juz wczytanych do projektu."),
                         new RibbonPulldownDefinition(
                             "HcbHvacToolsPulldown",
                             "HVAC Tools",
@@ -343,41 +361,29 @@ namespace HCB.RevitAddin
                                     "Resources\\Ribbon\\Parameters",
                                     "Narzedzia do pracy z parametrami projektu.",
                                     "Co zawiera: narzedzia do sprawdzania, uzupelniania i przeliczania parametrow projektu. Jak uzyc: wybierz odpowiednie polecenie po ustawieniu poprawnego pliku Shared Parameters albo po wskazaniu parametrow do obliczen. Zakres: parametry HC_* i inne parametry liczbowe w projekcie.",
-                                    [
-                                        new RibbonPushButtonDefinition(
-                                            "HcbSharedParametersButton",
-                                            "Shared Params",
-                                            typeof(Features.SharedParameters.SharedParametersCommand),
-                                            "Sprawdza i wczytuje wymagane parametry wspoldzielone.",
-                                            "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu."),
-                                        new RibbonPushButtonDefinition(
-                                            "HcbParameterCalculatorButton",
-                                            "Calculator",
-                                            typeof(Features.ParameterCalculator.ParameterCalculatorCommand),
-                                            "Wykonuje dzialania matematyczne na wybranych parametrach liczbowych i zapisuje wynik do wskazanego parametru.",
-                                            "Co robi: wykonuje obliczenia na co najmniej dwoch parametrach liczbowych typu Double albo Integer i zapisuje wynik do wybranego parametru. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz parametry zrodlowe, operator oraz parametr docelowy. 3. Ustaw liczbe miejsc po przecinku i uruchom obliczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia analizuje caly model, a elementy bez wszystkich wybranych parametrow sa automatycznie pomijane."),
-                                        new RibbonPushButtonDefinition(
-                                            "HcbParameterClearButton",
-                                            "Clear Param",
-                                            typeof(Features.ParameterClear.ParameterClearCommand),
-                                            "Usuwa wartosci z wybranego parametru tekstowego dla zaznaczenia, kategorii albo calego modelu.",
-                                            "Co robi: czysci wartosci wybranego parametru tekstowego. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz zakres, parametr i ewentualnie kategorie. 3. Potwierdz wyczyszczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia moze pracowac na wybranej kategorii albo w calym modelu dla elementow, ktore maja ten parametr.")
-                                    ]),
+                                    CreateProjectParameterButtons(revitVersion)),
                                 new RibbonPushButtonDefinition(
                                     "HcbAiFamilyBuilderButton",
                                     "AI Family",
                                     typeof(Features.AiFamilyBuilder.AiFamilyBuilderCommand),
                                     "Buduje parametry, typy i podstawowa geometrie rodziny na podstawie opisu JSON.",
                                     "Co robi: czyta opis JSON i dodaje parametry, typy oraz prosta geometrie w otwartym dokumencie rodziny. Jak uzyc: 1. Otworz nowa rodzine na poprawnym szablonie. 2. Wklej JSON wygenerowany przez AI. 3. Uruchom budowanie. Zakres: dokument rodziny; MVP obsluguje family/shared parameters, typy i extrusion_rectangle.",
-                                    typeof(FamilyDocumentCommandAvailability),
-                                    "Resources\\Ribbon\\Parameters"),
+                                    typeof(FamilyDocumentCommandAvailability)),
                                 new RibbonPushButtonDefinition(
-                                    "HcbPurgeAnnotationsButton",
-                                    "Purge Anno",
-                                    typeof(Features.PurgeAnnotations.PurgeAnnotationsCommand),
-                                    "Usuwa nieuzywane style adnotacji.",
-                                    "Co robi: usuwa nieuzywane style adnotacji. Jak uzyc: 1. Uruchom narzedzie. 2. Sprawdz liste nieuzywanych stylow. 3. Zatwierdz usuniecie. Zakres: typy kategorii Annotation bez instancji.")
+                                    "HcbCopyBetweenProjectsButton",
+                                    "Copy Beetwen Projects",
+                                    typeof(Features.CopyBetweenProjects.CopyBetweenProjectsCommand),
+                                    "Kopiuje wybrane typy i rodziny miedzy otwartymi projektami.",
+                                    "Co robi: kopiuje Level Type, Grid Type, Family oraz Family Type miedzy otwartymi projektami. Jak uzyc: 1. Wybierz projekt zrodlowy i docelowy. 2. Przefiltruj liste i zaznacz wiele pozycji. 3. Uruchom kopiowanie. Zakres: co najmniej dwa otwarte projekty; przy konfliktach nazw typow uzywa typow z projektu docelowego.",
+                                    null,
+                                    "Resources\\Ribbon\\Parameters")
                             ]),
+                        new RibbonPushButtonDefinition(
+                            "HcbPurgeAnnotationsButton",
+                            "Purge Anno",
+                            typeof(Features.PurgeAnnotations.PurgeAnnotationsCommand),
+                            "Usuwa nieuzywane style adnotacji.",
+                            "Co robi: usuwa nieuzywane style adnotacji. Jak uzyc: 1. Uruchom narzedzie. 2. Sprawdz liste nieuzywanych stylow. 3. Zatwierdz usuniecie. Zakres: typy kategorii Annotation bez instancji."),
                         new RibbonPushButtonDefinition(
                             "HcbHCWireSizeButton",
                             "HC Wire",
@@ -392,6 +398,56 @@ namespace HCB.RevitAddin
                             "Co robi: seryjnie zmienia nazwy materialow. Jak uzyc: 1. Wybierz materialy. 2. Ustaw prefiks, zamiane tekstu i lub sufiks. 3. Zatwierdz podglad. Zakres: tylko wybrane materialy.")
                     ])
             ];
+        }
+
+        private static IReadOnlyList<RibbonPushButtonDefinition> CreateProjectParameterButtons(int revitVersion)
+        {
+            List<RibbonPushButtonDefinition> buttons =
+            [
+                new RibbonPushButtonDefinition(
+                    "HcbSharedParametersButton",
+                    "Shared Params",
+                    typeof(Features.SharedParameters.SharedParametersCommand),
+                    "Sprawdza i wczytuje wymagane parametry wspoldzielone.",
+                    "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu.")
+            ];
+
+            if (revitVersion >= 2026)
+            {
+                buttons.Add(
+                    new RibbonPushButtonDefinition(
+                        "HcbParameterServiceButton",
+                        "Param Service",
+                        typeof(Features.ParameterService.ParameterServiceCommand),
+                        "Importuje predefiniowane parametry z Autodesk Parameter Service.",
+                        "Co robi: pobiera ustawienia predefiniowanych parametrow z Parameter Service i dodaje brakujace do projektu z ich domyslnymi kategoriami, bindingiem instance albo type oraz grupa. Jak uzyc: 1. Uzupelnij liste predefiniowanych identyfikatorow w kodzie. 2. Uruchom polecenie. 3. Narzedzie automatycznie doda brakujace parametry. Zakres: dokument projektu; wymaga zalogowanego uzytkownika i dostepu do tych parametrow."));
+            }
+
+            buttons.Add(
+                new RibbonPushButtonDefinition(
+                    "HcbParameterCalculatorButton",
+                    "Calculator",
+                    typeof(Features.ParameterCalculator.ParameterCalculatorCommand),
+                    "Wykonuje dzialania matematyczne na wybranych parametrach liczbowych i zapisuje wynik do wskazanego parametru.",
+                    "Co robi: wykonuje obliczenia na co najmniej dwoch parametrach liczbowych typu Double albo Integer i zapisuje wynik do wybranego parametru. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz parametry zrodlowe, operator oraz parametr docelowy. 3. Ustaw liczbe miejsc po przecinku i uruchom obliczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia analizuje caly model, a elementy bez wszystkich wybranych parametrow sa automatycznie pomijane."));
+
+            buttons.Add(
+                new RibbonPushButtonDefinition(
+                    "HcbParameterClearButton",
+                    "Clear Param",
+                    typeof(Features.ParameterClear.ParameterClearCommand),
+                    "Usuwa wartosci z wybranego parametru tekstowego dla zaznaczenia, kategorii albo calego modelu.",
+                    "Co robi: czysci wartosci wybranego parametru tekstowego. Jak uzyc: 1. Jesli chcesz, zaznacz elementy. 2. Wybierz zakres, parametr i ewentualnie kategorie. 3. Potwierdz wyczyszczenie. Zakres: przy zaznaczeniu dziala tylko na nim; bez zaznaczenia moze pracowac na wybranej kategorii albo w calym modelu dla elementow, ktore maja ten parametr."));
+
+            buttons.Add(
+                new RibbonPushButtonDefinition(
+                    "HcbParameterCopyButton",
+                    "Copy Param",
+                    typeof(Features.ParameterCopy.ParameterCopyCommand),
+                    "Kopiuje wartosc z jednego parametru do drugiego dla elementow instalacji w zaznaczeniu albo w calym modelu.",
+                    "Co robi: kopiuje wartosc z wybranego parametru zrodlowego do wybranego parametru docelowego na elementach instalacji. Jak uzyc: 1. Jesli chcesz, zaznacz elementy instalacji. 2. Wybierz zakres, parametr zrodlowy i docelowy. 3. Potwierdz nadpisanie. Zakres: zaznaczone elementy instalacji albo wszystkie obslugiwane elementy instalacji; lista docelowa obejmuje tylko zgodne typy danych."));
+
+            return buttons;
         }
     }
 

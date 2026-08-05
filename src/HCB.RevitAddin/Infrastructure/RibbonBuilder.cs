@@ -10,7 +10,11 @@ namespace HCB.RevitAddin
         {
             EnsureTab(application);
 
-            foreach (RibbonPanelDefinition panelDefinition in RibbonDefinitions.Create())
+            int revitVersion = int.TryParse(application.ControlledApplication.VersionNumber, out int version)
+                ? version
+                : int.MaxValue;
+
+            foreach (RibbonPanelDefinition panelDefinition in RibbonDefinitions.Create(revitVersion))
             {
                 CreatePanel(application, panelDefinition);
             }

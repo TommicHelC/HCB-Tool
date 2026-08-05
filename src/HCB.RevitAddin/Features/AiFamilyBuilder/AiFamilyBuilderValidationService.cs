@@ -57,15 +57,20 @@ public sealed class AiFamilyBuilderValidationService
                 result.Errors.Add($"Powielona nazwa parametru: {parameter.Name}");
             }
 
-            if (!IsSupportedParameterKind(parameter.Kind))
+            if (!IsSupportedParameterKind(GetParameterKind(parameter)))
             {
-                result.Errors.Add($"Nieobslugiwany kind parametru '{parameter.Kind}' dla {parameter.Name}");
+                result.Errors.Add($"Nieobslugiwany kind/source parametru '{GetParameterKind(parameter)}' dla {parameter.Name}");
             }
 
-            if (string.Equals(parameter.Kind, "family", StringComparison.OrdinalIgnoreCase) &&
-                !IsSupportedSpecType(parameter.SpecType))
+            if (string.Equals(GetParameterKind(parameter), "family", StringComparison.OrdinalIgnoreCase) &&
+                !IsSupportedSpecType(GetParameterSpecType(parameter)))
             {
-                result.Errors.Add($"Nieobslugiwany spec_type '{parameter.SpecType}' dla {parameter.Name}");
+                result.Errors.Add($"Nieobslugiwany spec_type/data_type '{GetParameterSpecType(parameter)}' dla {parameter.Name}");
+            }
+
+            if (!IsSupportedScope(parameter))
+            {
+                result.Errors.Add($"Nieobslugiwany scope parametru '{parameter.Scope}' dla {parameter.Name}");
             }
         }
 
@@ -110,9 +115,19 @@ public sealed class AiFamilyBuilderValidationService
             {
                 result.Errors.Add($"Nieobslugiwana orientacja reference plane '{plane.Orientation}' dla {plane.Name}");
             }
+
+            if (!string.IsNullOrWhiteSpace(plane.View) && !IsSupportedWorkingView(plane.View))
+            {
+                result.Errors.Add($"Nieobslugiwany view '{plane.View}' dla reference plane {plane.Name}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(plane.LineDirection) && !IsSupportedLineDirection(plane.LineDirection))
+            {
+                result.Errors.Add($"Nieobslugiwany line_direction '{plane.LineDirection}' dla reference plane {plane.Name}");
+            }
         }
 
-        foreach (DimensionConstraintSpec dimension in spec.Dimensions)
+        foreach (DimensionConstraintSpec dimension in GetDimensionSpecs(spec))
         {
             if (string.IsNullOrWhiteSpace(dimension.Parameter))
             {
@@ -127,13 +142,19 @@ public sealed class AiFamilyBuilderValidationService
             {
                 result.Errors.Add($"Constraint '{dimension.Name}' odwoluje sie do nieistniejacych reference planes.");
             }
+
+            if (!string.IsNullOrWhiteSpace(dimension.View) && !IsSupportedWorkingView(dimension.View))
+            {
+                result.Errors.Add($"Constraint '{dimension.Name}' ma nieobslugiwany view '{dimension.View}'.");
+            }
         }
 
         foreach (GeometryOperationSpec operation in spec.Geometry)
         {
-            if (!IsSupportedGeometryOperation(operation.Op))
+            string operationKind = GetGeometryOperationKind(operation);
+            if (!IsSupportedGeometryOperation(operationKind))
             {
-                result.Errors.Add($"Nieobslugiwana operacja geometrii: {operation.Op}");
+                result.Errors.Add($"Nieobslugiwana operacja geometrii: {operationKind}");
                 continue;
             }
 
@@ -143,27 +164,34 @@ public sealed class AiFamilyBuilderValidationService
 
     private static void ValidateGeometryOperation(GeometryOperationSpec operation, IReadOnlySet<string> parameterNames, AiFamilyBuilderValidationResult result)
     {
-        switch (operation.Op.Trim().ToLowerInvariant())
+        string operationKind = GetGeometryOperationKind(operation);
+        switch (operationKind)
         {
             case "extrusion_rectangle":
             case "void_rectangle":
-                RequireValue(operation.Width, operation.Op, "width", parameterNames, result);
-                RequireValue(operation.Height, operation.Op, "height", parameterNames, result);
-                RequireValue(operation.Depth, operation.Op, "depth", parameterNames, result);
+                RequireValue(operation.Width, operationKind, "width", parameterNames, result);
+                RequireValue(operation.Height, operationKind, "height", parameterNames, result);
+                RequireValue(operation.Depth, operationKind, "depth", parameterNames, result);
                 break;
 
             case "extrusion_circle":
             case "void_circle":
-                RequireValue(operation.Radius, operation.Op, "radius", parameterNames, result);
-                RequireValue(operation.Depth, operation.Op, "depth", parameterNames, result);
+                RequireValue(operation.Radius, operationKind, "radius", parameterNames, result);
+                RequireValue(operation.Depth, operationKind, "depth", parameterNames, result);
                 break;
 
             case "blend_rectangle":
-                RequireValue(operation.TopWidth, operation.Op, "top_width", parameterNames, result);
-                RequireValue(operation.TopHeight, operation.Op, "top_height", parameterNames, result);
-                RequireValue(operation.BottomWidth, operation.Op, "bottom_width", parameterNames, result);
-                RequireValue(operation.BottomHeight, operation.Op, "bottom_height", parameterNames, result);
-                RequireValue(operation.Depth, operation.Op, "depth", parameterNames, result);
+                RequireValue(operation.TopWidth, operationKind, "top_width", parameterNames, result);
+                RequireValue(operation.TopHeight, operationKind, "top_height", parameterNames, result);
+                RequireValue(operation.BottomWidth, operationKind, "bottom_width", parameterNames, result);
+                RequireValue(operation.BottomHeight, operationKind, "bottom_height", parameterNames, result);
+                RequireValue(operation.Depth, operationKind, "depth", parameterNames, result);
+                break;
+
+            case "rectangular_prism":
+                RequireParameterReference(operation.Width, operationKind, "width", parameterNames, result);
+                RequireParameterReference(operation.Height, operationKind, "height", parameterNames, result);
+                RequireValue(operation.Depth, operationKind, "depth", parameterNames, result);
                 break;
         }
     }
@@ -178,7 +206,7 @@ public sealed class AiFamilyBuilderValidationService
         if (value.ValueKind == JsonValueKind.String)
         {
             string raw = value.GetString() ?? string.Empty;
-            if (double.TryParse(raw, out _))
+            if (double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
             {
                 return;
             }
@@ -189,7 +217,35 @@ public sealed class AiFamilyBuilderValidationService
             }
         }
 
+        if (value.ValueKind == JsonValueKind.Object)
+        {
+            if (value.TryGetProperty("value", out JsonElement objectValue) &&
+                objectValue.ValueKind == JsonValueKind.Number)
+            {
+                return;
+            }
+
+            if (value.TryGetProperty("ref", out JsonElement refElement) &&
+                refElement.ValueKind == JsonValueKind.String &&
+                parameterNames.Contains(refElement.GetString() ?? string.Empty))
+            {
+                return;
+            }
+        }
+
         result.Errors.Add($"Operacja '{op}' ma niepoprawne pole '{fieldName}'.");
+    }
+
+    private static void RequireParameterReference(JsonElement value, string op, string fieldName, IReadOnlySet<string> parameterNames, AiFamilyBuilderValidationResult result)
+    {
+        if (TryGetParameterReference(value, out string? parameterName) &&
+            parameterName != null &&
+            parameterNames.Contains(parameterName))
+        {
+            return;
+        }
+
+        result.Errors.Add($"Operacja '{op}' wymaga pola '{fieldName}' jako referencji do parametru, np. {{ \"ref\": \"Width\" }}.");
     }
 
     private static bool IsSupportedParameterKind(string value)
@@ -203,7 +259,84 @@ public sealed class AiFamilyBuilderValidationService
     private static bool IsSupportedOrientation(string value)
         => value.Trim().ToLowerInvariant() is "vertical" or "horizontal";
 
+    private static bool IsSupportedWorkingView(string value)
+        => value.Trim().ToLowerInvariant() is "plan" or "elevation";
+
+    private static bool IsSupportedLineDirection(string value)
+        => value.Trim().ToLowerInvariant() is "vertical" or "horizontal";
+
     private static bool IsSupportedGeometryOperation(string value)
         => value.Trim().ToLowerInvariant() is
-            "extrusion_rectangle" or "void_rectangle" or "extrusion_circle" or "void_circle" or "blend_rectangle";
+            "extrusion_rectangle" or "void_rectangle" or "extrusion_circle" or "void_circle" or "blend_rectangle" or "rectangular_prism";
+
+    private static bool IsSupportedScope(FamilyParameterSpec parameter)
+    {
+        return string.IsNullOrWhiteSpace(parameter.Scope) ||
+               parameter.Scope.Trim().ToLowerInvariant() is "type" or "instance";
+    }
+
+    private static string GetParameterKind(FamilyParameterSpec parameter)
+    {
+        return string.IsNullOrWhiteSpace(parameter.Source)
+            ? parameter.Kind
+            : parameter.Source!;
+    }
+
+    private static string GetParameterSpecType(FamilyParameterSpec parameter)
+    {
+        return string.IsNullOrWhiteSpace(parameter.DataType)
+            ? parameter.SpecType
+            : parameter.DataType!;
+    }
+
+    private static string GetGeometryOperationKind(GeometryOperationSpec operation)
+    {
+        return string.IsNullOrWhiteSpace(operation.Kind)
+            ? operation.Op.Trim().ToLowerInvariant()
+            : operation.Kind.Trim().ToLowerInvariant();
+    }
+
+    private static IReadOnlyList<DimensionConstraintSpec> GetDimensionSpecs(FamilyDefinitionSpec spec)
+    {
+        if (spec.Constraints.Count == 0)
+        {
+            return spec.Dimensions;
+        }
+
+        if (spec.Dimensions.Count == 0)
+        {
+            return spec.Constraints;
+        }
+
+        return spec.Dimensions.Concat(spec.Constraints).ToList();
+    }
+
+    private static bool TryGetParameterReference(JsonElement value, out string? parameterName)
+    {
+        parameterName = null;
+        if (value.ValueKind == JsonValueKind.String)
+        {
+            string? raw = value.GetString();
+            if (!string.IsNullOrWhiteSpace(raw) &&
+                !double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+            {
+                parameterName = raw.Trim();
+                return true;
+            }
+        }
+
+        if (value.ValueKind == JsonValueKind.Object &&
+            value.TryGetProperty("ref", out JsonElement refElement) &&
+            refElement.ValueKind == JsonValueKind.String)
+        {
+            string? raw = refElement.GetString();
+            if (!string.IsNullOrWhiteSpace(raw))
+            {
+                parameterName = raw.Trim();
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

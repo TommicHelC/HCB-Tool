@@ -27,6 +27,11 @@ public sealed class ViewsDuplicateCommand : IExternalCommand
         if (views.Count == 0)
         {
             List<View> availableViews = service.GetAvailableViews(document).ToList();
+            ElementId? activeViewId = uiDocument.ActiveView?.Id;
+            View? activeView = activeViewId != null
+                ? availableViews.FirstOrDefault(view => view.Id == activeViewId)
+                : null;
+
             SelectionListWindow picker = new(
                 "Duplicate Views",
                 "Wybierz widoki",
@@ -34,7 +39,7 @@ public sealed class ViewsDuplicateCommand : IExternalCommand
                 [],
                 "Wybierz",
                 null,
-                availableViews.Contains(uiDocument.ActiveView) ? uiDocument.ActiveView : null,
+                activeView,
                 "Active View",
                 "ViewType",
                 "Type");

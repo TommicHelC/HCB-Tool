@@ -31,6 +31,11 @@ public sealed class ViewFiltersLegendCommand : IExternalCommand
             return Result.Succeeded;
         }
 
+        ElementId? activeViewId = uiDocument.ActiveView?.Id;
+        View? activeView = activeViewId != null
+            ? sourceViews.FirstOrDefault(view => view.Id == activeViewId)
+            : null;
+
         SelectionListWindow viewsWindow = new(
             "View Filters Legend",
             "Widoki i szablony z filtrami",
@@ -38,7 +43,7 @@ public sealed class ViewFiltersLegendCommand : IExternalCommand
             [],
             "Dalej",
             $"Dostepne z filtrami: {sourceViews.Count}",
-            sourceViews.Contains(uiDocument.ActiveView) ? uiDocument.ActiveView : null,
+            activeView,
             "Active View",
             "ViewType",
             "Type");

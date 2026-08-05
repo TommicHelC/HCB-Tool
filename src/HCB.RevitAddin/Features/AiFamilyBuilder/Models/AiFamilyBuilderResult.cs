@@ -14,5 +14,17 @@ public sealed class AiFamilyBuilderResult
 
     public int SkippedGeometryOperationsCount { get; set; }
 
+    public int CreatedConnectorsCount { get; set; }
+
+    public int SkippedConnectorsCount { get; set; }
+
+    public int CreatedReferencePlanesCount { get; set; }
+
+    public int SkippedReferencePlanesCount { get; set; }
+
+    public int CreatedDimensionsCount { get; set; }
+
+    public int SkippedDimensionsCount { get; set; }
+
     public List<string> Messages { get; } = [];
 }

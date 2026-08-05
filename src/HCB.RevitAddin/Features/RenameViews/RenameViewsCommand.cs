@@ -30,6 +30,11 @@ public sealed class RenameViewsCommand : IExternalCommand
                 .Where(view => view is not ViewSheet)
                 .ToList();
 
+            ElementId? activeViewId = uiDocument.ActiveView?.Id;
+            View? activeView = activeViewId != null
+                ? availableViews.FirstOrDefault(view => view.Id == activeViewId)
+                : null;
+
             SelectionListWindow picker = new(
                 "Zmiana nazw widokow",
                 "Wybierz widoki",
@@ -37,7 +42,7 @@ public sealed class RenameViewsCommand : IExternalCommand
                 [],
                 "Wybierz",
                 null,
-                availableViews.Contains(uiDocument.ActiveView) ? uiDocument.ActiveView : null,
+                activeView,
                 "Active View",
                 "ViewType",
                 "Type");

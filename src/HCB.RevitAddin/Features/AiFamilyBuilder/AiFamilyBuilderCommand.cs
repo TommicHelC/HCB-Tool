@@ -1,9 +1,11 @@
 using System;
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HCB.RevitAddin.Features.AiFamilyBuilder.Models;
 using HCB.RevitAddin.Features.AiFamilyBuilder.UI;
+using HCB.RevitAddin.Features.AiFamilyBuilder.V3;
 
 namespace HCB.RevitAddin.Features.AiFamilyBuilder;
 
@@ -28,8 +30,10 @@ public sealed class AiFamilyBuilderCommand : IExternalCommand
                 return Result.Cancelled;
             }
 
-            AiFamilyBuilderService service = new();
-            AiFamilyBuilderResult result = service.Apply(document, commandData.Application.Application, window.Options);
+            Application application = commandData.Application.Application;
+            AiFamilyBuilderResult result = AiFamilyBuilderSchemaDetector.IsV3(window.Options.JsonText)
+                ? new AiFamilyBuilderV3Service().Apply(document, application, window.Options)
+                : new AiFamilyBuilderService().Apply(document, application, window.Options);
 
             TaskDialog.Show("AI Family Builder", BuildSummary(result));
             return Result.Succeeded;
@@ -50,6 +54,10 @@ public sealed class AiFamilyBuilderCommand : IExternalCommand
             $"Pominiete parametry: {result.SkippedParametersCount}",
             $"Dodane typy: {result.AddedTypesCount}",
             $"Zaktualizowane wartosci: {result.UpdatedValuesCount}",
+            $"Reference planes: {result.CreatedReferencePlanesCount}",
+            $"Pominiete reference planes: {result.SkippedReferencePlanesCount}",
+            $"Constraints: {result.CreatedDimensionsCount}",
+            $"Pominiete constraints: {result.SkippedDimensionsCount}",
             $"Operacje geometrii: {result.ExecutedGeometryOperationsCount}",
             $"Pominiete operacje geometrii: {result.SkippedGeometryOperationsCount}"
         ];
@@ -58,7 +66,7 @@ public sealed class AiFamilyBuilderCommand : IExternalCommand
         {
             lines.Add(string.Empty);
             lines.Add("Szczegoly:");
-            lines.AddRange(result.Messages.Take(16));
+            lines.AddRange(result.Messages);
         }
 
         return string.Join("\n", lines);

@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configurations>Debug R25;Debug R25 Deploy;Debug R26;Debug R26 Deploy;Release R25;Release R26</Configurations>
+    <Configurations>Debug R25;Debug R25 Deploy;Debug R26;Debug R26 Deploy;Debug R27;Debug R27 Deploy;Release R25;Release R26;Release R27</Configurations>
     <RevitVersion Condition="'$(RevitVersion)' == '' and $(Configuration.Contains('R25'))">2025</RevitVersion>
     <RevitVersion Condition="'$(RevitVersion)' == '' and $(Configuration.Contains('R26'))">2026</RevitVersion>
+    <RevitVersion Condition="'$(RevitVersion)' == '' and $(Configuration.Contains('R27'))">2027</RevitVersion>
     <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
     <LegacyAssemblyName>HCB.Addin</LegacyAssemblyName>
     <RevitAddinsDir>$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)</RevitAddinsDir>
-    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -27,6 +27,11 @@
     <StartProgram>$(RevitInstallDir)\Revit.exe</StartProgram>
     <StartWorkingDirectory>$(RevitInstallDir)</StartWorkingDirectory>
     <StartArguments>/language ENU</StartArguments>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(RevitVersion)' == '2027'">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net8.0-windows</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('Deploy'))">
@@ -65,6 +70,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\**\*.png" />
+    <EmbeddedResource Include="Features\**\Resources\**\*.png" />
     <Compile Include="App.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Features\BatchFileScan\BatchFileScanCommand.cs" />
@@ -107,7 +114,41 @@
     <Compile Include="Features\AiFamilyBuilder\Models\AiFamilyBuilderResult.cs" />
     <Compile Include="Features\AiFamilyBuilder\Models\AiFamilyBuilderValidationResult.cs" />
     <Compile Include="Features\AiFamilyBuilder\Models\FamilyDefinitionSpec.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\AiFamilyBuildRequest.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\ParameterSpecs.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\ReferenceSpecs.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\GeometrySpecs.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\ConnectorSpecs.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Schema\FlexTestSpec.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Validation\ExpressionParser.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Validation\IRequestValidator.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Validation\RequestValidator.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\IRevitTypeMapper.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\RevitTypeMapper.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\Maps.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\FlexTestReport.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\BuildContext.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\IAiFamilyBuilder.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\IBuilderResolver.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\BuilderResolver.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\ServiceInterfaces.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\ParameterService.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\FamilyValueWriter.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\FlexTestService.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\GeometryValues.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\CompositeGeometryExecutor.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\RectangularPrismExecutor.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\CircularExtrusionExecutor.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Execution\DuctConnectorService.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\Builders\GenericBoxBuilder.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\AiFamilyBuilderSchemaDetector.cs" />
+    <Compile Include="Features\AiFamilyBuilder\V3\AiFamilyBuilderV3Service.cs" />
     <Compile Include="Features\AiFamilyBuilder\UI\AiFamilyBuilderWindow.xaml.cs" />
+    <Compile Include="Features\CopyBetweenProjects\CopyBetweenProjectsCommand.cs" />
+    <Compile Include="Features\CopyBetweenProjects\CopyBetweenProjectsService.cs" />
+    <Compile Include="Features\CopyBetweenProjects\Models\CopyBetweenProjectsItem.cs" />
+    <Compile Include="Features\CopyBetweenProjects\Models\CopyBetweenProjectsResult.cs" />
+    <Compile Include="Features\CopyBetweenProjects\UI\CopyBetweenProjectsWindow.xaml.cs" />
     <Compile Include="Features\CopyFilters\CopyFiltersCommand.cs" />
     <Compile Include="Features\CopyFilters\CopyFiltersService.cs" />
     <Compile Include="Features\CopyFilters\Models\CopyFiltersResult.cs" />
@@ -149,6 +190,21 @@
     <Compile Include="Features\FlowChanger\FlowChangerService.cs" />
     <Compile Include="Features\FlowChanger\Models\FlowChangerResult.cs" />
     <Compile Include="Features\FlowChanger\UI\FlowChangerOptionsWindow.xaml.cs" />
+    <Compile Include="Features\HvacTagging\HvacTaggingCommand.cs" />
+    <Compile Include="Features\HvacTagging\HvacTaggingService.cs" />
+    <Compile Include="Features\HvacTagging\Models\HvacTagCategoryRule.cs" />
+    <Compile Include="Features\HvacTagging\Models\HvacTaggingOptions.cs" />
+    <Compile Include="Features\HvacTagging\Models\HvacTaggingResult.cs" />
+    <Compile Include="Features\HvacTagging\Models\HvacTagPreviewRow.cs" />
+    <Compile Include="Features\HvacTagging\UI\HvacTaggingWindow.xaml.cs" />
+    <Compile Include="Features\VelocitySizer\Models\VelocitySizerCommitMode.cs" />
+    <Compile Include="Features\VelocitySizer\Models\VelocitySizerSelectionItem.cs" />
+    <Compile Include="Features\VelocitySizer\Models\VelocitySizerResult.cs" />
+    <Compile Include="Features\VelocitySizer\Models\VelocitySizerSizeOption.cs" />
+    <Compile Include="Features\VelocitySizer\VelocitySizerCommand.cs" />
+    <Compile Include="Features\VelocitySizer\VelocitySizerService.cs" />
+    <Compile Include="Features\VelocitySizer\UI\VelocitySizerWindow.xaml.cs" />
+    <Compile Include="Features\VelocitySizer\UI\VelocityToBrushConverter.cs" />
     <Compile Include="Features\HCWireSize\HCWireSizeCommand.cs" />
     <Compile Include="Features\HCWireSize\HCWireSizeService.cs" />
     <Compile Include="Features\HCWireSize\Models\HCWireSizeResult.cs" />
@@ -176,6 +232,12 @@
     <Compile Include="Features\ParameterCalculator\ParameterCalculatorCommand.cs" />
     <Compile Include="Features\ParameterCalculator\ParameterCalculatorService.cs" />
     <Compile Include="Features\ParameterCalculator\UI\ParameterCalculatorWindow.xaml.cs" />
+    <Compile Include="Features\ParameterService\Models\PredefinedParameterServiceDefinition.cs" />
+    <Compile Include="Features\ParameterService\Models\ParameterServiceDescriptor.cs" />
+    <Compile Include="Features\ParameterService\Models\ParameterServiceImportResult.cs" />
+    <Compile Include="Features\ParameterService\Models\ParameterServiceResolveResult.cs" />
+    <Compile Include="Features\ParameterService\ParameterServiceCommand.cs" />
+    <Compile Include="Features\ParameterService\ParameterServiceService.cs" />
     <Compile Include="Features\ParameterClear\Models\ParameterClearCatalog.cs" />
     <Compile Include="Features\ParameterClear\Models\ParameterClearOptions.cs" />
     <Compile Include="Features\ParameterClear\Models\ParameterClearResult.cs" />
@@ -183,6 +245,13 @@
     <Compile Include="Features\ParameterClear\ParameterClearCommand.cs" />
     <Compile Include="Features\ParameterClear\ParameterClearService.cs" />
     <Compile Include="Features\ParameterClear\UI\ParameterClearWindow.xaml.cs" />
+    <Compile Include="Features\ParameterCopy\Models\ParameterCopyCatalog.cs" />
+    <Compile Include="Features\ParameterCopy\Models\ParameterCopyOptions.cs" />
+    <Compile Include="Features\ParameterCopy\Models\ParameterCopyResult.cs" />
+    <Compile Include="Features\ParameterCopy\Models\ParameterCopyScope.cs" />
+    <Compile Include="Features\ParameterCopy\ParameterCopyCommand.cs" />
+    <Compile Include="Features\ParameterCopy\ParameterCopyService.cs" />
+    <Compile Include="Features\ParameterCopy\UI\ParameterCopyWindow.xaml.cs" />
     <Compile Include="Features\PurgeAnnotations\Models\PurgeAnnotationsResult.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsCommand.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsService.cs" />
@@ -266,13 +335,17 @@
     <Page Include="Features\ColorVentSystems\UI\ColorSetSystemsOptionsWindow.xaml" />
     <Page Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml" />
     <Page Include="Features\AiFamilyBuilder\UI\AiFamilyBuilderWindow.xaml" />
+    <Page Include="Features\CopyBetweenProjects\UI\CopyBetweenProjectsWindow.xaml" />
     <Page Include="Features\DuctFittingNumbering\UI\DuctFittingNumberingWindow.xaml" />
     <Page Include="Features\DuctFittingsArea\UI\DuctFittingsAreaOptionsWindow.xaml" />
     <Page Include="Features\Estimate\UI\EstimateOptionsWindow.xaml" />
     <Page Include="Features\FlowChanger\UI\FlowChangerOptionsWindow.xaml" />
+    <Page Include="Features\HvacTagging\UI\HvacTaggingWindow.xaml" />
+    <Page Include="Features\VelocitySizer\UI\VelocitySizerWindow.xaml" />
     <Page Include="Features\Levels\UI\LevelsOptionsWindow.xaml" />
     <Page Include="Features\ParameterCalculator\UI\ParameterCalculatorWindow.xaml" />
     <Page Include="Features\ParameterClear\UI\ParameterClearWindow.xaml" />
+    <Page Include="Features\ParameterCopy\UI\ParameterCopyWindow.xaml" />
     <Page Include="Features\RenameMaterials\UI\RenameMaterialsPreviewWindow.xaml" />
     <Page Include="Features\SharedParameters\UI\SharedParametersWindow.xaml" />
     <Page Include="Features\Splitter\UI\SplitterWindow.xaml" />

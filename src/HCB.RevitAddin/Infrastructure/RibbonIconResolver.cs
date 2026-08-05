@@ -1,77 +1,101 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
+using System.Reflection;
+using System.Windows.Media;
 using Autodesk.Revit.UI;
 
 namespace HCB.RevitAddin
 {
     internal static class RibbonIconResolver
     {
-        private static readonly ConcurrentDictionary<string, string?> ResolvedPathCache = new(StringComparer.OrdinalIgnoreCase);
-
         public static void ApplyTo(ButtonData buttonData, Type commandType, string? resourceDirectoryOverride = null)
         {
             string assemblyDir = Path.GetDirectoryName(commandType.Assembly.Location) ?? string.Empty;
-            string featureResourcesDir = string.IsNullOrWhiteSpace(resourceDirectoryOverride)
-                ? GetFeatureResourcesDir(assemblyDir, commandType)
-                : Path.Combine(assemblyDir, resourceDirectoryOverride);
-            string sharedResourcesDir = Path.Combine(assemblyDir, "Resources");
+            string primaryResourceDir = string.IsNullOrWhiteSpace(resourceDirectoryOverride)
+                ? GetFeatureResourcesDir(commandType)
+                : resourceDirectoryOverride;
+            const string sharedResourcesDir = "Resources";
 
-            string? largeIconPath = ResolveIconPath(featureResourcesDir, sharedResourcesDir, "icon32.png", "icon.png");
-            string? smallIconPath = ResolveIconPath(featureResourcesDir, sharedResourcesDir, "icon16.png", "icon32.png", "icon.png");
+            Assembly assembly = commandType.Assembly;
+            ImageSource? largeIcon = ResolveIcon(assemblyDir, assembly, primaryResourceDir, sharedResourcesDir, 32, "icon32.png", "icon.png");
+            ImageSource? smallIcon = ResolveIcon(assemblyDir, assembly, primaryResourceDir, sharedResourcesDir, 16, "icon16.png", "icon32.png", "icon.png");
 
-            if (largeIconPath != null)
+            if (largeIcon != null)
             {
-                buttonData.LargeImage = ImageLoader.LoadPng(largeIconPath, 32);
+                buttonData.LargeImage = largeIcon;
             }
 
-            if (smallIconPath != null)
+            if (smallIcon != null)
             {
-                buttonData.Image = ImageLoader.LoadPng(smallIconPath, 16);
+                buttonData.Image = smallIcon;
             }
         }
 
-        private static string GetFeatureResourcesDir(string assemblyDir, Type commandType)
+        private static string GetFeatureResourcesDir(Type commandType)
         {
             string? namespaceName = commandType.Namespace;
             if (string.IsNullOrWhiteSpace(namespaceName))
             {
-                return Path.Combine(assemblyDir, "Resources");
+                return "Resources";
             }
 
             string[] parts = namespaceName.Split('.');
             int featuresIndex = Array.IndexOf(parts, "Features");
             if (featuresIndex < 0 || featuresIndex >= parts.Length - 1)
             {
-                return Path.Combine(assemblyDir, "Resources");
+                return "Resources";
             }
 
-            return Path.Combine(assemblyDir, "Features", parts[featuresIndex + 1], "Resources");
+            return Path.Combine("Features", parts[featuresIndex + 1], "Resources");
         }
 
-        private static string? ResolveIconPath(string primaryDir, string fallbackDir, params string[] fileNames)
+        private static ImageSource? ResolveIcon(
+            string assemblyDir,
+            Assembly assembly,
+            string primaryDir,
+            string fallbackDir,
+            int pixelWidth,
+            params string[] fileNames)
         {
-            string cacheKey = string.Join("|", new[] { primaryDir, fallbackDir }.Concat(fileNames));
-            return ResolvedPathCache.GetOrAdd(cacheKey, _ =>
+            foreach (string fileName in fileNames)
             {
-                foreach (string fileName in fileNames)
+                ImageSource? primaryIcon = LoadIcon(assemblyDir, assembly, Path.Combine(primaryDir, fileName), pixelWidth);
+                if (primaryIcon != null)
                 {
-                    string primaryPath = Path.Combine(primaryDir, fileName);
-                    if (File.Exists(primaryPath))
-                    {
-                        return primaryPath;
-                    }
-
-                    string fallbackPath = Path.Combine(fallbackDir, fileName);
-                    if (File.Exists(fallbackPath))
-                    {
-                        return fallbackPath;
-                    }
+                    return primaryIcon;
                 }
 
-                return null;
-            });
+                ImageSource? fallbackIcon = LoadIcon(assemblyDir, assembly, Path.Combine(fallbackDir, fileName), pixelWidth);
+                if (fallbackIcon != null)
+                {
+                    return fallbackIcon;
+                }
+            }
+
+            return null;
+        }
+
+        private static ImageSource? LoadIcon(string assemblyDir, Assembly assembly, string relativePath, int pixelWidth)
+        {
+            string filePath = Path.Combine(assemblyDir, relativePath);
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    return ImageLoader.LoadPng(filePath, pixelWidth);
+                }
+                catch (IOException)
+                {
+                }
+                catch (InvalidOperationException)
+                {
+                }
+                catch (NotSupportedException)
+                {
+                }
+            }
+
+            return ImageLoader.TryLoadEmbeddedPng(assembly, relativePath, pixelWidth);
         }
     }
 }

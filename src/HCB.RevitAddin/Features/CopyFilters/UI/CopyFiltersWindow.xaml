@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Kopiowanie filtrów"
-        Width="1080"
-        Height="720"
+        Width="600"
+        Height="420"
         MinWidth="820"
         MinHeight="520"
         ResizeMode="CanResize"
@@ -37,7 +37,7 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Header="1. Widok lub szablon źródłowy"
-                      Padding="10">
+                      Padding="10" MinWidth="240">
                 <DockPanel LastChildFill="True">
                     <TextBox x:Name="SourceSearchTextBox"
                              Margin="0,0,0,8"
@@ -72,7 +72,7 @@
                               DockPanel.Dock="Top" />
                     <ListBox x:Name="SourceViewsListBox"
                              DisplayMemberPath="DisplayName"
-                             SelectionChanged="SourceViewsListBox_OnSelectionChanged" />
+                             SelectionChanged="SourceViewsListBox_OnSelectionChanged" MinWidth="180" />
                 </DockPanel>
             </GroupBox>
 
@@ -87,7 +87,7 @@
 
             <GroupBox Grid.Column="2"
                       Header="2. Filtry"
-                      Margin="12,0">
+                      Margin="12,0" MinWidth="120">
                 <DockPanel LastChildFill="True">
                     <controls:SelectionActionsBar DockPanel.Dock="Top"
                                                   Margin="0,0,0,8"
@@ -112,7 +112,7 @@
 
             <GroupBox Grid.Column="4"
                       Header="3. Widoki lub szablony docelowe"
-                      Padding="10">
+                      Padding="10" MinWidth="250">
                 <DockPanel LastChildFill="True">
                     <TextBox x:Name="DestinationSearchTextBox"
                              Margin="0,0,0,8"
@@ -153,7 +153,7 @@
                                                   RightButtonClick="ClearDestinationsButton_OnClick" />
                     <ListBox x:Name="DestinationViewsListBox"
                              DisplayMemberPath="DisplayName"
-                             SelectionMode="Extended" />
+                             SelectionMode="Extended" MinWidth="180" />
                 </DockPanel>
             </GroupBox>
         </Grid>

@@ -76,6 +76,7 @@ public sealed class UpgradeAndCopyCommand : IExternalCommand
         {
             MainInstruction = "Wybierz miejsce zapisu kopii po upgrade.",
             MainContent = "Mozesz zapisac kopie w tym samym folderze co pliki zrodlowe albo wskazac osobny folder docelowy.",
+            VerificationText = "Przemianuj tez plik zrodlowy, dodajac jego oryginalna wersje (np. _R24)",
             CommonButtons = TaskDialogCommonButtons.Cancel
         };
 
@@ -83,9 +84,10 @@ public sealed class UpgradeAndCopyCommand : IExternalCommand
         dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Wybierz osobny folder docelowy");
 
         TaskDialogResult decision = dialog.Show();
+        bool renameSourceWithVersion = dialog.WasVerificationChecked();
         if (decision == TaskDialogResult.CommandLink1)
         {
-            return service.ProcessUsingSourceFolders(commandData.Application.Application, filePaths);
+            return service.ProcessUsingSourceFolders(commandData.Application.Application, filePaths, renameSourceWithVersion);
         }
 
         if (decision != TaskDialogResult.CommandLink2)
@@ -99,7 +101,7 @@ public sealed class UpgradeAndCopyCommand : IExternalCommand
             return null;
         }
 
-        return service.Process(commandData.Application.Application, filePaths, outputFolderPath);
+        return service.Process(commandData.Application.Application, filePaths, outputFolderPath, renameSourceWithVersion);
     }
 
     private static IReadOnlyDictionary<string, string> ToRow(WithoutOpenOperationLogEntry entry)

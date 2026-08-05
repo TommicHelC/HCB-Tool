@@ -1,8 +1,10 @@
+using System;
 using System.Windows;
 using System.Text.Json;
 using Microsoft.Win32;
 using HCB.RevitAddin.Features.AiFamilyBuilder;
 using HCB.RevitAddin.Features.AiFamilyBuilder.Models;
+using HCB.RevitAddin.Features.AiFamilyBuilder.V3;
 
 namespace HCB.RevitAddin.Features.AiFamilyBuilder.UI;
 
@@ -12,32 +14,34 @@ public partial class AiFamilyBuilderWindow : Window
 
     private const string SampleJson = """
 {
+  "schema": "hcb.ai_family_builder.v2",
   "meta": {
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "family_name": "Damper_600x300",
-    "category_hint": "OST_DuctAccessory"
+    "category_hint": "OST_DuctAccessory",
+    "template_hint": "Metric Generic Model"
   },
   "parameters": [
     {
       "name": "Width",
-      "kind": "family",
-      "spec_type": "length",
+      "source": "family",
+      "data_type": "length",
       "group": "Geometry",
-      "is_instance": false
+      "scope": "type"
     },
     {
       "name": "Height",
-      "kind": "family",
-      "spec_type": "length",
+      "source": "family",
+      "data_type": "length",
       "group": "Geometry",
-      "is_instance": false
+      "scope": "type"
     },
     {
       "name": "Depth",
-      "kind": "family",
-      "spec_type": "length",
+      "source": "family",
+      "data_type": "length",
       "group": "Geometry",
-      "is_instance": false
+      "scope": "type"
     }
   ],
   "types": [
@@ -52,11 +56,12 @@ public partial class AiFamilyBuilderWindow : Window
   ],
   "geometry": [
     {
-      "op": "extrusion_rectangle",
+      "kind": "rectangular_prism",
       "name": "Body",
-      "width": "Width",
-      "height": "Height",
-      "depth": "Depth"
+      "solid": true,
+      "width": { "ref": "Width" },
+      "height": { "ref": "Height" },
+      "depth": { "ref": "Depth" }
     }
   ]
 }
@@ -66,7 +71,7 @@ public partial class AiFamilyBuilderWindow : Window
     {
         InitializeComponent();
         JsonTextBox.Text = SampleJson;
-        FooterBar.StatusText = "Wklej JSON i uruchom generator parametrow, typow oraz geometrii MVP.";
+        SetStatus("Wklej JSON v2 i uruchom generator parametrow, typow oraz geometrii parametrycznej.");
     }
 
     public AiFamilyBuilderOptions Options => new()
@@ -78,14 +83,14 @@ public partial class AiFamilyBuilderWindow : Window
     {
         if (string.IsNullOrWhiteSpace(JsonTextBox.Text))
         {
-            FooterBar.StatusText = "Wklej kod JSON.";
+            SetStatus("Wklej kod JSON.");
             return;
         }
 
-        AiFamilyBuilderValidationResult validation = _validationService.ValidateJson(JsonTextBox.Text);
+        AiFamilyBuilderValidationResult validation = ValidateInput(JsonTextBox.Text);
         if (!validation.IsValid)
         {
-            FooterBar.StatusText = $"JSON ma bledy semantyczne: {validation.Errors[0]}";
+            SetValidationMessages(validation, "JSON ma bledy semantyczne.");
             return;
         }
 
@@ -112,34 +117,43 @@ public partial class AiFamilyBuilderWindow : Window
         }
 
         JsonTextBox.Text = File.ReadAllText(dialog.FileName);
-        FooterBar.StatusText = $"Wczytano plik: {dialog.FileName}";
+        SetStatus($"Wczytano plik: {dialog.FileName}");
     }
 
     private void InsertSampleButton_OnClick(object sender, RoutedEventArgs e)
     {
         JsonTextBox.Text = SampleJson;
-        FooterBar.StatusText = "Wstawiono przykladowy JSON.";
+        SetStatus("Wstawiono przykladowy JSON.");
     }
 
     private void ValidateJsonButton_OnClick(object sender, RoutedEventArgs e)
     {
-        AiFamilyBuilderValidationResult validation = _validationService.ValidateJson(JsonTextBox.Text);
+        AiFamilyBuilderValidationResult validation = ValidateInput(JsonTextBox.Text);
         if (!validation.IsValid)
         {
-            FooterBar.StatusText = $"JSON niepoprawny: {validation.Errors[0]}";
+            SetValidationMessages(validation, "JSON niepoprawny.");
             return;
         }
 
-        FooterBar.StatusText = validation.Warnings.Count == 0
-            ? "JSON jest poprawny skladniowo i semantycznie."
-            : $"JSON poprawny, ale ma ostrzezenia: {validation.Warnings[0]}";
+        SetValidationMessages(
+            validation,
+            validation.Warnings.Count == 0
+                ? "JSON jest poprawny skladniowo i semantycznie."
+                : "JSON poprawny, ale ma ostrzezenia.");
+    }
+
+    private AiFamilyBuilderValidationResult ValidateInput(string jsonText)
+    {
+        return AiFamilyBuilderSchemaDetector.IsV3(jsonText)
+            ? new AiFamilyBuilderV3Service().Validate(jsonText)
+            : _validationService.ValidateJson(jsonText);
     }
 
     private void FormatJsonButton_OnClick(object sender, RoutedEventArgs e)
     {
         if (!TryParseJson(out JsonDocument? document, out string errorMessage) || document == null)
         {
-            FooterBar.StatusText = $"Nie mozna sformatowac JSON: {errorMessage}";
+            SetStatus($"Nie mozna sformatowac JSON: {errorMessage}");
             return;
         }
 
@@ -148,7 +162,25 @@ public partial class AiFamilyBuilderWindow : Window
             WriteIndented = true
         });
 
-        FooterBar.StatusText = "Sformatowano JSON.";
+        SetStatus("Sformatowano JSON.");
+    }
+
+    private void CopyMessagesButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(MessagesTextBox.Text))
+        {
+            SetStatus("Brak komunikatow do skopiowania.");
+            return;
+        }
+
+        Clipboard.SetText(MessagesTextBox.Text);
+        SetStatus("Skopiowano komunikaty do schowka.");
+    }
+
+    private void ClearMessagesButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        MessagesTextBox.Clear();
+        SetStatus("Wyczyszczono komunikaty.");
     }
 
     private bool TryParseJson(out JsonDocument? document, out string errorMessage)
@@ -172,5 +204,31 @@ public partial class AiFamilyBuilderWindow : Window
             errorMessage = ex.Message;
             return false;
         }
+    }
+
+    private void SetStatus(string statusText)
+    {
+        FooterBar.StatusText = statusText;
+        MessagesTextBox.Text = statusText;
+    }
+
+    private void SetValidationMessages(AiFamilyBuilderValidationResult validation, string header)
+    {
+        List<string> lines = [header];
+        if (validation.Errors.Count > 0)
+        {
+            lines.Add("Errors:");
+            lines.AddRange(validation.Errors);
+        }
+
+        if (validation.Warnings.Count > 0)
+        {
+            lines.Add("Warnings:");
+            lines.AddRange(validation.Warnings);
+        }
+
+        string text = string.Join(Environment.NewLine, lines);
+        FooterBar.StatusText = header;
+        MessagesTextBox.Text = text;
     }
 }

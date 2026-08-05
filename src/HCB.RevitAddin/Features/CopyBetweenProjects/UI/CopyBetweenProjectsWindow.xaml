@@ -1,0 +1,120 @@
+<Window x:Class="HCB.RevitAddin.Features.CopyBetweenProjects.UI.CopyBetweenProjectsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Copy Beetwen Projects"
+        Width="760"
+        Height="760"
+        MinWidth="680"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Copy Beetwen Projects"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+        <GroupBox Grid.Row="1"
+                  Margin="0,16,0,16"
+                  Header="Projekty">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Kopiuj z"
+                           VerticalAlignment="Center" />
+                <ComboBox x:Name="SourceDocumentComboBox"
+                          Grid.Row="0"
+                          Grid.Column="1"
+                          SelectionChanged="DocumentComboBox_OnSelectionChanged" />
+                <TextBlock Grid.Row="2"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Wklej do"
+                           VerticalAlignment="Center" />
+                <ComboBox x:Name="TargetDocumentComboBox"
+                          Grid.Row="2"
+                          Grid.Column="1"
+                          SelectionChanged="DocumentComboBox_OnSelectionChanged" />
+            </Grid>
+        </GroupBox>
+
+        <TextBox x:Name="SearchTextBox"
+                 Grid.Row="2"
+                 Margin="0,0,0,8"
+                 TextChanged="SearchTextBox_OnTextChanged" />
+
+        <StackPanel x:Name="PrimaryFilterPanel"
+                    Grid.Row="3"
+                    Margin="0,0,0,8"
+                    Visibility="Collapsed">
+            <TextBlock Margin="0,0,0,4"
+                       Style="{StaticResource SectionLabelStyle}"
+                       Text="Kategoria" />
+            <ComboBox x:Name="FilterGroupComboBox"
+                      DisplayMemberPath="DisplayName"
+                      SelectedValuePath="Value"
+                      SelectionChanged="FilterGroupComboBox_OnSelectionChanged" />
+        </StackPanel>
+
+        <StackPanel x:Name="SecondaryFilterPanel"
+                    Grid.Row="4"
+                    Margin="0,0,0,8"
+                    Visibility="Collapsed">
+            <TextBlock Margin="0,0,0,4"
+                       Style="{StaticResource SectionLabelStyle}"
+                       Text="Typ" />
+            <ComboBox x:Name="SecondaryFilterGroupComboBox"
+                      DisplayMemberPath="DisplayName"
+                      SelectedValuePath="Value"
+                      SelectionChanged="SecondaryFilterGroupComboBox_OnSelectionChanged" />
+        </StackPanel>
+
+        <GroupBox x:Name="ItemsGroupBox"
+                  Grid.Row="5"
+                  Header="Elementy do skopiowania">
+            <DockPanel LastChildFill="True">
+                <controls:SelectionActionsBar DockPanel.Dock="Top"
+                                              Margin="0,0,0,8"
+                                              LeftButtonText="Wszystkie"
+                                              RightButtonText="Brak"
+                                              LeftButtonClick="SelectAllButton_OnClick"
+                                              RightButtonClick="SelectNoneButton_OnClick" />
+                <ListBox x:Name="ItemsListBox"
+                         DisplayMemberPath="DisplayName"
+                         SelectionMode="Extended"
+                         SelectionChanged="ItemsListBox_OnSelectionChanged" />
+            </DockPanel>
+        </GroupBox>
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Grid.Row="6"
+                                  Margin="0,16,0,0"
+                                  PrimaryButtonText="Kopiuj"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="ConfirmButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </Grid>
+</Window>

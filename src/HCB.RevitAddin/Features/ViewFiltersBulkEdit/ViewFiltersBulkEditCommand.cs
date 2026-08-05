@@ -24,6 +24,11 @@ public sealed class ViewFiltersBulkEditCommand : IExternalCommand
             return Result.Succeeded;
         }
 
+        ElementId? activeViewId = uiDocument.ActiveView?.Id;
+        View? activeView = activeViewId != null
+            ? viewsWithFilters.FirstOrDefault(view => view.Id == activeViewId)
+            : null;
+
         SelectionListWindow viewsWindow = new(
             "View Filters Bulk Edit",
             "Wybierz widoki",
@@ -31,7 +36,7 @@ public sealed class ViewFiltersBulkEditCommand : IExternalCommand
             [],
             "Wybierz",
             null,
-            viewsWithFilters.Contains(uiDocument.ActiveView) ? uiDocument.ActiveView : null,
+            activeView,
             "Active View",
             "ViewType",
             "Type");

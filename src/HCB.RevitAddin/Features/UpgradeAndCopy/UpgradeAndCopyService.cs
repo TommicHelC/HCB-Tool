@@ -16,7 +16,7 @@ public sealed class UpgradeAndCopyService
     private readonly WithoutOpenFileMetadataService _fileMetadataService = new();
     private readonly WithoutOpenDocumentService _documentService = new();
 
-    public UpgradeAndCopyResult Process(Application application, IEnumerable<string> filePaths, string outputFolderPath)
+    public UpgradeAndCopyResult Process(Application application, IEnumerable<string> filePaths, string outputFolderPath, bool renameSourceWithVersion = false)
     {
         IReadOnlyList<string> normalizedPaths = _fileDiscoveryService.Normalize(filePaths);
         Directory.CreateDirectory(outputFolderPath);
@@ -24,7 +24,7 @@ public sealed class UpgradeAndCopyService
 
         foreach (string filePath in normalizedPaths)
         {
-            entries.Add(ProcessSingle(application, filePath, outputFolderPath));
+            entries.Add(ProcessSingle(application, filePath, outputFolderPath, renameSourceWithVersion));
         }
 
         return new UpgradeAndCopyResult
@@ -33,7 +33,7 @@ public sealed class UpgradeAndCopyService
         };
     }
 
-    public UpgradeAndCopyResult ProcessUsingSourceFolders(Application application, IEnumerable<string> filePaths)
+    public UpgradeAndCopyResult ProcessUsingSourceFolders(Application application, IEnumerable<string> filePaths, bool renameSourceWithVersion = false)
     {
         IReadOnlyList<string> normalizedPaths = _fileDiscoveryService.Normalize(filePaths);
         List<WithoutOpenOperationLogEntry> entries = new(normalizedPaths.Count);
@@ -54,7 +54,7 @@ public sealed class UpgradeAndCopyService
             }
 
             Directory.CreateDirectory(sourceFolderPath);
-            entries.Add(ProcessSingle(application, filePath, sourceFolderPath));
+            entries.Add(ProcessSingle(application, filePath, sourceFolderPath, renameSourceWithVersion));
         }
 
         return new UpgradeAndCopyResult
@@ -63,7 +63,7 @@ public sealed class UpgradeAndCopyService
         };
     }
 
-    private WithoutOpenOperationLogEntry ProcessSingle(Application application, string filePath, string outputFolderPath)
+    private WithoutOpenOperationLogEntry ProcessSingle(Application application, string filePath, string outputFolderPath, bool renameSourceWithVersion)
     {
         DateTime startedAt = DateTime.UtcNow;
         WithoutOpenFileScanItem scan = _fileMetadataService.Scan(filePath);
@@ -94,7 +94,9 @@ public sealed class UpgradeAndCopyService
             if (scan.IsSavedInCurrentVersion)
             {
                 File.Copy(filePath, targetPath, true);
-                return CreateLog(filePath, WithoutOpenOperationStatus.Success, $"Skopiowano bez upgrade: {targetPath}", startedAt, targetPath);
+                string copyMessage = $"Skopiowano bez upgrade: {targetPath}";
+                copyMessage += RenameSourceIfRequested(renameSourceWithVersion, scan, ref filePath);
+                return CreateLog(filePath, WithoutOpenOperationStatus.Success, copyMessage, startedAt, targetPath);
             }
 
             Document? document = null;
@@ -125,7 +127,9 @@ public sealed class UpgradeAndCopyService
                 }
             }
 
-            return CreateLog(filePath, WithoutOpenOperationStatus.Success, $"Zapisano kopie po upgrade: {targetPath}", startedAt, targetPath);
+            string upgradeMessage = $"Zapisano kopie po upgrade: {targetPath}";
+            upgradeMessage += RenameSourceIfRequested(renameSourceWithVersion, scan, ref filePath);
+            return CreateLog(filePath, WithoutOpenOperationStatus.Success, upgradeMessage, startedAt, targetPath);
         }
         catch (Exception exception)
         {
@@ -141,6 +145,58 @@ public sealed class UpgradeAndCopyService
         string baseName = ExistingRevitSuffixRegex.Replace(fileNameWithoutExtension, string.Empty);
 
         return Path.Combine(outputFolderPath, baseName + suffix + extension);
+    }
+
+    private static string RenameSourceIfRequested(bool renameSourceWithVersion, WithoutOpenFileScanItem scan, ref string filePath)
+    {
+        if (!renameSourceWithVersion)
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            string? sourceFolderPath = Path.GetDirectoryName(filePath);
+            if (string.IsNullOrWhiteSpace(sourceFolderPath))
+            {
+                return " | Nie przemianowano zrodla: nie ustalono folderu.";
+            }
+
+            string extension = Path.GetExtension(filePath);
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            string suffix = GetSourceRevitSuffix(scan);
+            string baseName = ExistingRevitSuffixRegex.Replace(fileNameWithoutExtension, string.Empty);
+            string newSourcePath = Path.Combine(sourceFolderPath, baseName + suffix + extension);
+
+            if (string.Equals(newSourcePath, filePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return $" | Zrodlo juz ma wersje w nazwie ({suffix}).";
+            }
+
+            if (File.Exists(newSourcePath))
+            {
+                return $" | Nie przemianowano zrodla: plik {Path.GetFileName(newSourcePath)} juz istnieje.";
+            }
+
+            File.Move(filePath, newSourcePath);
+            filePath = newSourcePath;
+            return $" | Zrodlo przemianowano na: {newSourcePath}";
+        }
+        catch (Exception exception)
+        {
+            return $" | Nie przemianowano zrodla: {exception.Message}";
+        }
+    }
+
+    private static string GetSourceRevitSuffix(WithoutOpenFileScanItem scan)
+    {
+        Match yearMatch = Regex.Match(scan.Format ?? string.Empty, @"\d{4}");
+        if (yearMatch.Success)
+        {
+            return $"_R{yearMatch.Value[^2..]}";
+        }
+
+        return "_RVT";
     }
 
     private static string GetRevitSuffix(Application application)

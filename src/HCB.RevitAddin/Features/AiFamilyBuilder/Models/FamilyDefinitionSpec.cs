@@ -6,6 +6,9 @@ namespace HCB.RevitAddin.Features.AiFamilyBuilder.Models;
 
 public sealed class FamilyDefinitionSpec
 {
+    [JsonPropertyName("schema")]
+    public string Schema { get; init; } = string.Empty;
+
     [JsonPropertyName("meta")]
     public FamilyMetaSpec Meta { get; init; } = new();
 
@@ -20,6 +23,9 @@ public sealed class FamilyDefinitionSpec
 
     [JsonPropertyName("dimensions")]
     public List<DimensionConstraintSpec> Dimensions { get; init; } = [];
+
+    [JsonPropertyName("constraints")]
+    public List<DimensionConstraintSpec> Constraints { get; init; } = [];
 
     [JsonPropertyName("geometry")]
     public List<GeometryOperationSpec> Geometry { get; init; } = [];
@@ -48,14 +54,23 @@ public sealed class FamilyParameterSpec
     [JsonPropertyName("kind")]
     public string Kind { get; init; } = "family";
 
+    [JsonPropertyName("source")]
+    public string? Source { get; init; }
+
     [JsonPropertyName("spec_type")]
     public string SpecType { get; init; } = "text";
+
+    [JsonPropertyName("data_type")]
+    public string? DataType { get; init; }
 
     [JsonPropertyName("group")]
     public string Group { get; init; } = "Data";
 
     [JsonPropertyName("is_instance")]
     public bool IsInstance { get; init; }
+
+    [JsonPropertyName("scope")]
+    public string? Scope { get; init; }
 
     [JsonPropertyName("formula")]
     public string? Formula { get; init; }
@@ -75,6 +90,12 @@ public sealed class ReferencePlaneSpec
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
 
+    [JsonPropertyName("view")]
+    public string? View { get; init; }
+
+    [JsonPropertyName("line_direction")]
+    public string? LineDirection { get; init; }
+
     [JsonPropertyName("orientation")]
     public string Orientation { get; init; } = "vertical";
 
@@ -89,6 +110,9 @@ public sealed class DimensionConstraintSpec
 {
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
+
+    [JsonPropertyName("view")]
+    public string? View { get; init; }
 
     [JsonPropertyName("orientation")]
     public string Orientation { get; init; } = "horizontal";
@@ -111,8 +135,14 @@ public sealed class GeometryOperationSpec
     [JsonPropertyName("op")]
     public string Op { get; init; } = string.Empty;
 
+    [JsonPropertyName("kind")]
+    public string Kind { get; init; } = string.Empty;
+
     [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("solid")]
+    public bool Solid { get; init; } = true;
 
     [JsonPropertyName("width")]
     public JsonElement Width { get; init; }
