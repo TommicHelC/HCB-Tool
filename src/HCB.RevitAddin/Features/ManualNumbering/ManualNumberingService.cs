@@ -24,14 +24,15 @@ public sealed class ManualNumberingService
     public ManualNumberingResult Apply(Document document, IEnumerable<Element> elements, ManualNumberingOptions options)
     {
         ManualNumberingResult result = new();
+        List<Element> targets = elements.ToList();
         int currentNumber = options.UseLastProjectNumber
-            ? GetNextProjectNumber(document, options.ParameterName)
+            ? GetNextProjectNumber(document, options.ParameterName, targets)
             : options.StartNumber;
 
         using Transaction transaction = new(document, "Manual Numbering");
         transaction.Start();
 
-        foreach (Element element in elements)
+        foreach (Element element in targets)
         {
             Parameter? parameter = element.LookupParameter(options.ParameterName);
             if (parameter == null || parameter.IsReadOnly || parameter.StorageType != StorageType.String)
@@ -56,11 +57,37 @@ public sealed class ManualNumberingService
         return result;
     }
 
-    private static int GetNextProjectNumber(Document document, string parameterName)
+    private static ElementId ResolveParameterId(IReadOnlyList<Element> elements, string parameterName)
+    {
+        foreach (Element element in elements)
+        {
+            Parameter? parameter = element.LookupParameter(parameterName);
+            if (parameter != null && parameter.Id != ElementId.InvalidElementId)
+            {
+                return parameter.Id;
+            }
+        }
+
+        return ElementId.InvalidElementId;
+    }
+
+    private static int GetNextProjectNumber(Document document, string parameterName, IReadOnlyList<Element> sampleElements)
     {
         int maxNumber = 0;
 
-        foreach (Element element in new FilteredElementCollector(document).WhereElementIsNotElementType())
+        FilteredElementCollector collector = new FilteredElementCollector(document)
+            .WhereElementIsNotElementType();
+
+        // Narrow the scan inside the Revit engine. Running LookupParameter over every element in
+        // the model is orders of magnitude slower than letting Revit skip elements that do not
+        // carry the parameter at all.
+        ElementId parameterId = ResolveParameterId(sampleElements, parameterName);
+        if (parameterId != ElementId.InvalidElementId)
+        {
+            collector = collector.WherePasses(new ElementParameterFilter(new HasValueFilterRule(parameterId)));
+        }
+
+        foreach (Element element in collector)
         {
             Parameter? parameter = element.LookupParameter(parameterName);
             string text = (parameter?.AsString() ?? parameter?.AsValueString() ?? string.Empty).Trim();

@@ -18,13 +18,17 @@ public sealed class PurgeAnnotationsService
             .ThenBy(GetDisplayName)
             .ToList();
 
-        HashSet<long> usedTypeIds = new(
-            new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .Select(element => element.GetTypeId())
-                .Where(id => id != ElementId.InvalidElementId)
-                .Select(id => id.Value));
+        // Streamed on purpose: ToElements() materialises a List<Element> of the whole model before
+        // a single type id is read.
+        HashSet<long> usedTypeIds = [];
+        foreach (Element element in new FilteredElementCollector(document).WhereElementIsNotElementType())
+        {
+            ElementId typeId = element.GetTypeId();
+            if (typeId != ElementId.InvalidElementId)
+            {
+                usedTypeIds.Add(typeId.Value);
+            }
+        }
 
         return annotationTypes
             .Where(type => !usedTypeIds.Contains(type.Id.Value))

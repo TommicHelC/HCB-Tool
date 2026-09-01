@@ -16,6 +16,24 @@ public sealed class DuctFittingNumberingService
         DuctsAndFittings
     }
 
+    private static readonly BuiltInCategory[] DuctCategories =
+    [
+        BuiltInCategory.OST_DuctCurves
+    ];
+
+    private static readonly BuiltInCategory[] FittingCategories =
+    [
+        BuiltInCategory.OST_DuctFitting,
+        BuiltInCategory.OST_DuctAccessory
+    ];
+
+    private static readonly BuiltInCategory[] NumberedCategories =
+    [
+        BuiltInCategory.OST_DuctCurves,
+        BuiltInCategory.OST_DuctFitting,
+        BuiltInCategory.OST_DuctAccessory
+    ];
+
     private static readonly string[] FittingGroupingParameterNames =
     [
         "LIN_VE_DIM_TYP",
@@ -73,8 +91,8 @@ public sealed class DuctFittingNumberingService
         }
 
         return new FilteredElementCollector(document)
+            .WherePasses(CreateScopeFilter(scope))
             .WhereElementIsNotElementType()
-            .Where(element => IsSupported(element, scope))
             .Where(element => !ShouldSkipElement(document, element))
             .ToList();
     }
@@ -118,7 +136,7 @@ public sealed class DuctFittingNumberingService
         transaction.Start();
 
         int currentNumber = useLastProjectNumber
-            ? GetNextProjectNumber(document, targetParameterName)
+            ? GetNextProjectNumber(document, targetParameterName, scope)
             : 1;
 
         foreach ((DuctKey _, NumberingGroup group) in groups.Ducts.OrderBy(pair => pair.Key, DuctKeyComparer.Instance))
@@ -174,11 +192,13 @@ public sealed class DuctFittingNumberingService
         return result;
     }
 
-    private static int GetNextProjectNumber(Document document, string targetParameterName)
+    private static int GetNextProjectNumber(Document document, string targetParameterName, NumberingScope scope)
     {
         int maxNumber = 0;
 
-        foreach (Element element in new FilteredElementCollector(document).WhereElementIsNotElementType())
+        foreach (Element element in new FilteredElementCollector(document)
+                     .WherePasses(CreateScopeFilter(scope))
+                     .WhereElementIsNotElementType())
         {
             Parameter? parameter = element.LookupParameter(targetParameterName);
             string text = (parameter?.AsString() ?? parameter?.AsValueString() ?? string.Empty).Trim();
@@ -209,6 +229,16 @@ public sealed class DuctFittingNumberingService
         }
 
         return null;
+    }
+
+    private static ElementMulticategoryFilter CreateScopeFilter(NumberingScope scope)
+    {
+        return new ElementMulticategoryFilter(scope switch
+        {
+            NumberingScope.Ducts => DuctCategories,
+            NumberingScope.Fittings => FittingCategories,
+            _ => NumberedCategories
+        });
     }
 
     private static bool IsSupported(Element? element, NumberingScope scope)

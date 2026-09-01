@@ -19,6 +19,11 @@ public sealed class HvacTaggingService
         .Select(rule => (long)rule.ModelCategory)
         .ToHashSet();
 
+    private static readonly BuiltInCategory[] SupportedModelCategories = SupportedCategoryTemplates
+        .Select(rule => rule.ModelCategory)
+        .Distinct()
+        .ToArray();
+
     public IReadOnlyList<HvacTagCategoryRule> CreateDefaultRules(Document document)
     {
         List<FamilySymbol> multiCategoryTags = GetTagTypes(document, BuiltInCategory.OST_MultiCategoryTags);
@@ -258,8 +263,8 @@ public sealed class HvacTaggingService
     private static List<Element> CollectCandidates(Document document, View view)
     {
         return new FilteredElementCollector(document, view.Id)
+            .WherePasses(new ElementMulticategoryFilter(SupportedModelCategories))
             .WhereElementIsNotElementType()
-            .Where(element => element.Category != null && SupportedCategoryIds.Contains(element.Category.Id.Value))
             .ToList();
     }
 

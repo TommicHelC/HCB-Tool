@@ -20,7 +20,7 @@ public sealed class ParameterClearService
 
     public IReadOnlyList<string> GetWritableParameterNames(IEnumerable<Element> elements)
     {
-        return elements
+        return DistinctParameterCarriers(elements)
             .SelectMany(element => element.Parameters.Cast<Parameter>())
             .Where(IsWritableParameter)
             .Select(GetParameterName)
@@ -158,16 +158,61 @@ public sealed class ParameterClearService
                 .Where(IsSupportedElement)
                 .DistinctBy(element => element!.Id.Value)
                 .Cast<Element>(),
-            ParameterClearScope.Category => new FilteredElementCollector(document)
-                .WhereElementIsNotElementType()
-                .Where(IsSupportedElement)
-                .Where(element => string.Equals(element.Category!.Name, options.CategoryName, StringComparison.CurrentCultureIgnoreCase)),
+            ParameterClearScope.Category => GetCategoryElements(document, options.CategoryName),
             ParameterClearScope.Model => new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
                 .Where(IsSupportedElement)
                 .Where(element => IsWritableParameter(element.LookupParameter(options.ParameterName))),
             _ => Array.Empty<Element>()
         };
+    }
+
+    /// <summary>
+    /// Resolves the category once and lets Revit filter on it, instead of walking the whole model
+    /// and comparing category names element by element. Falls back to the name scan when the name
+    /// cannot be resolved, so exotic (sub)categories keep working.
+    /// </summary>
+    private static IEnumerable<Element> GetCategoryElements(Document document, string? categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            return [];
+        }
+
+        ElementId categoryId = FindCategoryId(document, categoryName);
+        if (categoryId == ElementId.InvalidElementId)
+        {
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .Where(IsSupportedElement)
+                .Where(element => string.Equals(element.Category!.Name, categoryName, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        return new FilteredElementCollector(document)
+            .OfCategoryId(categoryId)
+            .WhereElementIsNotElementType()
+            .Where(IsSupportedElement);
+    }
+
+    private static ElementId FindCategoryId(Document document, string categoryName)
+    {
+        foreach (Category category in document.Settings.Categories)
+        {
+            if (string.Equals(category.Name, categoryName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return category.Id;
+            }
+
+            foreach (Category subCategory in category.SubCategories)
+            {
+                if (string.Equals(subCategory.Name, categoryName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return subCategory.Id;
+                }
+            }
+        }
+
+        return ElementId.InvalidElementId;
     }
 
     private static bool IsWritableParameter(Parameter? parameter)
@@ -207,5 +252,22 @@ public sealed class ParameterClearService
     private static bool IsSupportedElement(Element? element)
     {
         return element is { Category: not null };
+    }
+
+    /// <summary>
+    /// Every instance of the same type in the same category exposes the same set of parameters,
+    /// so one sample per (category, type) is enough to build the catalog. On real models this
+    /// turns millions of Parameter lookups into a few thousand.
+    /// </summary>
+    private static IEnumerable<Element> DistinctParameterCarriers(IEnumerable<Element> elements)
+    {
+        HashSet<(long CategoryId, long TypeId)> seen = [];
+        foreach (Element element in elements)
+        {
+            if (seen.Add((element.Category?.Id.Value ?? 0L, element.GetTypeId().Value)))
+            {
+                yield return element;
+            }
+        }
     }
 }

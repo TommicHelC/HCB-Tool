@@ -28,7 +28,7 @@ public sealed class ParameterCalculatorService
 
     public IReadOnlyList<string> GetNumericParameterNames(IReadOnlyList<Element> elements)
     {
-        return elements
+        return DistinctParameterCarriers(elements)
             .SelectMany(element => element.Parameters.Cast<Parameter>())
             .Where(IsNumericParameter)
             .Select(GetParameterName)
@@ -40,7 +40,7 @@ public sealed class ParameterCalculatorService
 
     public IReadOnlyList<string> GetWritableNumericTargetParameterNames(IReadOnlyList<Element> elements)
     {
-        return elements
+        return DistinctParameterCarriers(elements)
             .SelectMany(element => element.Parameters.Cast<Parameter>())
             .Where(parameter => IsNumericParameter(parameter) && !parameter.IsReadOnly)
             .Select(GetParameterName)
@@ -208,5 +208,21 @@ public sealed class ParameterCalculatorService
     private static bool IsSupportedElement(Element? element)
     {
         return element is { Category: not null };
+    }
+
+    /// <summary>
+    /// Every instance of the same type in the same category exposes the same set of parameters,
+    /// so one sample per (category, type) is enough to list the available parameter names.
+    /// </summary>
+    private static IEnumerable<Element> DistinctParameterCarriers(IEnumerable<Element> elements)
+    {
+        HashSet<(long CategoryId, long TypeId)> seen = [];
+        foreach (Element element in elements)
+        {
+            if (seen.Add((element.Category?.Id.Value ?? 0L, element.GetTypeId().Value)))
+            {
+                yield return element;
+            }
+        }
     }
 }

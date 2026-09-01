@@ -21,8 +21,8 @@ public sealed class AccessoryTerminalNumberingService
         }
 
         return new FilteredElementCollector(document)
+            .OfCategory(BuiltInCategory.OST_DuctAccessory)
             .WhereElementIsNotElementType()
-            .Where(IsSupported)
             .Where(element => !IsFabricAir(document, element))
             .ToList();
     }
@@ -119,8 +119,8 @@ public sealed class AccessoryTerminalNumberingService
         int maxNumber = 0;
 
         IEnumerable<Element> elements = new FilteredElementCollector(document)
-            .WhereElementIsNotElementType()
-            .Where(IsSupported);
+            .OfCategory(BuiltInCategory.OST_DuctAccessory)
+            .WhereElementIsNotElementType();
 
         foreach (Element element in elements)
         {
