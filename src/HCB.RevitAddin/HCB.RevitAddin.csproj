@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configurations>Debug R25;Debug R25 Deploy;Debug R26;Debug R26 Deploy;Debug R27;Debug R27 Deploy;Release R25;Release R26;Release R27</Configurations>
     <RevitVersion Condition="'$(RevitVersion)' == '' and $(Configuration.Contains('R25'))">2025</RevitVersion>
@@ -253,6 +253,9 @@
     <Compile Include="Features\ParameterCopy\ParameterCopyService.cs" />
     <Compile Include="Features\ParameterCopy\UI\ParameterCopyWindow.xaml.cs" />
     <Compile Include="Features\PurgeAnnotations\Models\PurgeAnnotationsResult.cs" />
+    <Compile Include="Features\ProjectParameterAudit\Models\ProjectParameterAuditRow.cs" />
+    <Compile Include="Features\ProjectParameterAudit\ProjectParameterAuditCommand.cs" />
+    <Compile Include="Features\ProjectParameterAudit\ProjectParameterAuditService.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsCommand.cs" />
     <Compile Include="Features\PurgeAnnotations\PurgeAnnotationsService.cs" />
     <Compile Include="Features\RenameMaterials\Models\RenameMaterialsPreviewItem.cs" />

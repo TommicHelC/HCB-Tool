@@ -409,7 +409,13 @@ namespace HCB.RevitAddin
                     "Shared Params",
                     typeof(Features.SharedParameters.SharedParametersCommand),
                     "Sprawdza i wczytuje wymagane parametry wspoldzielone.",
-                    "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu.")
+                    "Co robi: sprawdza i dodaje brakujace parametry wspoldzielone HC_*. Jak uzyc: 1. Ustaw poprawny plik Shared Parameters. 2. Uruchom polecenie. 3. Zapisz wynik. Zakres: odpowiednie kategorie projektu."),
+                new RibbonPushButtonDefinition(
+                    "HcbProjectParameterAuditButton",
+                    "Param Audit",
+                    typeof(Features.ProjectParameterAudit.ProjectParameterAuditCommand),
+                    "Diagnozuje konfliktowe parametry projektu BimObject.",
+                    "Co robi: sprawdza parametry Nominal width, Nominal height oraz Weight Net (Kg) pod katem typu danych, GUID, bindingow, kategorii, wartosci, zestawien i filtrow. Jak uzyc: uruchom w projekcie, przefiltruj raport i wyeksportuj CSV przed decyzja o usunieciu albo migracji parametrow.")
             ];
 
             if (revitVersion >= 2026)
