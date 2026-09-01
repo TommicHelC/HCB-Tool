@@ -156,16 +156,10 @@
     <Compile Include="Features\FittingsAngle\FittingsAngleCommand.cs" />
     <Compile Include="Features\FittingsAngle\FittingsAngleService.cs" />
     <Compile Include="Features\FittingsAngle\Models\FittingsAngleResult.cs" />
-    <Compile Include="Features\ColorVentSystems\ColorVentSystemsCommand.cs" />
-    <Compile Include="Features\ColorVentSystems\ColorVentSystemsService.cs" />
-    <Compile Include="Features\ColorVentSystems\Models\ColorVentSystemsResult.cs" />
-    <Compile Include="Features\ColorVentSystems\Models\SystemColorPackageOption.cs" />
-    <Compile Include="Features\ColorVentSystems\UI\ColorSetSystemsOptionsWindow.xaml.cs" />
     <Compile Include="Features\ColorUniqueSystems\ColorUniqueSystemsCommand.cs" />
     <Compile Include="Features\ColorUniqueSystems\ColorUniqueSystemsService.cs" />
     <Compile Include="Features\ColorUniqueSystems\Models\ColorUniqueSystemsResult.cs" />
     <Compile Include="Features\ColorUniqueSystems\Models\SystemColorOption.cs" />
-    <Compile Include="Features\ColorVentSystems\Models\VentSystemColorOption.cs" />
     <Compile Include="Features\DuctFittingsArea\DuctFittingsAreaLinearCommand.cs" />
     <Compile Include="Features\DuctFittingsArea\DuctFittingsAreaMagicadCommand.cs" />
     <Compile Include="Features\DuctFittingsArea\DuctFittingsAreaService.cs" />
@@ -331,7 +325,6 @@
     <Compile Include="Infrastructure\WithoutOpen\WithoutOpenTransmissionDataService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Page Include="Features\CopyFilters\UI\CopyFiltersWindow.xaml" />
-    <Page Include="Features\ColorVentSystems\UI\ColorSetSystemsOptionsWindow.xaml" />
     <Page Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml" />
     <Page Include="Features\AiFamilyBuilder\UI\AiFamilyBuilderWindow.xaml" />
     <Page Include="Features\CopyBetweenProjects\UI\CopyBetweenProjectsWindow.xaml" />
