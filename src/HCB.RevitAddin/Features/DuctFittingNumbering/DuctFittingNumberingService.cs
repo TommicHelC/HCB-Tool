@@ -59,9 +59,10 @@ public sealed class DuctFittingNumberingService
     public IReadOnlyList<string> GetAvailableLengthParameters(Document document)
     {
         List<string> parameters = ["Length"];
+        // OfClass is a quick filter and rules out the InvalidCastException that a non-Duct
+        // element in OST_DuctCurves would trigger.
         IEnumerable<Duct> ducts = new FilteredElementCollector(document)
-            .OfCategory(BuiltInCategory.OST_DuctCurves)
-            .WhereElementIsNotElementType()
+            .OfClass(typeof(Duct))
             .Cast<Duct>()
             .Take(100);
 
