@@ -21,3 +21,4 @@
 /mcp_server.py
 /mcp_requirements.txt
 /src/HCB.RevitAddin/Infrastructure/Mcp/
+dist/
