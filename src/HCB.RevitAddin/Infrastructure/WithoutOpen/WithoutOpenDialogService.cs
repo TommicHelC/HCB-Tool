@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Microsoft.Win32;
-using Forms = System.Windows.Forms;
 
 namespace HCB.RevitAddin.Infrastructure.WithoutOpen;
 
@@ -38,15 +37,14 @@ public sealed class WithoutOpenDialogService
 
     public string? PickFolderPath(string description)
     {
-        using Forms.FolderBrowserDialog dialog = new()
+        OpenFolderDialog dialog = new()
         {
-            Description = description,
-            UseDescriptionForTitle = true,
-            ShowNewFolderButton = true
+            Title = description,
+            Multiselect = false
         };
 
-        return dialog.ShowDialog() == Forms.DialogResult.OK
-            ? dialog.SelectedPath
+        return dialog.ShowDialog() == true
+            ? dialog.FolderName
             : null;
     }
 

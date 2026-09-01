@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
@@ -67,7 +68,7 @@ public sealed class SplitterService
             removedConnectorCount = rebuild.RemovedElementCount;
         }
 
-        Line orientedLine;
+        Line? orientedLine;
         if (!TryGetOrientedLine(workingCurve, workingStart, workingEnd, out orientedLine, out string? orientedErrorMessage))
         {
             return BuildFailure(workingCurve.Id.Value, orientedErrorMessage ?? "Nie udalo sie przygotowac ciagu do podzialu.");
@@ -102,7 +103,7 @@ public sealed class SplitterService
 
         while (true)
         {
-            Line currentLine;
+            Line? currentLine;
             if (!TryGetOrientedLine(currentCurve, currentStart, currentEnd, out currentLine, out string? loopErrorMessage))
             {
                 return BuildFailure(workingCurve.Id.Value, loopErrorMessage ?? "Podzial zostal przerwany.");
@@ -328,7 +329,7 @@ public sealed class SplitterService
             .Any(reference => reference.Owner.Id == target.Owner.Id && reference.Id == target.Id);
     }
 
-    private static bool TryGetOrientedLine(MEPCurve curve, Reference reference, out Line? orientedLine, out XYZ startPoint, out XYZ endPoint, out string? errorMessage)
+    private static bool TryGetOrientedLine(MEPCurve curve, Reference reference, [NotNullWhen(true)] out Line? orientedLine, out XYZ startPoint, out XYZ endPoint, out string? errorMessage)
     {
         orientedLine = null;
         startPoint = XYZ.Zero;
@@ -358,7 +359,7 @@ public sealed class SplitterService
         return true;
     }
 
-    private static bool TryGetOrientedLine(MEPCurve curve, XYZ startPoint, XYZ endPoint, out Line? orientedLine, out string? errorMessage)
+    private static bool TryGetOrientedLine(MEPCurve curve, XYZ startPoint, XYZ endPoint, [NotNullWhen(true)] out Line? orientedLine, out string? errorMessage)
     {
         orientedLine = null;
         errorMessage = null;
