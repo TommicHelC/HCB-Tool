@@ -86,6 +86,11 @@
     <Compile Include="Features\UpgradeAndCopy\UpgradeAndCopyCommand.cs" />
     <Compile Include="Features\UpgradeAndCopy\UpgradeAndCopyService.cs" />
     <Compile Include="Features\UpgradeAndCopy\Models\UpgradeAndCopyResult.cs" />
+    <Compile Include="Features\ViewerExport\ViewerExportCommand.cs" />
+    <Compile Include="Features\ViewerExport\ViewerExportService.cs" />
+    <Compile Include="Features\ViewerExport\CloudModelCacheScanner.cs" />
+    <Compile Include="Features\ViewerExport\Models\CloudModelCandidate.cs" />
+    <Compile Include="Features\ViewerExport\Models\ViewerExportResult.cs" />
     <Compile Include="Features\BatchAddSharedFamilyParameters\BatchAddSharedFamilyParametersCommand.cs" />
     <Compile Include="Features\BatchAddSharedFamilyParameters\BatchAddSharedFamilyParametersService.cs" />
     <Compile Include="Features\BatchAddSharedFamilyParameters\Models\BatchAddSharedFamilyParametersOptions.cs" />

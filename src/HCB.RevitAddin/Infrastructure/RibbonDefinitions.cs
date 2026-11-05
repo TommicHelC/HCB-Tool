@@ -326,6 +326,13 @@ namespace HCB.RevitAddin
                                     "Co robi: odczytuje parametry rodzin .rfa i tworzy raport CSV. Jak uzyc: 1. Wybierz rodziny. 2. Uruchom raport. 3. Odbierz CSV. Zakres: szybka analiza rodzin bez recznego otwierania kazdej z nich.",
                                     typeof(AlwaysAvailableCommandAvailability)),
                                 new RibbonPushButtonDefinition(
+                                    "HcbViewerExportButton",
+                                    "Viewer Export",
+                                    typeof(Features.ViewerExport.ViewerExportCommand),
+                                    "Zapisuje wybrane modele ACC z linkami RVT do lokalnego folderu (detach + purge) i przepina linki na kopie, gotowe do Autodesk Viewer.",
+                                    "Co robi: otwiera wybrane modele ACC w tle (detach, bez zapisu w ACC), czysci Purge Unused w petli, zapisuje do wskazanego folderu razem ze wszystkimi zaladowanymi linkami RVT i przepina linki na lokalne kopie. Jak uzyc: 1. Wybierz modele glowne z listy (cache Revita). 2. Wskaz folder (np. OneDrive). 3. Sprawdz raport. Zakres: modele ACC otwierane wczesniej w tej wersji Revita; istniejace pliki sa nadpisywane.",
+                                    typeof(AlwaysAvailableCommandAvailability)),
+                                new RibbonPushButtonDefinition(
                                     "HcbUpgradeAndCopyButton",
                                     "Upgrade Copy",
                                     typeof(Features.UpgradeAndCopy.UpgradeAndCopyCommand),
