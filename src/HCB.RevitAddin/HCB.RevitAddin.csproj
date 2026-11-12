@@ -284,6 +284,9 @@
     <Compile Include="Features\SpaceToElement\Models\SpaceToElementResult.cs" />
     <Compile Include="Features\SpaceToElement\SpaceToElementCommand.cs" />
     <Compile Include="Features\SpaceToElement\SpaceToElementService.cs" />
+    <Compile Include="Features\SpaceCleanup\Models\SpaceCleanupResult.cs" />
+    <Compile Include="Features\SpaceCleanup\SpaceCleanupCommand.cs" />
+    <Compile Include="Features\SpaceCleanup\SpaceCleanupService.cs" />
     <Compile Include="Features\StylePreview\UI\StylePreviewWindow.xaml.cs" />
     <Compile Include="Features\SystemAssigner\Models\SystemAssignerResult.cs" />
     <Compile Include="Features\SystemAssigner\SystemAssignerCommand.cs" />

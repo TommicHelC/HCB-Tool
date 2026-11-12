@@ -131,7 +131,7 @@ namespace HCB.RevitAddin
                             typeof(Features.SpaceParamLinked.SpaceParamLinkedCommand),
                             "Resources\\Ribbon\\Spaces",
                             "Narzedzia do pracy z pomieszczeniami i przestrzeniami.",
-                            "Co zawiera: narzedzia do uzupelniania danych pomieszczen i przestrzeni. Jak uzyc: wybierz polecenie zalezne od zrodla danych, czyli rooms z linku albo spaces z modelu lokalnego. Zakres: parametry LIN_ROOM_*.",
+                            "Co zawiera: narzedzia do uzupelniania danych pomieszczen i przestrzeni oraz porzadkowania przestrzeni. Jak uzyc: wybierz polecenie zalezne od zrodla danych, czyli rooms z linku albo spaces z modelu lokalnego, albo Space Cleanup do usuwania zbednych przestrzeni. Zakres: parametry LIN_ROOM_* i przestrzenie MEP.",
                             [
                                 new RibbonPushButtonDefinition(
                                     "HcbSpaceParamLinkedButton",
@@ -144,7 +144,15 @@ namespace HCB.RevitAddin
                                     "Space To Element",
                                     typeof(Features.SpaceToElement.SpaceToElementCommand),
                                     "Uzupelnia LIN_ROOM_* na podstawie wszystkich lokalnych przestrzeni MEP w modelu.",
-                                    "Co robi: uzupelnia LIN_ROOM_* na podstawie wszystkich lokalnych przestrzeni MEP w modelu. Jak uzyc: 1. Otworz odpowiedni widok. 2. Uruchom narzedzie. 3. Zapisz wynik. Zakres: wszystkie spaces w modelu oraz elementy z obslugiwanych kategorii. Uwagi: to alternatywa dla pracy na roomach z linku.")
+                                    "Co robi: uzupelnia LIN_ROOM_* na podstawie wszystkich lokalnych przestrzeni MEP w modelu. Jak uzyc: 1. Otworz odpowiedni widok. 2. Uruchom narzedzie. 3. Zapisz wynik. Zakres: wszystkie spaces w modelu oraz elementy z obslugiwanych kategorii. Uwagi: to alternatywa dla pracy na roomach z linku."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbSpaceCleanupButton",
+                                    "Space Cleanup",
+                                    typeof(Features.SpaceCleanup.SpaceCleanupCommand),
+                                    "Usuwa wybrane przestrzenie MEP, filtrowane po frazie w nazwie, statusie (nieumieszczone, nieobwiedzione, nadmiarowe) i poziomie.",
+                                    "Co robi: pokazuje liste wszystkich przestrzeni MEP z nazwa, numerem, poziomem i statusem, a po potwierdzeniu usuwa wybrane razem z ich znacznikami. Jak uzyc: 1. Wpisz fraze z nazwy, np. Wolny. 2. Ustaw filtr Status, np. Nieumieszczona, i ewentualnie Poziom. 3. Kliknij Zaznacz wszystkie, potem Usun wybrane i potwierdz. Zakres: lokalne spaces w modelu; jedna transakcja, mozna cofnac przez Ctrl+Z.",
+                                    null,
+                                    "Resources\\Ribbon\\Spaces")
                             ])
                         ,
                         new RibbonPushButtonDefinition(
