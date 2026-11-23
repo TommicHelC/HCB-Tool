@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<path d="M1,25.5 H31" fill="none" stroke="#135491" stroke-width="9"/><path d="M1,25.5 H31" fill="none" stroke="#3194DD" stroke-width="7"/><path d="M1,27.90625 H31" fill="none" stroke="#2477BE" stroke-width="2.1875"/><path d="M1,23.69375 H31" fill="none" stroke="#7CC2F3" stroke-width="2.1875"/><path d="M3.5,20 V17 A12.5,12.5 0 0 1 28.5,17 V20 Z" fill="#fff" stroke="#2E466F" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.0,17 A10.0,10.0 0 0 1 16,7.0" stroke="#2FA84F" stroke-width="2" fill="none"/><path d="M16,7.0 A10.0,10.0 0 0 1 23.0,10.0" stroke="#FAA425" stroke-width="2" fill="none"/><path d="M23.0,10.0 A10.0,10.0 0 0 1 26.0,17" stroke="#E5484D" stroke-width="2" fill="none"/><path d="M5.66,13.24 L8.01,14.09" stroke="#2E466F" stroke-width="1.3" stroke-linecap="round"/><path d="M9.69,7.99 L11.12,10.04" stroke="#2E466F" stroke-width="1.3" stroke-linecap="round"/><path d="M16.00,6.00 L16.00,8.50" stroke="#2E466F" stroke-width="1.3" stroke-linecap="round"/><path d="M22.31,7.99 L20.88,10.04" stroke="#2E466F" stroke-width="1.3" stroke-linecap="round"/><path d="M26.34,13.24 L23.99,14.09" stroke="#2E466F" stroke-width="1.3" stroke-linecap="round"/><path d="M16,17 L22.11,9.72" stroke="#2E466F" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="17" r="2" fill="#2E466F"/></svg>

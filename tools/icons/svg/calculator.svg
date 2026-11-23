@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="5.5" y="1.5" width="21" height="29" rx="2.5" fill="url(#navyFace)" stroke="#1C2E4D"/><rect x="8.5" y="4.5" width="15" height="6" rx="1" fill="#D3EBFB" stroke="#1C2E4D"/><text x="22" y="9.6" font-family="Segoe UI" font-size="5.5" font-weight="bold" fill="#2E466F" text-anchor="end">123</text><rect x="8.5" y="13.5" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="13.8" y="13.5" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="19.1" y="13.5" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="8.5" y="18.8" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="13.8" y="18.8" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="19.1" y="18.8" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="8.5" y="24.1" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="13.8" y="24.1" width="4" height="4" rx=".8" fill="#D8E2EC"/><rect x="19.1" y="24.1" width="4" height="4" rx=".8" fill="#FAA425"/></svg>

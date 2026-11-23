@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="2.5" width="19" height="15" rx="1.5" fill="#D3EBFB" stroke="#374E6D"/><path d="M2.5,6.5 V4 Q2.5,2.5 4,2.5 H20 Q21.5,2.5 21.5,4 V6.5 Z" fill="#2E466F" stroke="#374E6D"/><rect x="7.5" y="8.5" width="20" height="16" rx="1.5" fill="#D3EBFB" stroke="#374E6D"/><path d="M7.5,12.5 V10 Q7.5,8.5 9,8.5 H26 Q27.5,8.5 27.5,10 V12.5 Z" fill="#2E466F" stroke="#374E6D"/><path d="M10,15 H24 V22 H10 Z M17.700000000000003,15 V19.2 M10,19.2 H14.899999999999999" fill="none" stroke="#3194DD" stroke-width="1.6" stroke-linejoin="round"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#2FA84F" stroke="#1E7A38" stroke-width="1"/><path d="M20.5,24 A4.5,4.5 0 0 1 29.5,24" stroke="#5CC879" stroke-width="1" fill="none" opacity="0.7"/><path d="M21.8,25 H28.2 M25,21.8 V28.2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>

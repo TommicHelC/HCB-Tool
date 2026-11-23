@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="3.5" width="25" height="21" rx="1.5" fill="#D3EBFB" stroke="#374E6D"/><path d="M2.5,7.5 V5 Q2.5,3.5 4,3.5 H26 Q27.5,3.5 27.5,5 V7.5 Z" fill="#2E466F" stroke="#374E6D"/><path d="M5.5,10 H17.5 V21 H5.5 Z M12.100000000000001,10 V16.6 M5.5,16.6 H9.7" fill="none" stroke="#93A6BD" stroke-width="1.6" stroke-linejoin="round"/><polygon points="28.50,17.00 28.38,18.27 26.44,18.84 26.00,19.67 26.60,21.60 25.61,22.40 23.84,21.44 22.94,21.72 22.00,23.50 20.73,23.38 20.16,21.44 19.33,21.00 17.40,21.60 16.60,20.61 17.56,18.84 17.28,17.94 15.50,17.00 15.62,15.73 17.56,15.16 18.00,14.33 17.40,12.40 18.39,11.60 20.16,12.56 21.06,12.28 22.00,10.50 23.27,10.62 23.84,12.56 24.67,13.00 26.60,12.40 27.40,13.39 26.44,15.16 26.72,16.06" fill="#2E466F" stroke="#2E466F" stroke-width=".6" stroke-linejoin="round"/><circle cx="22" cy="17" r="2.34" fill="#fff"/></svg>

@@ -80,3 +80,24 @@ Before accepting an icon:
 3. Produce `icon16.png` and `icon32.png`.
 4. Verify the icon in Revit after deployment.
 5. Only then treat the feature as visually complete.
+
+## Icon Generator (tools/icons)
+
+All ribbon icons are generated from code so the set stays consistent:
+
+- `tools/icons/hcb_icon_kit.py` — palette and primitives (tubes, documents, views, badges).
+- `tools/icons/build_ribbon_icons.py` — one function per icon plus the target folders.
+- `tools/icons/svg/` — generated SVG sources (`*.16.svg` = simplified small variant).
+- `tools/icons/preview.png` — contact sheet (32 px zoom, 32/16 px, dark background).
+
+Run: `pip install resvg-py pillow`, then `python tools/icons/build_ribbon_icons.py --preview`
+(`--only name1,name2` rebuilds selected icons).
+
+Style rules (anchor: MEP Modify icons Connect / Extend / Rotate):
+
+- MEP objects as blue / steel tubes with a 1px outline and a light highlight band.
+- Documents and views on white paper with steel outline; navy title bars.
+- The verb is the accent badge in the bottom-right corner:
+  green = create / add / copy-to, orange = edit / rename / transform,
+  red = delete / clear / unload, navy = inspect / report / numbering.
+- Icons that turn to noise at 16 px get a dedicated small variant (`SMALL` in the build script).

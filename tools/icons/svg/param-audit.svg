@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="3.5" width="25" height="5" rx="1" fill="url(#paper)" stroke="#374E6D"/><rect x="4" y="5" width="8.32" height="2" rx="1" fill="#93A6BD"/><rect x="13.700000000000001" y="5" width="11.700000000000001" height="2" rx="1" fill="#3194DD"/><rect x="2.5" y="9.5" width="25" height="5" rx="1" fill="url(#paper)" stroke="#374E6D"/><rect x="4" y="11" width="8.32" height="2" rx="1" fill="#93A6BD"/><rect x="13.700000000000001" y="11" width="11.700000000000001" height="2" rx="1" fill="#E5484D"/><rect x="2.5" y="15.5" width="25" height="5" rx="1" fill="url(#paper)" stroke="#374E6D"/><rect x="4" y="17" width="8.32" height="2" rx="1" fill="#93A6BD"/><rect x="13.700000000000001" y="17" width="11.700000000000001" height="2" rx="1" fill="#3194DD"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#2E466F" stroke="#1C2E4D" stroke-width="1"/><path d="M20.5,24 A4.5,4.5 0 0 1 29.5,24" stroke="#4A6894" stroke-width="1" fill="none" opacity="0.7"/><circle cx="24.2" cy="24.2" r="2.3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M25.9,25.9 L28,28" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>

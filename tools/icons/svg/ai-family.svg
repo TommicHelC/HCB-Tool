@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<path d="M3,13 L13,18.8 V29.8 L3,24.0 Z" fill="#3194DD" stroke="#135491" stroke-linejoin="round"/><path d="M23,13 L13,18.8 V29.8 L23,24.0 Z" fill="#2477BE" stroke="#135491" stroke-linejoin="round"/><path d="M13,7.2 L23,13.0 L13,18.8 L3,13 Z" fill="#7CC2F3" stroke="#135491" stroke-linejoin="round"/><path d="M25,1 Q26.08,5.92 31,7 Q26.08,8.08 25,13 Q23.92,8.08 19,7 Q23.92,5.92 25,1 Z" fill="url(#orangeFace)" stroke="#C67A0E" stroke-width=".8" stroke-linejoin="round"/><path d="M26.5,15.8 Q27.076,18.424 29.7,19 Q27.076,19.576 26.5,22.2 Q25.924,19.576 23.3,19 Q25.924,18.424 26.5,15.8 Z" fill="url(#orangeFace)" stroke="#C67A0E" stroke-width=".8" stroke-linejoin="round"/><path d="M17.5,0.8999999999999999 Q17.968,3.032 20.1,3.5 Q17.968,3.968 17.5,6.1 Q17.032,3.968 14.9,3.5 Q17.032,3.032 17.5,0.8999999999999999 Z" fill="url(#orangeFace)" stroke="#C67A0E" stroke-width=".8" stroke-linejoin="round"/></svg>

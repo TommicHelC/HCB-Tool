@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="3.5" width="21" height="6" rx="1.2" fill="url(#paper)" stroke="#374E6D"/><g transform="translate(4.2,4.6) scale(0.2)"><path d="M1,1 H21 Q22,1 21.3,2 L13.5,11.5 V19 L8.5,21.5 V11.5 L0.7,2 Q0,1 1,1 Z" fill="url(#blueFace)" stroke="#135491" stroke-width="5.0" stroke-linejoin="round"/><path d="M3.5,3.5 H18.5" stroke="#7CC2F3" stroke-width="6.999999999999999" stroke-linecap="round"/></g><rect x="10" y="5.6" width="6" height="2" rx="1" fill="#93A6BD"/><rect x="17.5" y="5" width="4.5" height="3" rx="1.5" fill="#2FA84F"/><circle cx="20.5" cy="6.5" r="1.1" fill="#fff"/><rect x="2.5" y="11.5" width="21" height="6" rx="1.2" fill="url(#paper)" stroke="#374E6D"/><g transform="translate(4.2,12.6) scale(0.2)"><path d="M1,1 H21 Q22,1 21.3,2 L13.5,11.5 V19 L8.5,21.5 V11.5 L0.7,2 Q0,1 1,1 Z" fill="url(#blueFace)" stroke="#135491" stroke-width="5.0" stroke-linejoin="round"/><path d="M3.5,3.5 H18.5" stroke="#7CC2F3" stroke-width="6.999999999999999" stroke-linecap="round"/></g><rect x="10" y="13.6" width="6" height="2" rx="1" fill="#93A6BD"/><rect x="17.5" y="13" width="4.5" height="3" rx="1.5" fill="#AFBFD1"/><circle cx="19" cy="14.5" r="1.1" fill="#fff"/><rect x="2.5" y="19.5" width="21" height="6" rx="1.2" fill="url(#paper)" stroke="#374E6D"/><g transform="translate(4.2,20.6) scale(0.2)"><path d="M1,1 H21 Q22,1 21.3,2 L13.5,11.5 V19 L8.5,21.5 V11.5 L0.7,2 Q0,1 1,1 Z" fill="url(#blueFace)" stroke="#135491" stroke-width="5.0" stroke-linejoin="round"/><path d="M3.5,3.5 H18.5" stroke="#7CC2F3" stroke-width="6.999999999999999" stroke-linecap="round"/></g><rect x="10" y="21.6" width="6" height="2" rx="1" fill="#93A6BD"/><rect x="17.5" y="21" width="4.5" height="3" rx="1.5" fill="#2FA84F"/><circle cx="20.5" cy="22.5" r="1.1" fill="#fff"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#FAA425" stroke="#C67A0E" stroke-width="1"/><path d="M20.5,24 A4.5,4.5 0 0 1 29.5,24" stroke="#FFC870" stroke-width="1" fill="none" opacity="0.7"/><path d="M22.4,27.6 L27.2,22.8" stroke="#fff" stroke-width="2.6" stroke-linecap="butt"/><path d="M21.7,28.3 L22.4,26.6 L23.4,27.6 Z" fill="#fff"/></svg>
