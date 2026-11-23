@@ -1,0 +1,100 @@
+<Window x:Class="HCB.RevitAddin.Features.RotateFittings.UI.RotateFittingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Rotate Fittings"
+        Width="440"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="14">
+        <GroupBox Header="Kat obrotu (klik = obracaj o ten kat)">
+            <StackPanel>
+                <UniformGrid Columns="4"
+                             Rows="2"
+                             Margin="0,0,0,10">
+                    <Button Margin="0,0,6,6" Content="+45°" Tag="45" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,6,6" Content="+90°" Tag="90" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,6,6" Content="+135°" Tag="135" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,0,6" Content="180°" Tag="180" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,6,0" Content="-45°" Tag="-45" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,6,0" Content="-90°" Tag="-90" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0,0,6,0" Content="-135°" Tag="-135" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                    <Button Margin="0" Content="-180°" Tag="-180" Style="{StaticResource InlineActionButtonStyle}" Click="PresetButton_OnClick" />
+                </UniformGrid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="30" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="0,0,10,0"
+                               Style="{StaticResource SectionLabelStyle}"
+                               Text="Wlasny kat:" />
+
+                    <TextBox x:Name="AngleTextBox"
+                             Grid.Column="1"
+                             Margin="0,0,8,0"
+                             KeyDown="AngleTextBox_OnKeyDown"
+                             TextChanged="AngleTextBox_OnTextChanged" />
+
+                    <TextBlock Grid.Column="2"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource SectionLabelStyle}"
+                               Text="st." />
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Margin="0,10,0,0"
+                  Header="Os obrotu">
+            <StackPanel>
+                <RadioButton x:Name="ConnectorAxisRadioButton"
+                             Margin="0,0,0,6"
+                             GroupName="Axis"
+                             Content="Os podlaczonego konektora (najblizej klikniecia)" />
+                <RadioButton x:Name="VerticalAxisRadioButton"
+                             GroupName="Axis"
+                             Content="Os pionowa Z przez punkt wstawienia" />
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Margin="0,10,0,0"
+                  Header="Kategorie">
+            <WrapPanel>
+                <CheckBox x:Name="DuctFittingsCheckBox"
+                          Margin="0,0,14,0"
+                          Content="Duct" />
+                <CheckBox x:Name="PipeFittingsCheckBox"
+                          Margin="0,0,14,0"
+                          Content="Pipe" />
+                <CheckBox x:Name="ConduitFittingsCheckBox"
+                          Content="Conduit" />
+            </WrapPanel>
+        </GroupBox>
+
+        <TextBlock Margin="0,10,0,0"
+                   TextWrapping="Wrap"
+                   Style="{StaticResource StatusTextStyle}"
+                   Text="Klikaj ksztaltki w widoku. ESC wstrzymuje wskazywanie - okno zostaje, Revit dziala normalnie. Kat + = przeciwnie do wskazowek zegara, patrzac od strony konektora osi (os Z: z gory)." />
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Margin="0,12,0,0"
+                                  PrimaryButtonText="Wskaz ksztaltki"
+                                  SecondaryButtonText="Zamknij"
+                                  PrimaryButtonClick="PickButton_OnClick"
+                                  SecondaryButtonClick="CloseButton_OnClick" />
+    </StackPanel>
+</Window>
