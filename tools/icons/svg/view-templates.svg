@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="2.5" width="22" height="19" rx="1.5" fill="#D3EBFB" stroke="#374E6D"/><path d="M2.5,6.5 V4 Q2.5,2.5 4,2.5 H23 Q24.5,2.5 24.5,4 V6.5 Z" fill="#2E466F" stroke="#374E6D"/><path d="M5,9 H15 V18 H5 Z M10.5,9 V14.399999999999999 M5,14.399999999999999 H8.5" fill="none" stroke="#93A6BD" stroke-width="1.6" stroke-linejoin="round"/><polygon points="24.00,14.00 23.90,14.98 22.42,15.42 22.08,16.06 22.54,17.54 21.78,18.16 20.42,17.42 19.72,17.63 19.00,19.00 18.02,18.90 17.58,17.42 16.94,17.08 15.46,17.54 14.84,16.78 15.58,15.42 15.37,14.72 14.00,14.00 14.10,13.02 15.58,12.58 15.92,11.94 15.46,10.46 16.22,9.84 17.58,10.58 18.28,10.37 19.00,9.00 19.98,9.10 20.42,10.58 21.06,10.92 22.54,10.46 23.16,11.22 22.42,12.58 22.63,13.28" fill="#2E466F" stroke="#2E466F" stroke-width=".6" stroke-linejoin="round"/><circle cx="19" cy="14" r="1.7999999999999998" fill="#fff"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#2FA84F" stroke="#1E7A38" stroke-width="1"/><path d="M20.5,24 A4.5,4.5 0 0 1 29.5,24" stroke="#5CC879" stroke-width="1" fill="none" opacity="0.7"/><path d="M21.8,25 H28 M25.4,22.3 L28,25 L25.4,27.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>

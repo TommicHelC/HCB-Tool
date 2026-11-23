@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="2.5" y="3.5" width="21" height="5" rx="1" fill="url(#paper)" stroke="#374E6D"/><rect x="4" y="5" width="7.04" height="2" rx="1" fill="#93A6BD"/><rect x="11.9" y="5" width="9.9" height="2" rx="1" fill="#3194DD"/><rect x="2.5" y="20.5" width="21" height="5" rx="1" fill="url(#paper)" stroke="#374E6D"/><rect x="4" y="22" width="7.04" height="2" rx="1" fill="#93A6BD"/><rect x="11.9" y="22" width="9.9" height="2" rx="1" fill="#3194DD"/><path d="M24,6 Q30,6 30,13 Q30,22.5 26.5,22.5" fill="none" stroke="#1E7A38" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M24,6 Q30,6 30,13 Q30,22.5 26.5,22.5" fill="none" stroke="#2FA84F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polygon points="24.0,22.5 27.6,19.8 27.6,25.2" fill="#2FA84F" stroke="#1E7A38" stroke-linejoin="round"/></svg>

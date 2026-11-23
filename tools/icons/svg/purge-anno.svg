@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<text x="11" y="19" font-family="Segoe UI" font-size="20" font-weight="bold" fill="#2E466F" text-anchor="middle">A</text><path d="M2.5,25 H19.5 M2.5,22 V28 M19.5,22 V28" stroke="#3194DD" stroke-width="1.4"/><polygon points="3.0,25.0 5.4,23.2 5.4,26.8" fill="#3194DD" stroke="#3194DD" stroke-linejoin="round"/><polygon points="19.0,25.0 16.6,23.2 16.6,26.8" fill="#3194DD" stroke="#3194DD" stroke-linejoin="round"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#E5484D" stroke="#A8282C" stroke-width="1"/><path d="M20.5,24 A4.5,4.5 0 0 1 29.5,24" stroke="#F27D80" stroke-width="1" fill="none" opacity="0.7"/><path d="M22.6,22.6 L27.4,27.4 M27.4,22.6 L22.6,27.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>

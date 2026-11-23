@@ -55,7 +55,7 @@ namespace HCB.RevitAddin
                                     "HcbRenamePulldown",
                                     "Rename",
                                     typeof(Features.RenameViews.RenameViewsCommand),
-                                    null,
+                                    "Resources\\Ribbon\\Rename",
                                     "Narzedzia do zmiany nazw.",
                                     "Co zawiera: narzedzia do seryjnej zmiany nazw. Jak uzyc: wybierz odpowiednie polecenie, ustaw reguly prefiksu, zamiany tekstu albo sufiksu i sprawdz podglad. Zakres: widoki i arkusze.",
                                     [
@@ -150,9 +150,7 @@ namespace HCB.RevitAddin
                                     "Space Cleanup",
                                     typeof(Features.SpaceCleanup.SpaceCleanupCommand),
                                     "Usuwa wybrane przestrzenie MEP, filtrowane po frazie w nazwie, statusie (nieumieszczone, nieobwiedzione, nadmiarowe) i poziomie.",
-                                    "Co robi: pokazuje liste wszystkich przestrzeni MEP z nazwa, numerem, poziomem i statusem, a po potwierdzeniu usuwa wybrane razem z ich znacznikami. Jak uzyc: 1. Wpisz fraze z nazwy, np. Wolny. 2. Ustaw filtr Status, np. Nieumieszczona, i ewentualnie Poziom. 3. Kliknij Zaznacz wszystkie, potem Usun wybrane i potwierdz. Zakres: lokalne spaces w modelu; jedna transakcja, mozna cofnac przez Ctrl+Z.",
-                                    null,
-                                    "Resources\\Ribbon\\Spaces")
+                                    "Co robi: pokazuje liste wszystkich przestrzeni MEP z nazwa, numerem, poziomem i statusem, a po potwierdzeniu usuwa wybrane razem z ich znacznikami. Jak uzyc: 1. Wpisz fraze z nazwy, np. Wolny. 2. Ustaw filtr Status, np. Nieumieszczona, i ewentualnie Poziom. 3. Kliknij Zaznacz wszystkie, potem Usun wybrane i potwierdz. Zakres: lokalne spaces w modelu; jedna transakcja, mozna cofnac przez Ctrl+Z.")
                             ])
                         ,
                         new RibbonPushButtonDefinition(
@@ -172,9 +170,7 @@ namespace HCB.RevitAddin
                             "Velocity",
                             typeof(Features.VelocitySizer.VelocitySizerCommand),
                             "Dobiera srednice okraglych kanalow i rur na podstawie przeplywu oraz pokazuje wynikowe predkosci dla standardowych rozmiarow z projektu.",
-                            "Co robi: dla zaznaczonych okraglych kanalow i rur pokazuje tabele standardowych srednic z projektu oraz wynikowe predkosci dla wpisanego przeplywu. Jak uzyc: 1. Zaznacz elementy. 2. Wpisz przeplyw dla kazdego wiersza. 3. Wybierz srednice z tabeli standardow i zatwierdz. Zakres: zmienia srednice elementu oraz zapisuje LIN_VE_VELOCITY i LIN_VE_FLOWRATE_SUM, a przy istniejacych wartosciach pyta o nadpisanie.",
-                            null,
-                            "Resources\\Ribbon\\Flow"),
+                            "Co robi: dla zaznaczonych okraglych kanalow i rur pokazuje tabele standardowych srednic z projektu oraz wynikowe predkosci dla wpisanego przeplywu. Jak uzyc: 1. Zaznacz elementy. 2. Wpisz przeplyw dla kazdego wiersza. 3. Wybierz srednice z tabeli standardow i zatwierdz. Zakres: zmienia srednice elementu oraz zapisuje LIN_VE_VELOCITY i LIN_VE_FLOWRATE_SUM, a przy istniejacych wartosciach pyta o nadpisanie."),
                         new RibbonPushButtonDefinition(
                             "HcbHvacTaggingButton",
                             "HVAC Tags",
@@ -185,7 +181,7 @@ namespace HCB.RevitAddin
                             "HcbHvacToolsPulldown",
                             "HVAC Tools",
                             typeof(Features.FittingsAngle.FittingsAngleCommand),
-                            null,
+                            "Resources\\Ribbon\\HvacTools",
                             "Dodatkowe narzedzia pomocnicze dla elementow HVAC i MEP.",
                             "Co zawiera: narzedzia pomocnicze dla HVAC i MEP. Jak uzyc: wybierz polecenie zalezne od zadania, np. kat, poziom, system albo masa. Zakres: operacje na wskazanych elementach albo obslugiwanych kategoriach.",
                             [
@@ -240,13 +236,17 @@ namespace HCB.RevitAddin
                                     "Area LIN",
                                     typeof(Features.DuctFittingsArea.DuctFittingsAreaLinearCommand),
                                     "Oblicza HC_Area dla ksztaltek wentylacyjnych LINEAR.",
-                                    "Co robi: oblicza HC_Area dla ksztaltek wentylacyjnych LINEAR. Jak uzyc: 1. Uruchom narzedzie dla rodzin przygotowanych pod LINEAR. 2. Wybierz zakres albo ustawienia. 3. Zapisz wynik. Zakres: raport i zapis do HC_Area."),
+                                    "Co robi: oblicza HC_Area dla ksztaltek wentylacyjnych LINEAR. Jak uzyc: 1. Uruchom narzedzie dla rodzin przygotowanych pod LINEAR. 2. Wybierz zakres albo ustawienia. 3. Zapisz wynik. Zakres: raport i zapis do HC_Area.",
+                                    null,
+                                    "Resources\\Ribbon\\Area\\Lin"),
                                 new RibbonPushButtonDefinition(
                                     "HcbDuctFittingsAreaMagicadButton",
                                     "Area MC",
                                     typeof(Features.DuctFittingsArea.DuctFittingsAreaMagicadCommand),
                                     "Oblicza HC_Area dla ksztaltek wentylacyjnych MagiCAD.",
-                                    "Co robi: oblicza HC_Area dla ksztaltek wentylacyjnych MagiCAD. Jak uzyc: 1. Uruchom narzedzie dla rodzin przygotowanych pod MagiCAD. 2. Wybierz zakres albo ustawienia. 3. Zapisz wynik. Zakres: raport i zapis do HC_Area.")
+                                    "Co robi: oblicza HC_Area dla ksztaltek wentylacyjnych MagiCAD. Jak uzyc: 1. Uruchom narzedzie dla rodzin przygotowanych pod MagiCAD. 2. Wybierz zakres albo ustawienia. 3. Zapisz wynik. Zakres: raport i zapis do HC_Area.",
+                                    null,
+                                    "Resources\\Ribbon\\Area\\Mc")
                             ])
                     ]),
                 new RibbonPanelDefinition(
@@ -270,7 +270,7 @@ namespace HCB.RevitAddin
                                     "HcbTemplatesPulldown",
                                     "Templates",
                                     typeof(Features.TransferViewTemplates.TransferViewTemplatesCommand),
-                                    null,
+                                    "Resources\\Ribbon\\Templates",
                                     "Udostepnia narzedzia do kopiowania szablonow widokow i zestawien miedzy otwartymi projektami.",
                                     "Co robi: udostepnia osobne polecenia do kopiowania szablonow widokow i szablonow zestawien miedzy otwartymi projektami. Jak uzyc: wybierz odpowiednie polecenie z listy, wskaz projekt zrodlowy i docelowy, a potem zaznacz szablony do transferu. Zakres: synchronizacja standardu widokow i zestawien pomiedzy otwartymi modelami.",
                                     [
@@ -285,7 +285,9 @@ namespace HCB.RevitAddin
                                             "Schedule Templates",
                                             typeof(Features.TransferViewTemplates.TransferScheduleTemplatesCommand),
                                             "Kopiuje wybrane szablony zestawien miedzy otwartymi projektami.",
-                                            "Co robi: kopiuje szablony zestawien miedzy otwartymi projektami. Jak uzyc: 1. Otworz projekt zrodlowy i docelowy. 2. Wybierz szablony zestawien do skopiowania. 3. Zdecyduj o nadpisaniu istniejacych pozycji. Zakres: szybka synchronizacja standardu zestawien pomiedzy otwartymi modelami.")
+                                            "Co robi: kopiuje szablony zestawien miedzy otwartymi projektami. Jak uzyc: 1. Otworz projekt zrodlowy i docelowy. 2. Wybierz szablony zestawien do skopiowania. 3. Zdecyduj o nadpisaniu istniejacych pozycji. Zakres: szybka synchronizacja standardu zestawien pomiedzy otwartymi modelami.",
+                                            null,
+                                            "Resources\\Ribbon\\Templates\\Schedule")
                                     ])
                             ]),
                         new RibbonPushButtonDefinition(
@@ -308,7 +310,7 @@ namespace HCB.RevitAddin
                             "HcbWithoutOpenPulldown",
                             "WithoutOpen",
                             typeof(Features.BatchFileScan.BatchFileScanCommand),
-                            null,
+                            "Resources\\Ribbon\\WithoutOpen",
                             "Narzedzia do pracy na plikach Revit bez otwierania ich w interfejsie uzytkownika.",
                             "Co zawiera: narzedzia WithoutOpen do pracy na plikach bez otwierania ich w interfejsie Revita. Jak uzyc: wskaz pliki albo folder, uruchom analize albo modyfikacje i zapisz raport. Zakres: projekty i rodziny poza UI Revita.",
                             [
@@ -389,9 +391,7 @@ namespace HCB.RevitAddin
                                     "Copy Beetwen Projects",
                                     typeof(Features.CopyBetweenProjects.CopyBetweenProjectsCommand),
                                     "Kopiuje wybrane typy i rodziny miedzy otwartymi projektami.",
-                                    "Co robi: kopiuje Level Type, Grid Type, Family oraz Family Type miedzy otwartymi projektami. Jak uzyc: 1. Wybierz projekt zrodlowy i docelowy. 2. Przefiltruj liste i zaznacz wiele pozycji. 3. Uruchom kopiowanie. Zakres: co najmniej dwa otwarte projekty; przy konfliktach nazw typow uzywa typow z projektu docelowego.",
-                                    null,
-                                    "Resources\\Ribbon\\Parameters")
+                                    "Co robi: kopiuje Level Type, Grid Type, Family oraz Family Type miedzy otwartymi projektami. Jak uzyc: 1. Wybierz projekt zrodlowy i docelowy. 2. Przefiltruj liste i zaznacz wiele pozycji. 3. Uruchom kopiowanie. Zakres: co najmniej dwa otwarte projekty; przy konfliktach nazw typow uzywa typow z projektu docelowego.")
                             ]),
                         new RibbonPushButtonDefinition(
                             "HcbPurgeAnnotationsButton",
