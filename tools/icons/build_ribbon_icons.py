@@ -409,13 +409,6 @@ def i_copy_param():
             + head(24, 22.5, "left", GREEN, GREEN_OUT, .6))
 
 
-def i_ai_family():
-    star = lambda cx, cy, r: (f'<path d="M{cx},{cy - r} Q{cx + r * .18},{cy - r * .18} {cx + r},{cy} Q{cx + r * .18},{cy + r * .18} {cx},{cy + r} '
-                              f'Q{cx - r * .18},{cy + r * .18} {cx - r},{cy} Q{cx - r * .18},{cy - r * .18} {cx},{cy - r} Z" '
-                              f'fill="url(#orangeFace)" stroke="{ORANGE_OUT}" stroke-width=".8" stroke-linejoin="round"/>')
-    return cube(13, 13, 10) + star(25, 7, 6) + star(26.5, 19, 3.2) + star(17.5, 3.5, 2.6)
-
-
 def i_purge_anno():
     return (text(11, 19, "A", size=20, fill=NAVY)
             + f'<path d="M2.5,25 H19.5 M2.5,22 V28 M19.5,22 V28" stroke="{BLUE}" stroke-width="1.4"/>'
@@ -526,7 +519,6 @@ ICONS = {
     "calculator": (i_calculator, ["Features/ParameterCalculator/Resources"]),
     "clear-param": (i_clear_param, ["Features/ParameterClear/Resources"]),
     "copy-param": (i_copy_param, ["Features/ParameterCopy/Resources"]),
-    "ai-family": (i_ai_family, ["Features/AiFamilyBuilder/Resources"]),
     "purge-anno": (i_purge_anno, ["Features/PurgeAnnotations/Resources"]),
     "hc-wire": (i_hc_wire, ["Features/HCWireSize/Resources"]),
 }

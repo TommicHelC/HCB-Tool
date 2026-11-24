@@ -429,13 +429,6 @@ namespace HCB.RevitAddin
                                     "Co zawiera: narzedzia do sprawdzania, uzupelniania i przeliczania parametrow projektu. Jak uzyc: wybierz odpowiednie polecenie po ustawieniu poprawnego pliku Shared Parameters albo po wskazaniu parametrow do obliczen. Zakres: parametry HC_* i inne parametry liczbowe w projekcie.",
                                     CreateProjectParameterButtons(revitVersion)),
                                 new RibbonPushButtonDefinition(
-                                    "HcbAiFamilyBuilderButton",
-                                    "AI Family",
-                                    typeof(Features.AiFamilyBuilder.AiFamilyBuilderCommand),
-                                    "Buduje parametry, typy i podstawowa geometrie rodziny na podstawie opisu JSON.",
-                                    "Co robi: czyta opis JSON i dodaje parametry, typy oraz prosta geometrie w otwartym dokumencie rodziny. Jak uzyc: 1. Otworz nowa rodzine na poprawnym szablonie. 2. Wklej JSON wygenerowany przez AI. 3. Uruchom budowanie. Zakres: dokument rodziny; MVP obsluguje family/shared parameters, typy i extrusion_rectangle.",
-                                    typeof(FamilyDocumentCommandAvailability)),
-                                new RibbonPushButtonDefinition(
                                     "HcbCopyBetweenProjectsButton",
                                     "Copy Beetwen Projects",
                                     typeof(Features.CopyBetweenProjects.CopyBetweenProjectsCommand),

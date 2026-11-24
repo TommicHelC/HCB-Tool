@@ -117,16 +117,16 @@ Została jedna ścieżka skanująca cały model z `LookupParameter` na element
 rozwiązać id parametru, więc sztuczka z `HasValueFilterRule` wymagałaby sięgnięcia do
 `document.ParameterBindings`. Wykonalne, ale to osobna robota.
 
-### 7. AiFamilyBuilder v3 — geometria i flex testy nieprzetestowane
+### 7. AiFamilyBuilder — usunięty (zarchiwizowany)
 
-Największe narzędzie w repo (5334 LOC, 37 plików). Zgodnie z notatkami projektowymi geometria
-parametryczna i flex testy nigdy nie zostały przeklikane w żywym Revicie. Poza zakresem tego
-audytu, ale to największe skupisko ryzyka w zestawie.
+Narzędzie (5334 LOC, 37 plików, v2 + v3) zostało usunięte z dodatku. Pełny kod i dokumentacja
+są dostępne pod tagiem git `archive/ai-family-builder`
+(`git checkout archive/ai-family-builder -- src/HCB.RevitAddin/Features/AiFamilyBuilder`).
 
 ## Inwentarz narzędzi
 
-47 przycisków wstążki, 50 klas `IExternalCommand` (w tym `_Template`, niekompilowany).
-Największe: AiFamilyBuilder 5334, VelocitySizer 1513, Estimate 1069, DuctFittingNumbering 982,
+46 przycisków wstążki, 49 klas `IExternalCommand` (w tym `_Template`, niekompilowany).
+Największe: VelocitySizer 1513, Estimate 1069, DuctFittingNumbering 982,
 Splitter 960, SharedParameters 864, HvacTagging 686, CopyFilters 669, ViewFiltersLegend 656,
 DuctFittingsArea 650 LOC.
 
