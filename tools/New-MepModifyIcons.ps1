@@ -187,29 +187,30 @@ function Draw-ElbowUp($g, [bool]$small) {
     Arrow-Head $g (New-Object System.Drawing.SolidBrush $green) (New-Object System.Drawing.Pen $greenLine, 1.0) 28 4.5 0 -1 8.5
 }
 
-# ---------- Elbow Side: plan view, existing steel pipe, new blue elbow turning right, green turn-right arrow
-function Draw-ElbowSide($g, [bool]$small) {
+# ---------- Elbow 45: plan view, existing steel pipe, new blue 45 degree elbow with straight segment, green "45" badge
+function Draw-Elbow45($g, [bool]$small) {
     $w = if ($small) { 6.5 } else { 5.5 }
     $existing = New-Object System.Drawing.Drawing2D.GraphicsPath
     $existing.AddLine(1, 8, 11, 8)
     Draw-Tube $g $existing $w $steelFill $steelLine $steelHi
 
+    # arc centre (13, 16), radius 8: from straight right (270) turning 45 degrees clockwise
     $new = New-Object System.Drawing.Drawing2D.GraphicsPath
     $new.AddLine(12.5, 8, 13, 8)
-    $new.AddArc(7, 8, 12, 12, 270, 90)
-    $new.AddLine(19, 14, 19, 30)
+    $new.AddArc(5, 8, 16, 16, 270, 45)
+    $new.AddLine(18.66, 10.34, 29, 20.7)
     Draw-Tube $g $new $w $blueFill $blueLine $blueHi
     Draw-Flange $g 12 (8 - $w / 2 - 1.5) 12 (8 + $w / 2 + 1.5) $blueFill $blueLine
 
-    # clockwise turn arrow outside the bend
-    $arcW = if ($small) { 3.0 } else { 2.6 }
-    $g.DrawArc((FlatPen $greenLine ($arcW + 1.6)), 13, 4, 16, 16, 280, 75)
-    $g.DrawArc((FlatPen $green $arcW), 13, 4, 16, 16, 280, 75)
-    $a = 355 * [Math]::PI / 180
-    $tipX = 21 + 8 * [Math]::Cos($a); $tipY = 12 + 8 * [Math]::Sin($a)
-    $dx = -[Math]::Sin($a); $dy = [Math]::Cos($a)
-    $head = if ($small) { 8.0 } else { 6.5 }
-    Arrow-Head $g (New-Object System.Drawing.SolidBrush $green) (New-Object System.Drawing.Pen $greenLine, 1.0) ($tipX + $dx * $head * 0.75) ($tipY + $dy * $head * 0.75) $dx $dy $head
+    $r = if ($small) { 8.0 } else { 7.0 }
+    $cx = $r + 0.5; $cy = 31.5 - $r
+    $g.FillEllipse((New-Object System.Drawing.SolidBrush $green), $cx - $r, $cy - $r, 2 * $r, 2 * $r)
+    $g.DrawEllipse((New-Object System.Drawing.Pen $greenLine, 1.0), $cx - $r, $cy - $r, 2 * $r, 2 * $r)
+    $fontSize = if ($small) { 9.5 } else { 8.0 }
+    $font = New-Object System.Drawing.Font 'Segoe UI', $fontSize, ([System.Drawing.FontStyle]::Bold), ([System.Drawing.GraphicsUnit]::Pixel)
+    $format = New-Object System.Drawing.StringFormat
+    $format.Alignment = 'Center'; $format.LineAlignment = 'Center'
+    $g.DrawString('45', $font, [System.Drawing.Brushes]::White, (New-Object System.Drawing.RectangleF ($cx - $r), ($cy - $r + 0.4), (2 * $r), (2 * $r)), $format)
 }
 
 function Render($drawer, [int]$size, [bool]$small) {
@@ -237,7 +238,7 @@ $tools = [ordered]@{
     'ConnectorExtend\Resources' = ${function:Draw-Extend}
     'AlignToAxis\Resources'     = ${function:Draw-Align}
     'ElbowBranch\Resources\Up'   = ${function:Draw-ElbowUp}
-    'ElbowBranch\Resources\Side' = ${function:Draw-ElbowSide}
+    'ElbowBranch\Resources\Side45' = ${function:Draw-Elbow45}
 }
 foreach ($name in $tools.Keys) {
     $dir = Join-Path $FeaturesDir $name

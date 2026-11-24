@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -29,14 +30,19 @@ public sealed class RotateFittingsCommand : IExternalCommand
 
         RotateFittingsPickHandler handler = new();
         ExternalEvent pickEvent = ExternalEvent.Create(handler);
-        RotateFittingsWindow window = new(pickEvent, handler);
+        IntPtr revitWindowHandle = commandData.Application.MainWindowHandle;
+        RotateFittingsWindow window = new(pickEvent, handler, revitWindowHandle);
         handler.Window = window;
-        _ = new WindowInteropHelper(window) { Owner = commandData.Application.MainWindowHandle };
+        _ = new WindowInteropHelper(window) { Owner = revitWindowHandle };
         window.Closed += (_, _) =>
         {
             openWindow = null;
             handler.Window = null;
-            pickEvent.Dispose();
+            // A running pick loop is still inside this event; it ends on the ESC the window just sent.
+            if (!handler.IsPicking)
+            {
+                pickEvent.Dispose();
+            }
         };
 
         openWindow = window;

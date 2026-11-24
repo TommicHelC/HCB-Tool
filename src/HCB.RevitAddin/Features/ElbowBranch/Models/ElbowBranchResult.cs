@@ -5,7 +5,7 @@ namespace HCB.RevitAddin.Features.ElbowBranch.Models;
 public enum ElbowBranchDirection
 {
     Up,
-    Right
+    Side45
 }
 
 public sealed class ElbowBranchResult

@@ -63,6 +63,49 @@ namespace HCB.RevitAddin
             return partners;
         }
 
+        /// <summary>
+        /// Collects the element and everything physically connected to it, directly or through other elements.
+        /// Returns false when the network grows beyond <paramref name="limit"/> elements.
+        /// </summary>
+        public static bool TryCollectConnectedGroup(Element start, int limit, out HashSet<ElementId> group)
+        {
+            group = [start.Id];
+            Queue<Element> queue = new();
+            queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                Element current = queue.Dequeue();
+                ConnectorManager? manager = GetConnectorManager(current);
+                if (manager == null)
+                {
+                    continue;
+                }
+
+                foreach (Connector connector in manager.Connectors)
+                {
+                    if (connector.ConnectorType == ConnectorType.Logical)
+                    {
+                        continue;
+                    }
+
+                    foreach (Connector partner in GetConnectedPartners(connector))
+                    {
+                        if (group.Add(partner.Owner.Id))
+                        {
+                            if (group.Count > limit)
+                            {
+                                return false;
+                            }
+
+                            queue.Enqueue(partner.Owner);
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public static Connector? FindClosestConnector(Element element, XYZ? point, bool preferFree)
         {
             List<Connector> connectors = GetPhysicalConnectors(element).ToList();
