@@ -21,8 +21,8 @@ public partial class RenameOptionsWindow : Window
         SetVisibility(NumberReplaceLabel, isSheetsMode);
         SetVisibility(NumberReplaceTextBox, isSheetsMode);
 
-        Height = isSheetsMode ? 470 : 400;
-        MinHeight = isSheetsMode ? 430 : 360;
+        Height = isSheetsMode ? 500 : 400;
+        MinHeight = isSheetsMode ? 480 : 380;
     }
 
     public RenameOptions Options => new()

@@ -7,7 +7,9 @@
         Height="700"
         MinWidth="640"
         MinHeight="620"
-        WindowStartupLocation="CenterScreen">
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,7 +18,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -25,12 +27,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Dodaj shared parameters do rodzin"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Add Shared Family Parameters"
+                               Description="Dodaje wybrane parametry współdzielone do wielu rodzin naraz." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,16"
-                  Header="Plik zrodlowy">
+                  Margin="{StaticResource Space.Section}"
+                  Header="Plik źródłowy">
             <TextBox x:Name="SharedParameterFileTextBox"
                      IsReadOnly="True"
                      TextWrapping="Wrap"
@@ -39,6 +41,7 @@
         </GroupBox>
 
         <GroupBox Grid.Row="2"
+                  Margin="{StaticResource Space.Section}"
                   Header="Parametry do dodania">
             <DockPanel LastChildFill="True">
                 <controls:SelectionActionsBar DockPanel.Dock="Top"
@@ -54,50 +57,44 @@
         </GroupBox>
 
         <GroupBox Grid.Row="3"
-                  Margin="0,16,0,0"
+                  Margin="{StaticResource Space.Section}"
                   Header="Ustawienia dodawania">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Tryb parametru"
-                           VerticalAlignment="Center" />
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,0,12,8"
+                           Text="Tryb parametru" />
                 <CheckBox x:Name="InstanceCheckBox"
-                          Grid.Row="0"
                           Grid.Column="1"
-                          Content="Dodaj jako Instance"
-                          VerticalAlignment="Center" />
+                          Margin="{StaticResource Space.Field}"
+                          Content="Dodaj jako Instance" />
 
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Grupa parametru"
-                           VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,0,12,8"
+                           Text="Grupa parametru" />
                 <ComboBox x:Name="GroupComboBox"
-                          Grid.Row="2"
+                          Grid.Row="1"
                           Grid.Column="1"
-                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
                           DisplayMemberPath="Label"
                           SelectedValuePath="Key" />
 
-                <TextBlock Grid.Row="4"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Copy-first"
-                           VerticalAlignment="Center" />
-                <StackPanel Grid.Row="4"
-                            Grid.Column="1"
-                            Grid.ColumnSpan="2">
+                <TextBlock Grid.Row="2"
+                           Style="{StaticResource FieldLabelStyle}"
+                           VerticalAlignment="Top"
+                           Text="Zapis rodzin" />
+                <StackPanel Grid.Row="2"
+                            Grid.Column="1">
                     <CheckBox x:Name="SaveAsCopyCheckBox"
                               Content="Zapisz jako kopie do wskazanego folderu"
                               IsChecked="True"
@@ -106,14 +103,15 @@
                     <Grid Margin="0,8,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="OutputFolderTextBox"
                                  IsReadOnly="True"
                                  VerticalAlignment="Center" />
-                        <Button Grid.Column="2"
-                                Content="Wybierz folder"
+                        <Button Grid.Column="1"
+                                Margin="8,0,0,0"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="Wybierz folder…"
                                 Click="BrowseOutputFolderButton_OnClick" />
                     </Grid>
                 </StackPanel>
@@ -122,7 +120,7 @@
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="4"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Dodaj parametry"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

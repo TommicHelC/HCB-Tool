@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Shared Parameters"
         Width="640"
-        Height="520"
+        Height="560"
         MinWidth="560"
-        MinHeight="440"
-        WindowStartupLocation="CenterScreen">
+        MinHeight="460"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,7 +18,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -24,33 +26,27 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Brakujace parametry wspoldzielone"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Shared Parameters"
+                               Description="Dodaje do projektu brakujące parametry współdzielone z pliku Shared Parameters." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,16"
-                  Header="Plik zrodlowy">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <TextBlock Text="Revit pobierze definicje z aktualnie ustawionego pliku Shared Parameters."
-                           Style="{StaticResource StatusTextStyle}" />
-
+                  Margin="{StaticResource Space.Section}"
+                  Header="Plik źródłowy">
+            <StackPanel>
                 <TextBox x:Name="SharedParameterFileTextBox"
-                         Grid.Row="2"
                          IsReadOnly="True"
                          TextWrapping="Wrap"
                          VerticalContentAlignment="Top"
                          MinHeight="52" />
-            </Grid>
+                <TextBlock Margin="0,4,0,0"
+                           Style="{StaticResource HintTextStyle}"
+                           Text="Revit pobierze definicje z aktualnie ustawionego pliku Shared Parameters." />
+            </StackPanel>
         </GroupBox>
 
         <GroupBox Grid.Row="2"
-                  Header="Parametry do dodania">
+                  Margin="{StaticResource Space.Section}"
+                  Header="Brakujące parametry do dodania">
             <DockPanel LastChildFill="True">
                 <controls:SelectionActionsBar DockPanel.Dock="Top"
                                               Margin="0,0,0,8"
@@ -65,7 +61,7 @@
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="3"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Dodaj parametry"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

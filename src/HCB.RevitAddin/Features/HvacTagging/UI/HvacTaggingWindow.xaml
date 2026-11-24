@@ -7,7 +7,9 @@
         Height="720"
         MinWidth="860"
         MinHeight="620"
-        WindowStartupLocation="CenterScreen">
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,7 +18,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -24,32 +26,31 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="HVAC Tags"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="HVAC Tags"
+                               Description="Tworzy tagi elementów HVAC w aktywnym widoku lub na widokach aktywnego arkusza." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,14,0,0"
+                  Margin="{StaticResource Space.Section}"
                   Header="Ustawienia tagowania">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="22" />
+                    <ColumnDefinition Width="24" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <ItemsControl x:Name="RulesItemsControl">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,0,0,8">
+                            <Grid Margin="{StaticResource Space.Field}">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0"
-                                           Style="{StaticResource SectionLabelStyle}"
-                                           Text="{Binding DisplayName}"
-                                           VerticalAlignment="Center" />
+                                           Style="{StaticResource FieldLabelStyle}"
+                                           Text="{Binding DisplayName}" />
 
                                 <ComboBox Grid.Column="1"
                                           ItemsSource="{Binding AvailableTagTypes}"
@@ -72,67 +73,66 @@
 
                 <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="110" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="16" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
                                Grid.Column="0"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Text="Offset X [mm]"
-                               VerticalAlignment="Center" />
+                               Margin="0,0,12,8"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Offset X [mm]" />
                     <TextBox x:Name="OffsetXTextBox"
                              Grid.Row="0"
                              Grid.Column="1"
+                             Margin="{StaticResource Space.Field}"
                              Text="0"
                              TextChanged="Options_OnChanged" />
 
-                    <TextBlock Grid.Row="2"
+                    <TextBlock Grid.Row="1"
                                Grid.Column="0"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Text="Offset Y [mm]"
-                               VerticalAlignment="Center" />
+                               Margin="0,0,12,8"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Offset Y [mm]" />
                     <TextBox x:Name="OffsetYTextBox"
-                             Grid.Row="2"
+                             Grid.Row="1"
                              Grid.Column="1"
+                             Margin="{StaticResource Space.Field}"
                              Text="0"
                              TextChanged="Options_OnChanged" />
 
                     <CheckBox x:Name="UseLeaderCheckBox"
-                              Grid.Row="4"
-                              Grid.ColumnSpan="2"
-                              Content="Use leader"
+                              Grid.Row="2"
+                              Grid.Column="1"
+                              Content="Użyj linii odniesienia (leader)"
                               Checked="Options_OnChanged"
                               Unchecked="Options_OnChanged" />
 
-                    <TextBlock Grid.Row="6"
-                               Grid.ColumnSpan="2"
-                               Style="{StaticResource StatusTextStyle}"
-                               TextWrapping="Wrap"
-                               Text="Zakres: aktywny widok albo viewporty aktywnego arkusza. Elementy z istniejacym tagiem nie beda dublowane." />
+                    <Border Grid.Row="3"
+                            Grid.ColumnSpan="2"
+                            Margin="{StaticResource Space.Section}"
+                            Style="{StaticResource InfoPanelStyle}">
+                        <TextBlock Style="{StaticResource HintTextStyle}"
+                                   Text="Zakres: aktywny widok albo viewporty aktywnego arkusza. Elementy z istniejącym tagiem nie będą dublowane." />
+                    </Border>
                 </Grid>
             </Grid>
         </GroupBox>
 
         <GroupBox Grid.Row="2"
-                  Margin="0,14,0,0"
-                  Header="Preview">
+                  Margin="{StaticResource Space.Section}"
+                  Header="Podgląd">
             <DataGrid x:Name="PreviewDataGrid"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"
                       IsReadOnly="True"
-                      GridLinesVisibility="Horizontal"
-                      HeadersVisibility="Column"
                       SelectionMode="Extended">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Status"
@@ -159,8 +159,8 @@
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="3"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Utworz tagi"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Utwórz tagi"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="CreateTagsButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

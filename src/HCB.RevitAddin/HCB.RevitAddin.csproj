@@ -339,6 +339,8 @@
     <Page Include="Features\ViewsDuplicate\UI\ViewsDuplicateWindow.xaml" />
     <Page Include="Features\BatchAddSharedFamilyParameters\UI\BatchAddSharedFamilyParametersWindow.xaml" />
     <Page Include="Features\RenameFamilyContent\UI\RenameFamilyContentWindow.xaml" />
+    <Compile Include="UI\Controls\DialogHeader.xaml.cs" />
+    <Page Include="UI\Controls\DialogHeader.xaml" />
     <Compile Include="UI\Controls\DialogFooterBar.xaml.cs" />
     <Page Include="UI\Controls\DialogFooterBar.xaml" />
     <Compile Include="UI\Controls\ColorSelectionItem.cs" />

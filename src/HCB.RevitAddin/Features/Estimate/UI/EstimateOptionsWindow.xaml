@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Estimate"
         Width="640"
-        Height="300"
-        MinWidth="620"
-        MinHeight="280"
-        WindowStartupLocation="CenterScreen">
+        Height="320"
+        MinWidth="560"
+        MinHeight="300"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,66 +18,60 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Estimate"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Estimate"
+                               Description="Aktualizuje HC_Cena_Jednostkowa i HC_Koszt dla elementów wentylacji na podstawie wybranego cennika." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
+                  Margin="{StaticResource Space.Section}"
+                  VerticalAlignment="Top"
                   Header="Ustawienia cennika">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Plik CSV"
-                           VerticalAlignment="Center" />
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Plik CSV" />
 
                 <TextBox x:Name="CatalogPathTextBox"
                          Grid.Row="0"
                          Grid.Column="1"
-                         Margin="0,0,12,0"
-                         VerticalContentAlignment="Center" />
+                         Margin="0,0,8,8" />
 
                 <Button Grid.Row="0"
                         Grid.Column="2"
+                        Margin="{StaticResource Space.Field}"
                         Style="{StaticResource SecondaryButtonStyle}"
-                        Content="Przegladaj"
+                        Content="Przeglądaj…"
                         Click="BrowseButton_OnClick" />
 
                 <CheckBox x:Name="AddFoilCheckBox"
-                          Grid.Row="2"
-                          Grid.ColumnSpan="3"
-                          Content="Dolicz foliowanie dla prostokatnych Duct i Duct Fitting"
-                          VerticalAlignment="Center" />
-
-                <TextBlock Grid.Row="4"
-                           Grid.ColumnSpan="3"
-                           Style="{StaticResource StatusTextStyle}"
-                           Text="Narzedzie aktualizuje HC_Cena_Jednostkowa i HC_Koszt dla elementow wentylacji na podstawie wybranego cennika." />
+                          Grid.Row="1"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="0,4,0,0"
+                          Content="Dolicz foliowanie dla prostokątnych Duct i Duct Fitting" />
             </Grid>
         </GroupBox>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Przelicz"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

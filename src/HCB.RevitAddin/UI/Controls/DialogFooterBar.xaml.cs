@@ -26,6 +26,21 @@ namespace HCB.RevitAddin.UI.Controls
                 typeof(DialogFooterBar),
                 new PropertyMetadata("Anuluj"));
 
+        public static readonly DependencyProperty ShowSecondaryButtonProperty =
+            DependencyProperty.Register(
+                nameof(ShowSecondaryButton),
+                typeof(bool),
+                typeof(DialogFooterBar),
+                new PropertyMetadata(true));
+
+        /// <summary>When true, Enter triggers the primary button. Off by default so Enter in a search box never runs the tool.</summary>
+        public static readonly DependencyProperty IsPrimaryDefaultProperty =
+            DependencyProperty.Register(
+                nameof(IsPrimaryDefault),
+                typeof(bool),
+                typeof(DialogFooterBar),
+                new PropertyMetadata(false));
+
         public static readonly RoutedEvent PrimaryButtonClickEvent =
             EventManager.RegisterRoutedEvent(
                 nameof(PrimaryButtonClick),
@@ -61,6 +76,18 @@ namespace HCB.RevitAddin.UI.Controls
         {
             get => (string)GetValue(SecondaryButtonTextProperty);
             set => SetValue(SecondaryButtonTextProperty, value);
+        }
+
+        public bool ShowSecondaryButton
+        {
+            get => (bool)GetValue(ShowSecondaryButtonProperty);
+            set => SetValue(ShowSecondaryButtonProperty, value);
+        }
+
+        public bool IsPrimaryDefault
+        {
+            get => (bool)GetValue(IsPrimaryDefaultProperty);
+            set => SetValue(IsPrimaryDefaultProperty, value);
         }
 
         public event RoutedEventHandler PrimaryButtonClick

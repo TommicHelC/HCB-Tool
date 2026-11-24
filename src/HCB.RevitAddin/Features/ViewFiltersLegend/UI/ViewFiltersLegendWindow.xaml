@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="View Filters Legend"
-        Width="520"
-        Height="541"
+        Width="540"
+        Height="560"
         MinWidth="480"
-        MinHeight="420"
-        WindowStartupLocation="CenterScreen">
+        MinHeight="480"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,117 +18,125 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="View Filters Legend"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="View Filters Legend"
+                               Description="Tworzy legendę filtrów widoku z próbkami linii i wzorów wypełnienia." />
 
-        <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
-                  Header="Ustawienia legendy">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="170" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="1"
+                      Margin="{StaticResource Space.Section}"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <GroupBox Header="Ustawienia legendy">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Typ tekstu"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="TextTypeComboBox"
-                          Grid.Row="0"
-                          Grid.Column="1" />
+                        <TextBlock Margin="0,0,12,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Typ tekstu" />
+                        <ComboBox x:Name="TextTypeComboBox"
+                                  Grid.Column="1"
+                                  Margin="{StaticResource Space.Field}" />
 
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Szerokosc [mm]"
-                           VerticalAlignment="Center" />
-                <TextBox x:Name="RegionWidthTextBox"
-                         Grid.Row="2"
-                         Grid.Column="1"
-                         Text="150" />
+                        <TextBlock Grid.Row="1"
+                                   Margin="0,0,12,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Szerokość [mm]" />
+                        <TextBox x:Name="RegionWidthTextBox"
+                                 Grid.Row="1"
+                                 Grid.Column="1"
+                                 Margin="{StaticResource Space.Field}"
+                                 Text="150" />
 
-                <TextBlock Grid.Row="4"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Wysokosc [mm]"
-                           VerticalAlignment="Center" />
-                <TextBox x:Name="RegionHeightTextBox"
-                         Grid.Row="4"
-                         Grid.Column="1"
-                         Text="80" />
+                        <TextBlock Grid.Row="2"
+                                   Margin="0,0,12,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Wysokość [mm]" />
+                        <TextBox x:Name="RegionHeightTextBox"
+                                 Grid.Row="2"
+                                 Grid.Column="1"
+                                 Margin="{StaticResource Space.Field}"
+                                 Text="80" />
 
-                <TextBlock Grid.Row="6"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Odstep [mm]"
-                           VerticalAlignment="Center" />
-                <TextBox x:Name="SpacingTextBox"
-                         Grid.Row="6"
-                         Grid.Column="1"
-                         Text="50" />
+                        <TextBlock Grid.Row="3"
+                                   Margin="0,0,12,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Odstęp [mm]" />
+                        <TextBox x:Name="SpacingTextBox"
+                                 Grid.Row="3"
+                                 Grid.Column="1"
+                                 Margin="{StaticResource Space.Field}"
+                                 Text="50" />
 
-                <TextBlock Grid.Row="8"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Dlugosc linii [mm]"
-                           VerticalAlignment="Center" />
-                <TextBox x:Name="LineWidthTextBox"
-                         Grid.Row="8"
-                         Grid.Column="1"
-                         Text="200" />
+                        <TextBlock Grid.Row="4"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Długość linii [mm]" />
+                        <TextBox x:Name="LineWidthTextBox"
+                                 Grid.Row="4"
+                                 Grid.Column="1"
+                                 Text="200" />
+                    </Grid>
+                </GroupBox>
 
-                <StackPanel Grid.Row="10"
-                            Grid.ColumnSpan="2"
-                            Margin="0,4,0,0">
-                    <TextBlock Margin="0,0,0,8"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Text="Elementy legendy" />
-                    <WrapPanel Orientation="Vertical">
+                <GroupBox Margin="{StaticResource Space.Section}"
+                          Header="Elementy legendy">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <CheckBox x:Name="ProjectionLineCheckBox"
                                   Margin="0,0,12,8"
                                   Content="Projection line"
                                   IsChecked="True" />
                         <CheckBox x:Name="CutLineCheckBox"
-                                  Margin="0,0,12,8"
+                                  Grid.Column="1"
+                                  Margin="0,0,0,8"
                                   Content="Cut line"
                                   IsChecked="True" />
                         <CheckBox x:Name="SurfaceFillCheckBox"
+                                  Grid.Row="1"
                                   Margin="0,0,12,8"
                                   Content="Projection pattern"
                                   IsChecked="True" />
                         <CheckBox x:Name="CutFillCheckBox"
-                                  Margin="0,0,12,8"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  Margin="0,0,0,8"
                                   Content="Cut pattern"
                                   IsChecked="True" />
                         <CheckBox x:Name="FilterNameCheckBox"
-                                  Margin="0,0,12,8"
+                                  Grid.Row="2"
                                   Content="Filter name"
                                   IsChecked="True" />
-                    </WrapPanel>
-                </StackPanel>
-            </Grid>
-        </GroupBox>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Generuj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

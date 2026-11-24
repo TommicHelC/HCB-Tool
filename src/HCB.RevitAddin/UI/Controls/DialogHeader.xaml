@@ -1,0 +1,23 @@
+<UserControl x:Class="HCB.RevitAddin.UI.Controls.DialogHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock Style="{StaticResource SectionTitleStyle}"
+                   Text="{Binding Title, ElementName=Root}" />
+        <TextBlock x:Name="DescriptionTextBlock"
+                   Style="{StaticResource WindowDescriptionStyle}"
+                   Text="{Binding Description, ElementName=Root}"
+                   Visibility="{Binding HasDescription, ElementName=Root, Converter={StaticResource BoolToVisibility}}" />
+        <Border Margin="0,12,0,0"
+                Style="{StaticResource DividerStyle}" />
+    </StackPanel>
+</UserControl>

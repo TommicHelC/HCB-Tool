@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Clear Parameter"
         Width="580"
-        Height="300"
-        MinWidth="540"
-        MinHeight="260"
-        WindowStartupLocation="CenterScreen">
+        Height="450"
+        MinWidth="500"
+        MinHeight="430"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,83 +18,79 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Czyszczenie wartosci parametru"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Clear Parameter"
+                               Description="Czyści wartość wybranego parametru w zaznaczonych elementach, kategorii lub całym modelu." />
 
-        <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
-                  Header="Zakres">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1"
+                    Margin="{StaticResource Space.Section}">
+            <GroupBox Header="Zakres">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Grid.ColumnSpan="2"
-                           Text="{Binding ScopeDescription}"
-                           Style="{StaticResource StatusTextStyle}"
-                           TextWrapping="Wrap" />
+                    <Border Grid.ColumnSpan="2"
+                            Margin="{StaticResource Space.Field}"
+                            Style="{StaticResource InfoPanelStyle}">
+                        <TextBlock Style="{StaticResource HintTextStyle}"
+                                   Text="{Binding ScopeDescription}" />
+                    </Border>
 
-                <TextBlock x:Name="ScopeLabelTextBlock"
-                           Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Tryb"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="ScopeComboBox"
-                          Grid.Row="2"
-                          Grid.Column="1"
-                          SelectionChanged="ScopeComboBox_OnSelectionChanged" />
+                    <TextBlock x:Name="ScopeLabelTextBlock"
+                               Grid.Row="1"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Tryb" />
+                    <ComboBox x:Name="ScopeComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              SelectionChanged="ScopeComboBox_OnSelectionChanged" />
 
-                <TextBlock x:Name="CategoryLabelTextBlock"
-                           Grid.Row="4"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Kategoria"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="CategoryComboBox"
-                          Grid.Row="4"
-                          Grid.Column="1"
-                          SelectionChanged="CategoryComboBox_OnSelectionChanged" />
-            </Grid>
-        </GroupBox>
+                    <TextBlock x:Name="CategoryLabelTextBlock"
+                               Grid.Row="2"
+                               Margin="0,8,12,0"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Kategoria" />
+                    <ComboBox x:Name="CategoryComboBox"
+                              Grid.Row="2"
+                              Grid.Column="1"
+                              Margin="0,8,0,0"
+                              SelectionChanged="CategoryComboBox_OnSelectionChanged" />
+                </Grid>
+            </GroupBox>
 
-        <GroupBox Grid.Row="2"
-                  Margin="0,16,0,0"
-                  Header="Parametr">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <GroupBox Margin="{StaticResource Space.Section}"
+                      Header="Parametr">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock Style="{StaticResource SectionLabelStyle}"
-                           Text="Parametr do wyczyszczenia"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="ParameterComboBox"
-                          Grid.Column="1" />
-            </Grid>
-        </GroupBox>
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr do wyczyszczenia" />
+                    <ComboBox x:Name="ParameterComboBox"
+                              Grid.Column="1" />
+                </Grid>
+            </GroupBox>
+        </StackPanel>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="4"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Wyczysc parametr"
+                                  Grid.Row="2"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Wyczyść parametr"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

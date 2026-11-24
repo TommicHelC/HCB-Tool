@@ -7,216 +7,323 @@
         mc:Ignorable="d"
         Title="Style Preview"
         Width="1120"
-        Height="760"
+        Height="820"
         MinWidth="960"
         MinHeight="680"
+        ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}"
         d:DataContext="{d:DesignInstance Type=Window, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Local helpers for the colour swatches only. -->
+            <Style x:Key="SwatchItemStyle" TargetType="StackPanel">
+                <Setter Property="Width" Value="150" />
+                <Setter Property="Margin" Value="0,0,8,8" />
+                <Setter Property="Orientation" Value="Horizontal" />
+            </Style>
+            <Style x:Key="SwatchStyle" TargetType="Border">
+                <Setter Property="Width" Value="20" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.BorderStrong}" />
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+            <Style x:Key="SwatchLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource HintTextStyle}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid Style="{StaticResource DialogRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Border Grid.Row="0"
-                    Background="{StaticResource Brush.TextPrimary}"
-                    CornerRadius="10"
-                    Padding="18"
-                    Margin="0,0,0,16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="HellCold UI Preview"
-                                   FontSize="24"
-                                   FontWeight="SemiBold"
-                                   Foreground="White" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Text="Designer-friendly preview of SharedStyles.xaml tokens and reusable controls."
-                                   Foreground="#DCE8F5" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Top">
-                        <Button Content="Primary"
-                                Margin="0,0,8,0" />
-                        <Button Content="Secondary"
-                                Style="{StaticResource SecondaryButtonStyle}" />
-                    </StackPanel>
-                </Grid>
-            </Border>
+        <controls:DialogHeader Title="Style Preview"
+                               Description="Podgląd tokenów i kontrolek z SharedStyles.xaml - wzorzec dla wszystkich okien narzędzi HCB." />
 
-            <UniformGrid Grid.Row="1"
-                         Columns="3"
-                         Margin="0,0,0,16">
-                <Border Background="{StaticResource Brush.WindowBackground}"
-                        BorderBrush="{StaticResource Brush.Border}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="14"
-                        Margin="0,0,12,0">
-                    <StackPanel>
-                        <TextBlock Text="Window Background"
-                                   FontWeight="SemiBold" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Foreground="{StaticResource Brush.TextSecondary}"
-                                   Text="#FFFFFF" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource Brush.TextPrimary}"
-                        BorderBrush="{StaticResource Brush.TextPrimary}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="14"
-                        Margin="0,0,12,0">
-                    <StackPanel>
-                        <TextBlock Text="HellCold Navy"
-                                   FontWeight="SemiBold"
-                                   Foreground="White" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Foreground="#DCE8F5"
-                                   Text="#2E466F" />
-                    </StackPanel>
-                </Border>
-                <Border Background="{StaticResource Brush.Accent}"
-                        BorderBrush="{StaticResource Brush.Accent}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="14">
-                    <StackPanel>
-                        <TextBlock Text="HellCold Blue"
-                                   FontWeight="SemiBold"
-                                   Foreground="White" />
-                        <TextBlock Margin="0,6,0,0"
-                                   Foreground="#E6F5FE"
-                                   Text="#1F8ECE" />
-                    </StackPanel>
-                </Border>
-            </UniformGrid>
-
-            <Grid Grid.Row="2"
-                  Margin="0,0,0,16">
+        <ScrollViewer Grid.Row="1"
+                      Margin="{StaticResource Space.Section}"
+                      VerticalScrollBarVisibility="Auto">
+            <Grid Margin="0,0,8,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.1*" />
-                    <ColumnDefinition Width="0.9*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <GroupBox Header="Inputs and Actions"
-                          Margin="0,0,16,0">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource SectionTitleStyle}"
-                                   FontSize="18"
-                                   Text="Form Elements" />
-                        <TextBox Margin="0,12,0,8"
-                                 Text="Sample search or input text" />
-                        <TextBox Margin="0,0,0,12"
-                                 IsEnabled="False"
-                                 Text="Disabled input preview" />
-                        <controls:SelectionActionsBar Margin="0,0,0,12"
-                                                      LeftButtonText="All"
-                                                      RightButtonText="None" />
-                        <controls:SelectionActionsBar Margin="0,0,0,12"
-                                                      LeftButtonText="Select"
-                                                      RightButtonText="Reset" />
-                        <WrapPanel>
-                            <Button Content="Primary Action"
-                                    Margin="0,0,8,8" />
-                            <Button Content="Secondary Action"
-                                    Margin="0,0,8,8"
-                                    Style="{StaticResource SecondaryButtonStyle}" />
-                            <Button Content="Disabled"
-                                    Margin="0,0,8,8"
-                                    IsEnabled="False" />
-                        </WrapPanel>
-                        <TextBlock Style="{StaticResource StatusTextStyle}"
-                                   Margin="0,4,0,0"
-                                   Text="Status text preview based on SharedStyles." />
-                    </StackPanel>
-                </GroupBox>
-
-                <GroupBox Grid.Column="1"
-                          Header="Lists and Selection">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Margin="0,0,0,10"
-                                   Foreground="{StaticResource Brush.TextSecondary}"
-                                   Text="Hover and selected state can be inspected directly in the designer or at runtime." />
-                        <ListBox Grid.Row="1"
-                                 SelectedIndex="1"
-                                 ItemsSource="{Binding ListItems}" />
-                    </Grid>
-                </GroupBox>
-            </Grid>
-
-            <GroupBox Grid.Row="3"
-                      Header="Window Composition Example">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource SectionTitleStyle}"
-                               Text="Reference Tool Window" />
-                    <Grid Grid.Row="1"
-                          Margin="0,14,0,14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <GroupBox Header="Left Section">
-                            <DockPanel>
-                                <TextBox DockPanel.Dock="Top"
-                                         Margin="0,0,0,8"
-                                         Text="Search..." />
-                                <ListBox SelectedIndex="2"
-                                         ItemsSource="{Binding ListItems}" />
-                            </DockPanel>
-                        </GroupBox>
-                        <GroupBox Grid.Column="2"
-                                  Header="Right Section">
-                            <DockPanel>
-                                <controls:SelectionActionsBar DockPanel.Dock="Top"
-                                                              Margin="0,0,0,8"
-                                                              LeftButtonText="Check"
-                                                              RightButtonText="Uncheck" />
-                                <ListBox ItemsSource="{Binding ListItems}" />
-                            </DockPanel>
-                        </GroupBox>
-                    </Grid>
-                    <DockPanel Grid.Row="2">
-                        <TextBlock Style="{StaticResource StatusTextStyle}"
-                                   DockPanel.Dock="Left"
-                                   Text="This footer mirrors the bottom action/status area used by tool windows." />
-                        <StackPanel DockPanel.Dock="Right"
-                                    Orientation="Horizontal">
-                            <Button Content="Apply"
-                                    Width="96"
-                                    Margin="0,0,8,0" />
-                            <Button Content="Cancel"
-                                    Width="96"
-                                    Style="{StaticResource SecondaryButtonStyle}" />
+                <!-- Left column: typography, colours, panels -->
+                <StackPanel>
+                    <GroupBox Header="Typografia">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SectionTitleStyle}"
+                                       Text="SectionTitleStyle - tytuł okna" />
+                            <TextBlock Style="{StaticResource WindowDescriptionStyle}"
+                                       Text="WindowDescriptionStyle - jedno zdanie opisu narzędzia." />
+                            <TextBlock Margin="{StaticResource Space.Section}"
+                                       Style="{StaticResource SectionLabelStyle}"
+                                       Text="SectionLabelStyle - etykieta sekcji" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource FieldLabelStyle}"
+                                       Text="FieldLabelStyle - etykieta pola" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource HintTextStyle}"
+                                       Text="HintTextStyle - tekst pomocniczy pod polem, kończy się kropką." />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource StatusTextStyle}"
+                                       Text="StatusTextStyle - tylko linia stanu w stopce." />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource EmphasisTextStyle}"
+                                       Text="EmphasisTextStyle - VAV.S1.12" />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource WarningTextStyle}"
+                                       Text="WarningTextStyle - ostrzeżenie dla użytkownika." />
+                            <TextBlock Margin="0,6,0,0"
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Text="ErrorTextStyle - błąd walidacji." />
                         </StackPanel>
-                    </DockPanel>
-                </Grid>
-            </GroupBox>
-        </Grid>
-    </ScrollViewer>
+                    </GroupBox>
+
+                    <GroupBox Margin="{StaticResource Space.Section}"
+                              Header="Kolory (Brush.*)">
+                        <WrapPanel Margin="0,0,0,-8">
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.TextPrimary}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="TextPrimary" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.TextSecondary}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="TextSecondary" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.TextMuted}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="TextMuted" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Accent}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Accent" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.AccentSubtle}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="AccentSubtle" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Surface}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Surface" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.SurfaceAlt}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="SurfaceAlt" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Border}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Border" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.BorderStrong}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="BorderStrong" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Divider}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Divider" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Selection}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Selection" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Success}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Success" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Warning}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Warning" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SwatchItemStyle}">
+                                <Border Style="{StaticResource SwatchStyle}" Background="{StaticResource Brush.Danger}" />
+                                <TextBlock Style="{StaticResource SwatchLabelStyle}" Text="Danger" />
+                            </StackPanel>
+                        </WrapPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="{StaticResource Space.Section}"
+                              Header="Panele">
+                        <StackPanel>
+                            <Border Style="{StaticResource InfoPanelStyle}">
+                                <TextBlock Style="{StaticResource HintTextStyle}"
+                                           Text="InfoPanelStyle - krótki opis działania narzędzia, tekst w HintTextStyle." />
+                            </Border>
+                            <Border Margin="{StaticResource Space.Section}"
+                                    Style="{StaticResource PreviewPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionLabelStyle}"
+                                               Text="Podgląd" />
+                                    <TextBlock Margin="0,6,0,0"
+                                               Style="{StaticResource EmphasisTextStyle}"
+                                               Text="VAV.S1.12" />
+                                    <TextBlock Margin="0,6,0,0"
+                                               Style="{StaticResource HintTextStyle}"
+                                               Text="PreviewPanelStyle - wartość w EmphasisTextStyle." />
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Margin="{StaticResource Space.Section}"
+                                       Style="{StaticResource HintTextStyle}"
+                                       Text="DividerStyle:" />
+                            <Border Margin="0,6,0,0"
+                                    Style="{StaticResource DividerStyle}" />
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+
+                <GridSplitter Grid.Column="1"
+                              Style="{StaticResource SplitterStyle}" />
+
+                <!-- Right column: inputs, lists, grid, buttons -->
+                <StackPanel Grid.Column="2">
+                    <GroupBox Header="Formularz">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                                       Text="Pole tekstowe" />
+                            <TextBox Grid.Column="1"
+                                     Text="Przykładowa wartość" />
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="1"
+                                       Margin="{StaticResource Space.Hint}"
+                                       Style="{StaticResource HintTextStyle}"
+                                       Text="Podpowiedź pod polem: HintTextStyle z marginesem Space.Hint." />
+
+                            <TextBlock Grid.Row="2"
+                                       Margin="0,0,12,8"
+                                       Style="{StaticResource FieldLabelStyle}"
+                                       Text="Pole wyłączone" />
+                            <TextBox Grid.Row="2"
+                                     Grid.Column="1"
+                                     Margin="{StaticResource Space.Field}"
+                                     IsEnabled="False"
+                                     Text="Tylko do odczytu" />
+
+                            <TextBlock Grid.Row="3"
+                                       Margin="0,0,12,8"
+                                       Style="{StaticResource FieldLabelStyle}"
+                                       Text="Lista rozwijana" />
+                            <ComboBox Grid.Row="3"
+                                      Grid.Column="1"
+                                      Margin="{StaticResource Space.Field}"
+                                      SelectedIndex="0">
+                                <ComboBoxItem Content="HC_Numer" />
+                                <ComboBoxItem Content="Mark" />
+                                <ComboBoxItem Content="Comments" />
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="4"
+                                       Margin="0,0,12,8"
+                                       Style="{StaticResource FieldLabelStyle}"
+                                       Text="Lista edytowalna" />
+                            <ComboBox Grid.Row="4"
+                                      Grid.Column="1"
+                                      Margin="{StaticResource Space.Field}"
+                                      IsEditable="True"
+                                      Text="Wpisz albo wybierz" />
+
+                            <CheckBox Grid.Row="5"
+                                      Grid.Column="1"
+                                      Margin="{StaticResource Space.Field}"
+                                      Content="Pole wyboru (CheckBox)"
+                                      IsChecked="True" />
+
+                            <StackPanel Grid.Row="6"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <RadioButton Margin="0,0,16,0"
+                                             Content="Opcja A"
+                                             GroupName="StylePreviewRadio"
+                                             IsChecked="True" />
+                                <RadioButton Content="Opcja B"
+                                             GroupName="StylePreviewRadio" />
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Margin="{StaticResource Space.Section}"
+                              Header="Lista z zaznaczaniem">
+                        <DockPanel>
+                            <controls:SelectionActionsBar DockPanel.Dock="Top"
+                                                          Margin="{StaticResource Space.Field}"
+                                                          LeftButtonText="Wszystkie"
+                                                          RightButtonText="Brak" />
+                            <ListBox Height="110"
+                                     SelectedIndex="1"
+                                     ItemsSource="{Binding ListItems}" />
+                        </DockPanel>
+                    </GroupBox>
+
+                    <GroupBox Margin="{StaticResource Space.Section}"
+                              Header="Tabela (DataGrid)">
+                        <DataGrid Height="130"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  HeadersVisibility="Column"
+                                  CanUserAddRows="False"
+                                  RowHeaderWidth="0"
+                                  SelectedIndex="0"
+                                  ItemsSource="{Binding ListItems}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="*"
+                                                    Header="Element"
+                                                    Binding="{Binding}" />
+                                <DataGridTextColumn Width="90"
+                                                    Header="Długość"
+                                                    Binding="{Binding Length}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <GroupBox Margin="{StaticResource Space.Section}"
+                              Header="Przyciski">
+                        <WrapPanel Margin="0,0,0,-8">
+                            <Button Margin="0,0,8,8"
+                                    Content="Główny" />
+                            <Button Margin="0,0,8,8"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Content="Drugorzędny" />
+                            <Button Margin="0,0,8,8"
+                                    Style="{StaticResource InlineActionButtonStyle}"
+                                    Content="Akcja w linii" />
+                            <Button Margin="0,0,8,8"
+                                    IsEnabled="False"
+                                    Content="Wyłączony" />
+                        </WrapPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <controls:DialogFooterBar Grid.Row="2"
+                                  Margin="{StaticResource Space.Section}"
+                                  StatusText="DialogFooterBar: linia stanu po lewej, akcje po prawej."
+                                  PrimaryButtonText="Zastosuj"
+                                  SecondaryButtonText="Zamknij" />
+    </Grid>
 </Window>

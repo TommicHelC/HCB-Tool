@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Parameter Calculator"
         Width="760"
-        Height="560"
-        MinWidth="720"
-        MinHeight="520"
-        WindowStartupLocation="CenterScreen">
+        Height="620"
+        MinWidth="640"
+        MinHeight="560"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,146 +18,144 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Parameter Calculator"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Parameter Calculator"
+                               Description="Oblicza wartość parametru docelowego z formuły złożonej z parametrów źródłowych." />
 
-        <GroupBox Grid.Row="1"
-                  Margin="0,16,0,12"
-                  Header="Zakres i wynik">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="170" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="150" />
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1"
+              Margin="{StaticResource Space.Section}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                <TextBlock x:Name="ScopeTextBlock"
-                           Grid.Row="0"
-                           Grid.ColumnSpan="3"
-                           TextWrapping="Wrap"
-                           Style="{StaticResource StatusTextStyle}" />
+            <GroupBox Header="Zakres i wynik">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Parametr docelowy"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="TargetParameterComboBox"
-                          Grid.Row="2"
-                          Grid.Column="1"
-                          Margin="0,0,8,0"
-                          SelectionChanged="OptionChanged" />
+                    <Border Grid.ColumnSpan="2"
+                            Margin="{StaticResource Space.Field}"
+                            Style="{StaticResource InfoPanelStyle}">
+                        <TextBlock x:Name="ScopeTextBlock"
+                                   Style="{StaticResource HintTextStyle}" />
+                    </Border>
 
-                <TextBlock Grid.Row="2"
-                           Grid.Column="2"
-                           Margin="8,0,0,0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Liczba miejsc po przecinku"
-                           VerticalAlignment="Center" />
-                <TextBox x:Name="DecimalPlacesTextBox"
-                         Grid.Row="4"
-                         Grid.Column="2"
-                         Margin="8,0,0,0"
-                         Width="72"
-                         HorizontalAlignment="Left"
-                         TextChanged="OptionChanged" />
-            </Grid>
-        </GroupBox>
+                    <TextBlock Grid.Row="1"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr docelowy" />
+                    <ComboBox x:Name="TargetParameterComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Margin="{StaticResource Space.Field}"
+                              SelectionChanged="OptionChanged" />
 
-        <GroupBox Grid.Row="2"
-                  Header="Formula">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="2"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Liczba miejsc po przecinku" />
+                    <TextBox x:Name="DecimalPlacesTextBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Width="72"
+                             HorizontalAlignment="Left"
+                             TextChanged="OptionChanged" />
+                </Grid>
+            </GroupBox>
 
-                <DataGrid x:Name="OperandsDataGrid"
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          HeadersVisibility="Column"
-                          ItemsSource="{Binding Operands}"
-                          SelectionMode="Single"
-                          CellEditEnding="OperandsDataGrid_OnCellEditEnding">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Operator" Width="110">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding OperatorSymbol}" VerticalAlignment="Center" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding DataContext.OperatorOptions, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              SelectedItem="{Binding OperatorSymbol, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Parametr" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding ParameterName}" VerticalAlignment="Center" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding DataContext.AvailableParameterNames, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              SelectedItem="{Binding ParameterName, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+            <GroupBox Grid.Row="1"
+                      Margin="{StaticResource Space.Section}"
+                      Header="Formuła">
+                <DockPanel>
+                    <WrapPanel DockPanel.Dock="Bottom"
+                               Margin="0,8,0,0"
+                               Orientation="Horizontal">
+                        <Button Style="{StaticResource InlineActionButtonStyle}"
+                                Content="Dodaj parametr"
+                                Click="AddRowButton_OnClick" />
+                        <Button Margin="6,0,0,0"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Content="Usuń parametr"
+                                Click="RemoveRowButton_OnClick" />
+                        <Button Margin="6,0,0,0"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Content="W górę"
+                                Click="MoveUpButton_OnClick" />
+                        <Button Margin="6,0,0,0"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Content="W dół"
+                                Click="MoveDownButton_OnClick" />
+                    </WrapPanel>
 
-                <StackPanel Grid.Row="1"
-                            Margin="0,12,0,0"
-                            Orientation="Horizontal">
-                    <Button Width="120"
-                            Margin="0,0,8,0"
-                            Content="Dodaj parametr"
-                            Click="AddRowButton_OnClick" />
-                    <Button Width="120"
-                            Margin="0,0,8,0"
-                            Content="Usun parametr"
-                            Click="RemoveRowButton_OnClick" />
-                    <Button Width="96"
-                            Margin="0,0,8,0"
-                            Content="W gore"
-                            Click="MoveUpButton_OnClick" />
-                    <Button Width="96"
-                            Content="W dol"
-                            Click="MoveDownButton_OnClick" />
+                    <DataGrid x:Name="OperandsDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              ItemsSource="{Binding Operands}"
+                              SelectionMode="Single"
+                              CellEditEnding="OperandsDataGrid_OnCellEditEnding">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Operator" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding OperatorSymbol}" VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.OperatorOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  SelectedItem="{Binding OperatorSymbol, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Parametr" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ParameterName}" VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableParameterNames, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  SelectedItem="{Binding ParameterName, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </GroupBox>
+
+            <Border Grid.Row="2"
+                    Margin="{StaticResource Space.Section}"
+                    Style="{StaticResource PreviewPanelStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionLabelStyle}"
+                               Text="Podgląd" />
+                    <TextBlock x:Name="PreviewTextBlock"
+                               Margin="0,6,0,0"
+                               Style="{StaticResource EmphasisTextStyle}" />
                 </StackPanel>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Grid.Row="3"
-                  Margin="0,12,0,0"
-                  Header="Podglad">
-            <TextBlock x:Name="PreviewTextBlock"
-                       TextWrapping="Wrap"
-                       Style="{StaticResource StatusTextStyle}" />
-        </GroupBox>
+            </Border>
+        </Grid>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="4"
-                                  Margin="0,16,0,0"
+                                  Grid.Row="2"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Oblicz"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

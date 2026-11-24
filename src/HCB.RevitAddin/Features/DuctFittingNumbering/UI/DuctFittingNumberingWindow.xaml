@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Duct and Fitting Numbering"
-        Width="460"
-        Height="360"
-        MinWidth="420"
-        MinHeight="320"
-        WindowStartupLocation="CenterScreen">
+        Width="560"
+        Height="380"
+        MinWidth="480"
+        MinHeight="340"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,67 +18,76 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!-- Heading text is set from code (WindowTitleTextBlock.Text); the header mirrors it. -->
         <TextBlock x:Name="WindowTitleTextBlock"
                    Text="Duct and Fitting Numbering"
-                   Style="{StaticResource SectionTitleStyle}" />
+                   Visibility="Collapsed" />
+        <controls:DialogHeader Title="{Binding Text, ElementName=WindowTitleTextBlock}"
+                               Description="Nadaje kolejne numery kanałom i kształtkom, grupując elementy o tych samych parametrach." />
 
-        <GroupBox x:Name="OptionsGroupBox"
-                  Grid.Row="1"
-                  Margin="0,16,0,0"
-                  Header="Opcje numeracji">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="160" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition x:Name="LengthParameterSpacerRow" Height="Auto" />
-                    <RowDefinition x:Name="LengthParameterRow" Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Style="{StaticResource SectionLabelStyle}"
-                           Grid.Row="0"
-                           Text="Parametr docelowy"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="TargetParameterComboBox"
-                          Grid.Row="0"
-                          Grid.Column="1" />
-                <TextBlock x:Name="LengthParameterLabel"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Grid.Row="3"
-                           Text="Parametr dlugosci"
-                           VerticalAlignment="Center" />
-                <ComboBox x:Name="LengthParameterComboBox"
-                          Grid.Row="3"
-                          Grid.Column="1" />
-                <CheckBox x:Name="IncludeSystemParameterCheckBox"
-                          Grid.Row="5"
-                          Grid.ColumnSpan="2"
-                          Content="Dodaj HC_System do numeru, jesli cala grupa ma jedna wspolna wartosc"
-                          VerticalAlignment="Center" />
-                <CheckBox x:Name="UseLastProjectNumberCheckBox"
-                          Grid.Row="7"
-                          Grid.ColumnSpan="2"
-                          Content="Pobierz ostatni numer z projektu i zacznij od kolejnego"
-                          VerticalAlignment="Center" />
-            </Grid>
-        </GroupBox>
+        <ScrollViewer Grid.Row="1"
+                      Margin="{StaticResource Space.Section}"
+                      VerticalScrollBarVisibility="Auto">
+            <GroupBox x:Name="OptionsGroupBox"
+                      VerticalAlignment="Top"
+                      Header="Opcje numeracji">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition x:Name="LengthParameterSpacerRow" Height="Auto" />
+                        <RowDefinition x:Name="LengthParameterRow" Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Margin="0,0,12,8"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr docelowy" />
+                    <ComboBox x:Name="TargetParameterComboBox"
+                              Grid.Row="0"
+                              Grid.Column="1"
+                              Margin="{StaticResource Space.Field}" />
+
+                    <TextBlock x:Name="LengthParameterLabel"
+                               Grid.Row="2"
+                               Margin="0,0,12,8"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr długości" />
+                    <ComboBox x:Name="LengthParameterComboBox"
+                              Grid.Row="2"
+                              Grid.Column="1"
+                              Margin="{StaticResource Space.Field}" />
+
+                    <CheckBox x:Name="IncludeSystemParameterCheckBox"
+                              Grid.Row="3"
+                              Grid.Column="1"
+                              Margin="0,4,0,8">
+                        <TextBlock Text="Dodaj HC_System do numeru, jeśli cała grupa ma jedną wspólną wartość"
+                                   TextWrapping="Wrap" />
+                    </CheckBox>
+                    <CheckBox x:Name="UseLastProjectNumberCheckBox"
+                              Grid.Row="4"
+                              Grid.Column="1"
+                              Content="Pobierz ostatni numer z projektu i zacznij od kolejnego" />
+                </Grid>
+            </GroupBox>
+        </ScrollViewer>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Numeruj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

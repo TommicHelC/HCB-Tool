@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="View Filters Bulk Edit"
         Width="520"
-        Height="280"
+        Height="320"
         MinWidth="480"
-        MinHeight="240"
-        WindowStartupLocation="CenterScreen">
+        MinHeight="300"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,58 +17,61 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Margin="16">
+
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="View Filters Bulk Edit"
-                   Style="{StaticResource SectionTitleStyle}" />
+
+        <controls:DialogHeader Title="View Filters Bulk Edit"
+                               Description="Zmienia stan i widoczność zaznaczonych filtrów widoku naraz." />
+
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
+                  Margin="{StaticResource Space.Section}"
+                  VerticalAlignment="Top"
                   Header="Akcje">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Stan filtra"
-                           VerticalAlignment="Center" />
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,0,12,8"
+                           Text="Stan filtra" />
                 <ComboBox x:Name="EnableModeComboBox"
-                          Grid.Row="0"
                           Grid.Column="1"
+                          Margin="{StaticResource Space.Field}"
                           SelectedIndex="0">
                     <ComboBoxItem Content="Bez zmian" Tag="NoChange" />
-                    <ComboBoxItem Content="ON" Tag="Enable" />
-                    <ComboBoxItem Content="OFF" Tag="Disable" />
+                    <ComboBoxItem Content="Włączony" Tag="Enable" />
+                    <ComboBoxItem Content="Wyłączony" Tag="Disable" />
                 </ComboBox>
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Widocznosc filtra"
-                           VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Widoczność filtra" />
                 <ComboBox x:Name="VisibilityModeComboBox"
-                          Grid.Row="2"
+                          Grid.Row="1"
                           Grid.Column="1"
                           SelectedIndex="0">
                     <ComboBoxItem Content="Bez zmian" Tag="NoChange" />
-                    <ComboBoxItem Content="Pokaz" Tag="Visible" />
+                    <ComboBoxItem Content="Pokaż" Tag="Visible" />
                     <ComboBoxItem Content="Ukryj" Tag="Hidden" />
                 </ComboBox>
             </Grid>
         </GroupBox>
+
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Zastosuj"
                                   SecondaryButtonText="Anuluj"
+                                  IsPrimaryDefault="True"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />
     </Grid>

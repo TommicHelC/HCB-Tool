@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Splitter"
         Width="560"
-        Height="330"
-        MinWidth="520"
-        MinHeight="320"
-        WindowStartupLocation="CenterScreen">
+        Height="420"
+        MinWidth="480"
+        MinHeight="380"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,61 +18,70 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Splitter"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Splitter"
+                               Description="Dzieli kanały i rury na odcinki produkcyjne o zadanej długości." />
 
-        <GroupBox Grid.Row="1"
-                  Margin="0,16,0,12"
-                  Header="Dlugosc odcinka produkcyjnego">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="90" />
-                </Grid.ColumnDefinitions>
-
-                <TextBox x:Name="SegmentLengthTextBox"
-                         Margin="0,0,8,0"
-                         VerticalAlignment="Center" />
-
-                <TextBlock Grid.Column="1"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="mm" />
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Grid.Row="2"
-                  Margin="0,0,0,12"
-                  Header="Zakres">
+        <ScrollViewer Grid.Row="1"
+                      Margin="{StaticResource Space.Section}"
+                      VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <CheckBox x:Name="DuctsCheckBox"
-                          Margin="0,0,0,8"
-                          Content="Ducts" />
-                <CheckBox x:Name="PipesCheckBox"
-                          Content="Pipes" />
-            </StackPanel>
-        </GroupBox>
+                <GroupBox Header="Ustawienia podziału">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="3"
-                  Header="Sposob pracy">
-            <TextBlock TextWrapping="Wrap"
-                       Style="{StaticResource StatusTextStyle}">
-                Po zatwierdzeniu klikaj wielokrotnie ducts i pipes. Strona startowa jest wyznaczana automatycznie na podstawie miejsca klikniecia blizej jednego z konektorow. Reszta dlugosci zostanie na przeciwnym koncu.
-            </TextBlock>
-        </GroupBox>
+                        <TextBlock Margin="0,0,12,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Długość odcinka" />
+                        <TextBox x:Name="SegmentLengthTextBox"
+                                 Grid.Column="1"
+                                 Margin="{StaticResource Space.Field}" />
+                        <TextBlock Grid.Column="2"
+                                   Margin="8,0,0,8"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="mm" />
+
+                        <TextBlock Grid.Row="1"
+                                   VerticalAlignment="Top"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Zakres" />
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2">
+                            <CheckBox x:Name="DuctsCheckBox"
+                                      Margin="{StaticResource Space.Field}"
+                                      Content="Ducts" />
+                            <CheckBox x:Name="PipesCheckBox"
+                                      Content="Pipes" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <Border Margin="{StaticResource Space.Section}"
+                        Style="{StaticResource InfoPanelStyle}">
+                    <TextBlock Style="{StaticResource HintTextStyle}"
+                               Text="Po zatwierdzeniu klikaj wielokrotnie kanały i rury. Strona startowa jest wyznaczana automatycznie na podstawie miejsca kliknięcia bliżej jednego z konektorów. Reszta długości zostanie na przeciwnym końcu." />
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="4"
-                                  Margin="0,16,0,0"
+                                  Grid.Row="2"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Rozpocznij"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

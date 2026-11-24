@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Copy Parameter"
         Width="620"
-        Height="360"
-        MinWidth="580"
-        MinHeight="340"
-        WindowStartupLocation="CenterScreen">
+        Height="440"
+        MinWidth="520"
+        MinHeight="400"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,83 +18,79 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Copy Parameter"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Copy Parameter"
+                               Description="Kopiuje wartość parametru źródłowego do parametru docelowego w elementach instalacji." />
 
-        <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
-                  Header="Ustawienia kopiowania">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="190" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="16" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1"
+                    Margin="{StaticResource Space.Section}">
+            <GroupBox Header="Ustawienia kopiowania">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Zakres"
-                           VerticalAlignment="Center" />
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="Zakres" />
+                    <ComboBox x:Name="ScopeComboBox"
+                              Grid.Column="1"
+                              Margin="{StaticResource Space.Field}"
+                              SelectionChanged="ScopeComboBox_OnSelectionChanged" />
 
-                <ComboBox x:Name="ScopeComboBox"
-                          Grid.Row="0"
-                          Grid.Column="1"
-                          SelectionChanged="ScopeComboBox_OnSelectionChanged" />
+                    <TextBlock Grid.Row="1"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr źródłowy" />
+                    <ComboBox x:Name="SourceParameterComboBox"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Margin="{StaticResource Space.Field}"
+                              SelectionChanged="SourceParameterComboBox_OnSelectionChanged" />
 
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Parametr zrodlowy"
-                           VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Parametr docelowy" />
+                    <ComboBox x:Name="TargetParameterComboBox"
+                              Grid.Row="2"
+                              Grid.Column="1"
+                              SelectionChanged="TargetParameterComboBox_OnSelectionChanged" />
 
-                <ComboBox x:Name="SourceParameterComboBox"
-                          Grid.Row="2"
-                          Grid.Column="1"
-                          SelectionChanged="SourceParameterComboBox_OnSelectionChanged" />
+                    <TextBlock Grid.Row="3"
+                               Grid.Column="1"
+                               Margin="{StaticResource Space.Hint}"
+                               Style="{StaticResource HintTextStyle}"
+                               Text="Lista docelowa jest ograniczona do zapisywalnych parametrów zgodnych typem danych z wybranym parametrem źródłowym." />
+                </Grid>
+            </GroupBox>
 
-                <TextBlock Grid.Row="4"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Parametr docelowy"
-                           VerticalAlignment="Center" />
-
-                <ComboBox x:Name="TargetParameterComboBox"
-                          Grid.Row="4"
-                          Grid.Column="1"
-                          SelectionChanged="TargetParameterComboBox_OnSelectionChanged" />
-
-                <TextBlock Grid.Row="6"
-                           Grid.ColumnSpan="2"
-                           Style="{StaticResource StatusTextStyle}"
-                           Text="Lista docelowa jest ograniczona do zapisywalnych parametrow zgodnych typem danych z wybranym parametrem zrodlowym." />
-
-                <TextBlock x:Name="PreviewTextBlock"
-                           Grid.Row="8"
-                           Grid.ColumnSpan="2"
-                           TextWrapping="Wrap"
-                           Style="{StaticResource StatusTextStyle}" />
-            </Grid>
-        </GroupBox>
+            <Border Margin="{StaticResource Space.Section}"
+                    Style="{StaticResource PreviewPanelStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionLabelStyle}"
+                               Text="Podgląd" />
+                    <TextBlock x:Name="PreviewTextBlock"
+                               Margin="0,6,0,0"
+                               Style="{StaticResource EmphasisTextStyle}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Kopiuj wartosci"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Kopiuj wartości"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

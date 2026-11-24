@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="FlowChanger"
         Width="540"
-        Height="260"
-        MinWidth="500"
-        MinHeight="230"
-        WindowStartupLocation="CenterScreen">
+        Height="300"
+        MinWidth="480"
+        MinHeight="280"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,51 +18,48 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="FlowChanger"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="FlowChanger"
+                               Description="Zmienia przepływ na terminalach w aktywnym widoku." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
+                  Margin="{StaticResource Space.Section}"
+                  VerticalAlignment="Top"
                   Header="Ustawienia parametru">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="16" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Parametr docelowy"
-                           VerticalAlignment="Center" />
-
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Text="Parametr docelowy" />
                 <ComboBox x:Name="ParameterComboBox"
-                          Grid.Row="0"
                           Grid.Column="1"
                           IsEditable="False" />
 
-                <TextBlock Grid.Row="2"
-                           Grid.ColumnSpan="2"
-                           Style="{StaticResource StatusTextStyle}"
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="0,6,0,0"
+                           Style="{StaticResource HintTextStyle}"
                            Text="Lista obejmuje zapisywalne parametry liczbowe znalezione na terminalach w aktywnym widoku." />
             </Grid>
         </GroupBox>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Zmien przeplywy"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Zmień przepływy"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

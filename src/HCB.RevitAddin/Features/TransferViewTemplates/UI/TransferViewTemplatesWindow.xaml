@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Transfer View Templates"
         Width="680"
-        Height="620"
+        Height="680"
         MinWidth="620"
-        MinHeight="540"
-        WindowStartupLocation="CenterScreen">
+        MinHeight="560"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,62 +17,75 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Margin="16">
+
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock x:Name="HeaderTextBlock"
-                   Text="Transfer View Templates"
-                   Style="{StaticResource SectionTitleStyle}" />
+
+        <!-- Same layout as controls:DialogHeader; the title TextBlock is kept because code-behind sets HeaderTextBlock.Text. -->
+        <StackPanel>
+            <TextBlock x:Name="HeaderTextBlock"
+                       Style="{StaticResource SectionTitleStyle}"
+                       Text="Transfer View Templates" />
+            <TextBlock Style="{StaticResource WindowDescriptionStyle}"
+                       Text="Kopiuje wybrane szablony z jednego otwartego projektu do drugiego." />
+            <Border Margin="0,12,0,0"
+                    Style="{StaticResource DividerStyle}" />
+        </StackPanel>
+
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,16"
+                  Margin="{StaticResource Space.Section}"
                   Header="Projekty">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Kopiuj z"
-                           VerticalAlignment="Center" />
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,0,12,8"
+                           Text="Kopiuj z" />
                 <ComboBox x:Name="SourceDocumentComboBox"
-                          Grid.Row="0"
                           Grid.Column="1"
+                          Margin="{StaticResource Space.Field}"
                           SelectionChanged="DocumentComboBox_OnSelectionChanged" />
-                <TextBlock Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Wklej do"
-                           VerticalAlignment="Center" />
+                <TextBlock Grid.Row="1"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Margin="0,0,12,8"
+                           Text="Wklej do" />
                 <ComboBox x:Name="TargetDocumentComboBox"
-                          Grid.Row="2"
+                          Grid.Row="1"
                           Grid.Column="1"
+                          Margin="{StaticResource Space.Field}"
                           SelectionChanged="DocumentComboBox_OnSelectionChanged" />
                 <CheckBox x:Name="OverrideExistingCheckBox"
-                          Grid.Row="4"
-                          Grid.ColumnSpan="2"
+                          Grid.Row="2"
+                          Grid.Column="1"
                           Content="Nadpisuj szablony o tej samej nazwie w projekcie docelowym" />
             </Grid>
         </GroupBox>
-        <TextBox x:Name="SearchTextBox"
-                 Grid.Row="2"
-                 Margin="0,0,0,8"
-                 TextChanged="SearchTextBox_OnTextChanged" />
+
         <GroupBox x:Name="TemplatesGroupBox"
-                  Grid.Row="3"
-                  Header="Szablony widokow">
+                  Grid.Row="2"
+                  Margin="{StaticResource Space.Section}"
+                  Header="Szablony widoków">
             <DockPanel LastChildFill="True">
+                <TextBlock DockPanel.Dock="Top"
+                           Margin="0,0,0,4"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Szukaj" />
+                <TextBox x:Name="SearchTextBox"
+                         DockPanel.Dock="Top"
+                         Margin="{StaticResource Space.Field}"
+                         TextChanged="SearchTextBox_OnTextChanged" />
                 <controls:SelectionActionsBar DockPanel.Dock="Top"
                                               Margin="0,0,0,8"
                                               LeftButtonText="Wszystkie"
@@ -82,9 +97,10 @@
                          SelectionMode="Extended" />
             </DockPanel>
         </GroupBox>
+
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="4"
-                                  Margin="0,16,0,0"
+                                  Grid.Row="3"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Transferuj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

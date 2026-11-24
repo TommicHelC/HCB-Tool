@@ -8,7 +8,9 @@
         Height="720"
         MinWidth="960"
         MinHeight="620"
-        WindowStartupLocation="CenterScreen">
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -29,72 +31,59 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="12" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Velocity Sizer"
-                       Style="{StaticResource SectionTitleStyle}" />
-            <TextBlock Margin="0,6,0,0"
-                       Foreground="{StaticResource Brush.TextSecondary}"
-                       TextWrapping="Wrap"
-                       Text="Zakres: zaznaczone okragle kanaly i rury. Wpisz przeplyw w m3/h, wybierz standardowy rozmiar z projektu i zatwierdz zmiane srednicy oraz parametrow LIN_VE_*." />
-        </StackPanel>
+        <controls:DialogHeader Title="Velocity Sizer"
+                               Description="Dobiera standardowe średnice okrągłych kanałów i rur na podstawie przepływu i prędkości." />
 
         <Border Grid.Row="1"
-                Margin="0,12,0,0"
-                Padding="12"
-                Background="{StaticResource Brush.SurfaceAlt}"
-                BorderBrush="{StaticResource Brush.Border}"
-                BorderThickness="1"
-                CornerRadius="8">
-            <TextBlock x:Name="InfoTextBlock"
-                       TextWrapping="Wrap"
-                       Foreground="{StaticResource Brush.TextSecondary}" />
-        </Border>
-
-        <Border Grid.Row="2"
-                Margin="0,12,0,0"
-                Padding="12"
-                Background="{StaticResource Brush.SurfaceAlt}"
-                BorderBrush="{StaticResource Brush.Border}"
-                BorderThickness="1"
-                CornerRadius="8">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Tryb automatyczny"
-                           Style="{StaticResource SectionLabelStyle}"
-                           VerticalAlignment="Center" />
-                <TextBlock Margin="16,0,8,0"
-                           Text="Max. v [m/s]:"
-                           Style="{StaticResource StatusTextStyle}" />
-                <TextBox x:Name="MaxVelocityTextBox"
-                         Width="30"
-                         Text="4" />
-                <Button Margin="12,0,0,0"
-                        Width="170"
-                        Click="AutoSizeAllButton_OnClick"
-                        Content="Dobierz wszystkie" />
-                <Button Margin="8,0,0,0"
-                        Width="190"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Click="AutoSizeSelectedButton_OnClick"
-                        Content="Dobierz zaznaczony" />
+                Margin="{StaticResource Space.Section}"
+                Style="{StaticResource InfoPanelStyle}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource HintTextStyle}"
+                           Text="Zakres: zaznaczone okrągłe kanały i rury. Wpisz przepływ w m3/h, wybierz standardowy rozmiar z projektu i zatwierdź zmianę średnicy oraz parametrów LIN_VE_*." />
+                <TextBlock x:Name="InfoTextBlock"
+                           Margin="0,4,0,0"
+                           Style="{StaticResource HintTextStyle}" />
             </StackPanel>
         </Border>
 
-        <Grid Grid.Row="4">
+        <GroupBox Grid.Row="2"
+                  Margin="{StaticResource Space.Section}"
+                  Header="Tryb automatyczny">
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Text="Max. v [m/s]" />
+                <TextBox x:Name="MaxVelocityTextBox"
+                         Width="56"
+                         Text="4" />
+                <Button Margin="12,0,0,0"
+                        Click="AutoSizeAllButton_OnClick"
+                        Content="Dobierz wszystkie" />
+                <Button Margin="8,0,0,0"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Click="AutoSizeSelectedButton_OnClick"
+                        Content="Dobierz zaznaczony" />
+            </WrapPanel>
+        </GroupBox>
+
+        <Grid Grid.Row="3"
+              Margin="{StaticResource Space.Section}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.55*" />
                 <ColumnDefinition Width="12" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
+
+            <GridSplitter Grid.Column="1"
+                          Style="{StaticResource SplitterStyle}" />
 
             <GroupBox Grid.Column="0" Header="Wybrane elementy">
                 <Grid>
@@ -125,46 +114,44 @@
                                             Binding="{Binding ElementTypeLabel}"
                                             IsReadOnly="True"
                                             Width="40" />
-                        <DataGridTextColumn Header="Ksztalt"
+                        <DataGridTextColumn Header="Kształt"
                                             Binding="{Binding SupportedShapeLabel}"
                                             IsReadOnly="True"
-                                            Width="50" />
+                                            Width="Auto" />
                         <DataGridTextColumn Header="Sq"
                                             Binding="{Binding SectionLabel}"
                                             IsReadOnly="True"
-                                            Width="30" />
+                                            Width="Auto" />
                         <DataGridTextColumn Header="Rozmiar"
                                             Binding="{Binding CurrentSizeDisplay}"
                                             IsReadOnly="True"
-                                            Width="60" />
+                                            Width="Auto" />
                         <DataGridTextColumn Header="Q[m3/h]"
                                             Binding="{Binding FlowText, UpdateSourceTrigger=PropertyChanged}"
-                                            Width="60" />
+                                            Width="Auto" />
                         <DataGridTextColumn Header="Nowy rozmiar"
                                             Binding="{Binding SelectedSizeDisplay}"
                                             IsReadOnly="True"
-                                            Width="60" />
+                                            Width="Auto" />
                         <DataGridTextColumn Header="v [m/s]"
                                             Binding="{Binding SelectedVelocityDisplay}"
                                             IsReadOnly="True"
-                                            Width="30" />
-                    </DataGrid.Columns>
+                                            Width="60" />
+                        </DataGrid.Columns>
                     </DataGrid>
 
-                    <StackPanel Grid.Row="1"
-                                Margin="0,12,0,0"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Left">
-                        <Button Width="160"
-                                Style="{StaticResource SecondaryButtonStyle}"
+                    <WrapPanel Grid.Row="1"
+                               Margin="0,8,0,0"
+                               Orientation="Horizontal"
+                               HorizontalAlignment="Left">
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
                                 Click="ShowInModelButton_OnClick"
-                                Content="Pokaz w modelu" />
+                                Content="Pokaż w modelu" />
                         <Button Margin="8,0,0,0"
-                                Width="260"
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Click="SaveParametersButton_OnClick"
                                 Content="Zapisz parametry (bez zmiany geometrii)" />
-                    </StackPanel>
+                    </WrapPanel>
                 </Grid>
             </GroupBox>
 
@@ -193,7 +180,7 @@
                                                 Binding="{Binding AreaSquareMeters, StringFormat=0.####}"
                                                 IsReadOnly="True"
                                                 Width="110" />
-                            <DataGridTextColumn Header="Predkosc [m/s]"
+                            <DataGridTextColumn Header="Prędkość [m/s]"
                                                 Binding="{Binding VelocityMetersPerSecond, StringFormat=0.##}"
                                                 IsReadOnly="True"
                                                 Width="120" />
@@ -201,11 +188,10 @@
                     </DataGrid>
 
                     <StackPanel Grid.Row="1"
-                                Margin="0,12,0,0"
+                                Margin="0,8,0,0"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
-                        <Button Width="156"
-                                Click="AssignCandidateButton_OnClick"
+                        <Button Click="AssignCandidateButton_OnClick"
                                 Content="Przypisz rozmiar" />
                     </StackPanel>
                 </Grid>
@@ -213,8 +199,8 @@
         </Grid>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="5"
-                                  Margin="0,16,0,0"
+                                  Grid.Row="4"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Zastosuj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

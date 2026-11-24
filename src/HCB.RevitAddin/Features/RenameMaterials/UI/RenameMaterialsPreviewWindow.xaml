@@ -7,7 +7,9 @@
         Height="560"
         MinWidth="760"
         MinHeight="460"
-        WindowStartupLocation="CenterScreen">
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,24 +18,24 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Rename Materials Preview"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Rename Materials"
+                               Description="Sprawdź proponowane nowe nazwy materiałów przed zastosowaniem zmian." />
 
         <GroupBox Grid.Row="1"
-                  Margin="0,16,0,0"
-                  Header="Podglad zmian">
+                  Margin="{StaticResource Space.Section}"
+                  Header="Podgląd zmian">
             <DockPanel LastChildFill="True">
                 <CheckBox x:Name="ProblemsOnlyCheckBox"
                           DockPanel.Dock="Top"
-                          Margin="0,0,0,12"
-                          Content="Pokaz tylko konflikty i pozycje bez zmian"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Pokaż tylko konflikty i pozycje bez zmian"
                           Checked="ProblemsOnlyCheckBox_OnChanged"
                           Unchecked="ProblemsOnlyCheckBox_OnChanged" />
 
@@ -51,7 +53,7 @@
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Zastosuj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

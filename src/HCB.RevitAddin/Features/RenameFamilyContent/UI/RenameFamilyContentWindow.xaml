@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Rename Family Parameters"
         Width="620"
-        Height="520"
-        MinWidth="560"
-        MinHeight="480"
-        WindowStartupLocation="CenterScreen">
+        Height="480"
+        MinWidth="520"
+        MinHeight="460"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,96 +18,91 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Grid.ColumnSpan="3"
-                   Text="Rename family parameters"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Rename Family Parameters"
+                               Description="Zmienia nazwy parametrów rodzinnych według prefiksu, sufiksu oraz reguły szukaj i zamień." />
 
-        <TextBlock Grid.Row="1"
-                   Style="{StaticResource SectionLabelStyle}"
-                   Text="Prefiks"
-                   VerticalAlignment="Center" />
-        <TextBox x:Name="PrefixTextBox"
-                 Grid.Row="1"
-                 Grid.Column="1"
-                 Grid.ColumnSpan="2" />
-
-        <TextBlock Grid.Row="3"
-                   Style="{StaticResource SectionLabelStyle}"
-                   Text="Szukaj"
-                   VerticalAlignment="Center" />
-        <TextBox x:Name="FindTextBox"
-                 Grid.Row="3"
-                 Grid.Column="1"
-                 Grid.ColumnSpan="2" />
-
-        <TextBlock Grid.Row="5"
-                   Style="{StaticResource SectionLabelStyle}"
-                   Text="Zamien na"
-                   VerticalAlignment="Center" />
-        <TextBox x:Name="ReplaceTextBox"
-                 Grid.Row="5"
-                 Grid.Column="1"
-                 Grid.ColumnSpan="2" />
-
-        <TextBlock Grid.Row="7"
-                   Style="{StaticResource SectionLabelStyle}"
-                   Text="Sufiks"
-                   VerticalAlignment="Center" />
-        <TextBox x:Name="SuffixTextBox"
-                 Grid.Row="7"
-                 Grid.Column="1"
-                 Grid.ColumnSpan="2" />
-
-        <GroupBox Grid.Row="8"
-                  Grid.ColumnSpan="3"
-                  Margin="0,16,0,0"
-                  Header="Tryb zapisu">
-            <StackPanel>
-                <CheckBox x:Name="SaveAsCopyCheckBox"
-                          Content="Zapisz jako kopie do wskazanego folderu"
-                          IsChecked="True"
-                          Checked="SaveAsCopyCheckBox_OnChanged"
-                          Unchecked="SaveAsCopyCheckBox_OnChanged" />
-                <Grid Margin="0,8,0,0">
+        <StackPanel Grid.Row="1"
+                    Margin="{StaticResource Space.Section}">
+            <GroupBox Header="Reguły nazw">
+                <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="120" />
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="OutputFolderTextBox"
-                             IsReadOnly="True" />
-                    <Button Grid.Column="2"
-                            Content="Wybierz folder"
-                            Click="BrowseOutputFolderButton_OnClick" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="Prefiks" />
+                    <TextBox x:Name="PrefixTextBox"
+                             Grid.Column="1"
+                             Margin="{StaticResource Space.Field}" />
+
+                    <TextBlock Grid.Row="1"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Szukaj" />
+                    <TextBox x:Name="FindTextBox"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Margin="{StaticResource Space.Field}" />
+
+                    <TextBlock Grid.Row="2"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Zamień na" />
+                    <TextBox x:Name="ReplaceTextBox"
+                             Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="{StaticResource Space.Field}" />
+
+                    <TextBlock Grid.Row="3"
+                               Style="{StaticResource FieldLabelStyle}"
+                               Text="Sufiks" />
+                    <TextBox x:Name="SuffixTextBox"
+                             Grid.Row="3"
+                             Grid.Column="1" />
                 </Grid>
-            </StackPanel>
-        </GroupBox>
+            </GroupBox>
+
+            <GroupBox Margin="{StaticResource Space.Section}"
+                      Header="Tryb zapisu">
+                <StackPanel>
+                    <CheckBox x:Name="SaveAsCopyCheckBox"
+                              Content="Zapisz jako kopię do wskazanego folderu"
+                              IsChecked="True"
+                              Checked="SaveAsCopyCheckBox_OnChanged"
+                              Unchecked="SaveAsCopyCheckBox_OnChanged" />
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="OutputFolderTextBox"
+                                 IsReadOnly="True" />
+                        <Button Grid.Column="1"
+                                Margin="8,0,0,0"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="Wybierz folder"
+                                Click="BrowseOutputFolderButton_OnClick" />
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Grid.Row="9"
-                                  Grid.ColumnSpan="3"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Zmien parametry"
+                                  Grid.Row="2"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Zmień parametry"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

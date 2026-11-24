@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Duct Accessory Numbering"
-        Width="520"
+        Width="560"
         Height="560"
-        MinWidth="440"
-        MinHeight="500"
-        WindowStartupLocation="CenterScreen">
+        MinWidth="480"
+        MinHeight="480"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,114 +18,93 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Duct Accessory Numbering"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <controls:DialogHeader Title="Duct Accessory Numbering"
+                               Description="Grupuje Duct Accessory po układzie w obrębie tego samego HC_System i nadaje każdej grupie wspólny numer." />
 
         <ScrollViewer Grid.Row="1"
-                      Margin="0,16,0,0"
+                      Margin="{StaticResource Space.Section}"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <Border Padding="12"
-                        Background="#F6F8FB"
-                        BorderBrush="#D8E0EC"
-                        BorderThickness="1"
-                        CornerRadius="6">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource SectionLabelStyle}"
-                                   Text="Jak dziala to narzedzie" />
-                        <TextBlock Margin="0,8,0,0"
-                                   Style="{StaticResource StatusTextStyle}"
-                                   Opacity="0.72"
-                                   TextWrapping="Wrap"
-                                   Text="narzedzie numeruje tylko Duct Accessory. elementy sa grupowane po ukladzie w obrebie tego samego HC_System i dostaja wspolny numer." />
-                        <TextBlock Margin="0,6,0,0"
-                                   Style="{StaticResource StatusTextStyle}"
-                                   Opacity="0.72"
-                                   TextWrapping="Wrap"
-                                   Text="format numeru: TypeMark.HC_System.KolejnyNumer. jesli Type Mark jest pusty, narzedzie uzyje nazwy typu." />
-                    </StackPanel>
+                <Border Style="{StaticResource InfoPanelStyle}">
+                    <TextBlock Style="{StaticResource HintTextStyle}"
+                               Text="Format numeru: TypeMark.HC_System.KolejnyNumer. Jeśli Type Mark jest pusty, narzędzie użyje nazwy typu." />
                 </Border>
 
-                <GroupBox Margin="0,16,0,0"
+                <GroupBox Margin="{StaticResource Space.Section}"
                           Header="Ustawienia numeracji">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="180" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource SectionLabelStyle}"
-                                       Text="Parametr docelowy"
-                                       VerticalAlignment="Center" />
-                            <ComboBox x:Name="TargetParameterComboBox"
-                                      Grid.Column="1"
-                                      SelectionChanged="OptionsChanged" />
-                        </Grid>
-                        <TextBlock Margin="0,0,0,12"
-                                   Style="{StaticResource StatusTextStyle}"
-                                   Opacity="0.62"
-                                   TextWrapping="Wrap"
-                                   Text="tu zostanie wpisany gotowy numer dla kazdego Duct Accessory." />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="180" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource SectionLabelStyle}"
-                                       Text="Numer startowy"
-                                       VerticalAlignment="Center" />
-                            <TextBox x:Name="StartNumberTextBox"
-                                     Grid.Column="1"
-                                     Text="1"
-                                     TextChanged="OptionsChanged" />
-                        </Grid>
-                        <TextBlock Margin="0,0,0,8"
-                                   Style="{StaticResource StatusTextStyle}"
-                                   Opacity="0.62"
-                                   TextWrapping="Wrap"
-                                   Text="kolejny numer jest nadawany kazdej nowej grupie ukladu." />
+                        <TextBlock Style="{StaticResource FieldLabelStyle}"
+                                   Text="Parametr docelowy" />
+                        <ComboBox x:Name="TargetParameterComboBox"
+                                  Grid.Column="1"
+                                  SelectionChanged="OptionsChanged" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Margin="{StaticResource Space.Hint}"
+                                   Style="{StaticResource HintTextStyle}"
+                                   Text="Tu zostanie wpisany gotowy numer dla każdego Duct Accessory." />
+
+                        <TextBlock Grid.Row="2"
+                                   Style="{StaticResource FieldLabelStyle}"
+                                   Text="Numer startowy" />
+                        <TextBox x:Name="StartNumberTextBox"
+                                 Grid.Row="2"
+                                 Grid.Column="1"
+                                 Text="1"
+                                 TextChanged="OptionsChanged" />
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="1"
+                                   Margin="{StaticResource Space.Hint}"
+                                   Style="{StaticResource HintTextStyle}"
+                                   Text="Kolejny numer jest nadawany każdej nowej grupie układu." />
+
                         <CheckBox x:Name="UseLastProjectNumberCheckBox"
-                                  Margin="0,0,0,12"
+                                  Grid.Row="4"
+                                  Grid.Column="1"
                                   Content="Pobierz ostatni numer z projektu i zacznij od kolejnego"
                                   Checked="OptionsChanged"
                                   Unchecked="OptionsChanged" />
-
-                        <Border Padding="10"
-                                Background="#FAFBFD"
-                                BorderBrush="#D8E0EC"
-                                BorderThickness="1"
-                                CornerRadius="6">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource SectionLabelStyle}"
-                                           Text="Preview" />
-                                <TextBlock x:Name="PreviewTextBlock"
-                                           Margin="0,8,0,0"
-                                           FontSize="15"
-                                           FontWeight="SemiBold"
-                                           TextWrapping="Wrap" />
-                                <TextBlock Margin="0,8,0,0"
-                                           Style="{StaticResource StatusTextStyle}"
-                                           Opacity="0.72"
-                                           TextWrapping="Wrap"
-                                           Text="przyklad: VAV.S1.12 albo Supply_Accessory.W1.12, zaleznie od Type Mark i HC_System." />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
+
+                <Border Margin="{StaticResource Space.Section}"
+                        Style="{StaticResource PreviewPanelStyle}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionLabelStyle}"
+                                   Text="Podgląd" />
+                        <TextBlock x:Name="PreviewTextBlock"
+                                   Margin="0,6,0,0"
+                                   Style="{StaticResource EmphasisTextStyle}" />
+                        <TextBlock Margin="0,6,0,0"
+                                   Style="{StaticResource HintTextStyle}"
+                                   Text="Przykład: VAV.S1.12 albo Supply_Accessory.W1.12, zależnie od Type Mark i HC_System." />
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
+                                  Margin="{StaticResource Space.Section}"
                                   PrimaryButtonText="Numeruj"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"

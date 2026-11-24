@@ -4,10 +4,12 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Opcje zmiany nazw"
         Width="560"
-        Height="420"
+        Height="500"
         MinWidth="480"
-        MinHeight="360"
-        WindowStartupLocation="CenterScreen">
+        MinHeight="480"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,111 +18,115 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Style="{StaticResource DialogRootStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="TitleTextBlock"
-                   Style="{StaticResource SectionTitleStyle}" />
+        <!-- Header: the title is set in code-behind (TitleTextBlock), so DialogHeader's layout is mirrored here. -->
+        <StackPanel>
+            <TextBlock x:Name="TitleTextBlock"
+                       Style="{StaticResource SectionTitleStyle}" />
+            <Border Margin="{StaticResource Space.Section}"
+                    Style="{StaticResource DividerStyle}" />
+        </StackPanel>
 
         <GroupBox Grid.Row="1"
-                  Header="Parametry zmiany nazw"
-                  Margin="0,16,0,0">
+                  Margin="{StaticResource Space.Section}"
+                  VerticalAlignment="Top"
+                  Header="Parametry zmiany nazw">
+            <!-- Rows hidden in code (Views mode) collapse to zero height: spacing lives on the controls, not in spacer rows. -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock x:Name="NumberPrefixLabel"
                            Grid.Row="0"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Prefiks numeru"
-                           VerticalAlignment="Center" />
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Prefiks numeru" />
                 <TextBox x:Name="NumberPrefixTextBox"
                          Grid.Row="0"
-                         Grid.Column="1" />
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NumberFindLabel"
-                           Grid.Row="2"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Szukaj w numerze"
-                           VerticalAlignment="Center" />
+                           Grid.Row="1"
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Szukaj w numerze" />
                 <TextBox x:Name="NumberFindTextBox"
-                         Grid.Row="2"
-                         Grid.Column="1" />
+                         Grid.Row="1"
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NumberReplaceLabel"
-                           Grid.Row="4"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Zamien w numerze na"
-                           VerticalAlignment="Center" />
+                           Grid.Row="2"
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Zamień w numerze na" />
                 <TextBox x:Name="NumberReplaceTextBox"
-                         Grid.Row="4"
-                         Grid.Column="1" />
+                         Grid.Row="2"
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NamePrefixLabel"
-                           Grid.Row="6"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Prefiks nazwy"
-                           VerticalAlignment="Center" />
+                           Grid.Row="3"
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Prefiks nazwy" />
                 <TextBox x:Name="PrefixTextBox"
-                         Grid.Row="6"
-                         Grid.Column="1" />
+                         Grid.Row="3"
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NameFindLabel"
-                           Grid.Row="8"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Szukaj w nazwie"
-                           VerticalAlignment="Center" />
+                           Grid.Row="4"
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Szukaj w nazwie" />
                 <TextBox x:Name="FindTextBox"
-                         Grid.Row="8"
-                         Grid.Column="1" />
+                         Grid.Row="4"
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NameReplaceLabel"
-                           Grid.Row="10"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Zamien w nazwie na"
-                           VerticalAlignment="Center" />
+                           Grid.Row="5"
+                           Margin="0,0,12,8"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Zamień w nazwie na" />
                 <TextBox x:Name="ReplaceTextBox"
-                         Grid.Row="10"
-                         Grid.Column="1" />
+                         Grid.Row="5"
+                         Grid.Column="1"
+                         Margin="{StaticResource Space.Field}" />
 
                 <TextBlock x:Name="NameSuffixLabel"
-                           Grid.Row="12"
-                           Style="{StaticResource SectionLabelStyle}"
-                           Text="Sufiks nazwy"
-                           VerticalAlignment="Center" />
+                           Grid.Row="6"
+                           Style="{StaticResource FieldLabelStyle}"
+                           Text="Sufiks nazwy" />
                 <TextBox x:Name="SuffixTextBox"
-                         Grid.Row="12"
+                         Grid.Row="6"
                          Grid.Column="1" />
             </Grid>
         </GroupBox>
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Grid.Row="2"
-                                  Margin="0,16,0,0"
-                                  PrimaryButtonText="Zmien nazwy"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Zmień nazwy"
                                   SecondaryButtonText="Anuluj"
                                   PrimaryButtonClick="ConfirmButton_OnClick"
                                   SecondaryButtonClick="CancelButton_OnClick" />

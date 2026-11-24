@@ -1,38 +1,44 @@
 <UserControl x:Class="HCB.RevitAddin.UI.Controls.DialogFooterBar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             MinHeight="40">
+             x:Name="Root">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
+    <StackPanel>
+        <Border Margin="0,0,0,12"
+                Style="{StaticResource DividerStyle}" />
+        <Grid MinHeight="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Column="0"
-                   Margin="0,0,16,0"
-                   Style="{StaticResource StatusTextStyle}"
-                   Text="{Binding StatusText, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0"
+                       Margin="0,0,16,0"
+                       Style="{StaticResource StatusTextStyle}"
+                       Text="{Binding StatusText, ElementName=Root}" />
 
-        <StackPanel Grid.Column="1"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <Button Width="120"
-                    Margin="0,0,8,0"
-                    Content="{Binding PrimaryButtonText, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Click="PrimaryButton_OnClick" />
-            <Button Width="96"
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    Content="{Binding SecondaryButtonText, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Click="SecondaryButton_OnClick" />
-        </StackPanel>
-    </Grid>
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button MinWidth="110"
+                        IsDefault="{Binding IsPrimaryDefault, ElementName=Root}"
+                        Content="{Binding PrimaryButtonText, ElementName=Root}"
+                        Click="PrimaryButton_OnClick" />
+                <Button MinWidth="90"
+                        Margin="8,0,0,0"
+                        IsCancel="True"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Content="{Binding SecondaryButtonText, ElementName=Root}"
+                        Visibility="{Binding ShowSecondaryButton, ElementName=Root, Converter={StaticResource BoolToVisibility}}"
+                        Click="SecondaryButton_OnClick" />
+            </StackPanel>
+        </Grid>
+    </StackPanel>
 </UserControl>
