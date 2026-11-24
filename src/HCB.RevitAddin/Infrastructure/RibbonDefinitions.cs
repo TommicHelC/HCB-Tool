@@ -431,7 +431,7 @@ namespace HCB.RevitAddin
                                     CreateProjectParameterButtons(revitVersion)),
                                 new RibbonPushButtonDefinition(
                                     "HcbCopyBetweenProjectsButton",
-                                    "Copy Beetwen Projects",
+                                    "Copy Between Projects",
                                     typeof(Features.CopyBetweenProjects.CopyBetweenProjectsCommand),
                                     "Kopiuje wybrane typy i rodziny miedzy otwartymi projektami.",
                                     "Co robi: kopiuje Level Type, Grid Type, Family oraz Family Type miedzy otwartymi projektami. Jak uzyc: 1. Wybierz projekt zrodlowy i docelowy. 2. Przefiltruj liste i zaznacz wiele pozycji. 3. Uruchom kopiowanie. Zakres: co najmniej dwa otwarte projekty; przy konfliktach nazw typow uzywa typow z projektu docelowego.")

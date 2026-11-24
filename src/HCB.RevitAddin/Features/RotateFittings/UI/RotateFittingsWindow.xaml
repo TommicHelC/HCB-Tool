@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Rotate Fittings"
-        Width="440"
+        Width="460"
         SizeToContent="Height"
         ResizeMode="NoResize"
-        ShowInTaskbar="False"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,8 +16,12 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <StackPanel Margin="14">
-        <GroupBox Header="Kat obrotu (klik = obracaj o ten kat)">
+    <StackPanel Margin="{StaticResource Space.DialogPadding}">
+        <controls:DialogHeader Title="Rotate Fittings"
+                               Description="Obraca klikane kształtki o wybrany kąt wokół wybranej osi." />
+
+        <GroupBox Margin="{StaticResource Space.Section}"
+                  Header="Kąt obrotu (klik = obracaj o ten kąt)">
             <StackPanel>
                 <UniformGrid Columns="4"
                              Rows="2"
@@ -36,63 +40,59 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="30" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock VerticalAlignment="Center"
-                               Margin="0,0,10,0"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Text="Wlasny kat:" />
-
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="Własny kąt" />
                     <TextBox x:Name="AngleTextBox"
                              Grid.Column="1"
-                             Margin="0,0,8,0"
                              KeyDown="AngleTextBox_OnKeyDown"
                              TextChanged="AngleTextBox_OnTextChanged" />
-
                     <TextBlock Grid.Column="2"
+                               Margin="8,0,0,0"
                                VerticalAlignment="Center"
-                               Style="{StaticResource SectionLabelStyle}"
-                               Text="st." />
+                               Text="°" />
                 </Grid>
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Margin="0,10,0,0"
-                  Header="Os obrotu">
+        <GroupBox Margin="{StaticResource Space.Section}"
+                  Header="Oś obrotu">
             <StackPanel>
                 <RadioButton x:Name="ConnectorAxisRadioButton"
                              Margin="0,0,0,6"
                              GroupName="Axis"
-                             Content="Os podlaczonego konektora (najblizej klikniecia)" />
+                             Content="Oś podłączonego konektora (najbliżej kliknięcia)" />
                 <RadioButton x:Name="VerticalAxisRadioButton"
                              GroupName="Axis"
-                             Content="Os pionowa Z przez punkt wstawienia" />
+                             Content="Oś pionowa Z przez punkt wstawienia" />
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Margin="0,10,0,0"
+        <GroupBox Margin="{StaticResource Space.Section}"
                   Header="Kategorie">
             <WrapPanel>
                 <CheckBox x:Name="DuctFittingsCheckBox"
-                          Margin="0,0,14,0"
+                          Margin="0,0,16,0"
                           Content="Duct" />
                 <CheckBox x:Name="PipeFittingsCheckBox"
-                          Margin="0,0,14,0"
+                          Margin="0,0,16,0"
                           Content="Pipe" />
                 <CheckBox x:Name="ConduitFittingsCheckBox"
                           Content="Conduit" />
             </WrapPanel>
         </GroupBox>
 
-        <TextBlock Margin="0,10,0,0"
-                   TextWrapping="Wrap"
-                   Style="{StaticResource StatusTextStyle}"
-                   Text="Klikaj ksztaltki w widoku. ESC wstrzymuje wskazywanie - okno zostaje, Revit dziala normalnie. Zamknij konczy obracanie. Kat + = przeciwnie do wskazowek zegara, patrzac od strony konektora osi (os Z: z gory)." />
+        <Border Margin="{StaticResource Space.Section}"
+                Style="{StaticResource InfoPanelStyle}">
+            <TextBlock Style="{StaticResource HintTextStyle}"
+                       Text="Klikaj kształtki w widoku. ESC w Revicie wstrzymuje wskazywanie – okno zostaje, Revit działa normalnie. Zamknij kończy obracanie. Kąt + = przeciwnie do wskazówek zegara, patrząc od strony konektora osi (oś Z: z góry)." />
+        </Border>
 
         <controls:DialogFooterBar x:Name="FooterBar"
-                                  Margin="0,12,0,0"
-                                  PrimaryButtonText="Wskaz ksztaltki"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Wskaż kształtki"
                                   SecondaryButtonText="Zamknij"
                                   PrimaryButtonClick="PickButton_OnClick"
                                   SecondaryButtonClick="CloseButton_OnClick" />

@@ -18,7 +18,7 @@ public sealed class CopyBetweenProjectsCommand : IExternalCommand
 
             if (documents.Count < 2)
             {
-                TaskDialog.Show("Copy Beetwen Projects", "Potrzebne sa co najmniej dwa otwarte projekty.");
+                TaskDialog.Show("Copy Between Projects", "Potrzebne sa co najmniej dwa otwarte projekty.");
                 return Result.Succeeded;
             }
 
@@ -31,7 +31,7 @@ public sealed class CopyBetweenProjectsCommand : IExternalCommand
             var result = service.Copy(window.SourceDocument, window.TargetDocument, window.SelectedItems);
             string details = string.Join("\n", result.Messages.Take(20));
             TaskDialog.Show(
-                "Copy Beetwen Projects",
+                "Copy Between Projects",
                 $"Projekt zrodlowy: {result.SourceDocumentTitle}\nProjekt docelowy: {result.TargetDocumentTitle}\nWybrane pozycje: {result.RequestedItemsCount}\nSkopiowane identyfikatory: {result.CopiedElementIdsCount}\n\n{details}");
 
             return Result.Succeeded;
@@ -39,7 +39,7 @@ public sealed class CopyBetweenProjectsCommand : IExternalCommand
         catch (Exception ex)
         {
             message = ex.Message;
-            TaskDialog.Show("Copy Beetwen Projects", $"Nie udalo sie skopiowac elementow.\n\n{ex}");
+            TaskDialog.Show("Copy Between Projects", $"Nie udalo sie skopiowac elementow.\n\n{ex}");
             return Result.Failed;
         }
     }
