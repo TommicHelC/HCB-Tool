@@ -22,3 +22,5 @@
 /mcp_requirements.txt
 /src/HCB.RevitAddin/Infrastructure/Mcp/
 dist/
+# Claude Code local state (worktrees, local settings)
+/.claude/
