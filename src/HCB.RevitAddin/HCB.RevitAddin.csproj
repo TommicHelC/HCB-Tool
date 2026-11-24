@@ -297,7 +297,6 @@
     <Compile Include="Features\ViewsDuplicate\ViewsDuplicateService.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="Infrastructure\AlwaysAvailableCommandAvailability.cs" />
-    <Compile Include="Infrastructure\FamilyDocumentCommandAvailability.cs" />
     <Compile Include="Infrastructure\MepConnectorHelper.cs" />
     <Compile Include="Infrastructure\WarningSwallower.cs" />
     <Compile Include="Infrastructure\RibbonDefinitions.cs" />

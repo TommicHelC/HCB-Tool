@@ -90,8 +90,7 @@ a nie mechaniczna. Wymaga też pierwszego w tym repo `#if` i stałej kompilacji 
 
 ### 3. Brak strażnika „to jest projekt, nie rodzina"
 
-Jest `FamilyDocumentCommandAvailability` (używa go tylko AI Family Builder) i
-`AlwaysAvailableCommandAvailability` (6 narzędzi batch, które słusznie działają bez otwartego
+Jest tylko `AlwaysAvailableCommandAvailability` (6 narzędzi batch, które słusznie działają bez otwartego
 dokumentu). Pozostałe ~40 przycisków nie ma strażnika — w dokumencie rodziny są klikalne i
 zachowają się losowo (pusty wynik albo wyjątek). Warto dodać `ProjectDocumentCommandAvailability`
 i wpiąć je hurtem.
