@@ -17,7 +17,7 @@ public sealed class ElbowBranchService
     }
 
     /// <summary>
-    /// Adds an elbow at a free connector and a straight segment turning up (+Z) or to the right in global coordinates.
+    /// Adds an elbow at a free connector and a straight segment turning up (+Z, 90 degrees) or 45 degrees to the right.
     /// </summary>
     public ElbowBranchResult Add(Document document, View view, Element element, XYZ? pickPoint, ElbowBranchDirection direction)
     {
@@ -50,8 +50,10 @@ public sealed class ElbowBranchService
             return !isVertical;
         }
 
-        // "Right" looking along the connector from above; a vertical connector turns towards global +X.
-        branchDirection = isVertical ? XYZ.BasisX : outward.CrossProduct(XYZ.BasisZ).Normalize();
+        // 45 degrees off the connector, towards the right looking along it from above;
+        // a vertical connector leans towards global +X.
+        XYZ side = isVertical ? XYZ.BasisX : outward.CrossProduct(XYZ.BasisZ).Normalize();
+        branchDirection = (outward + side).Normalize();
         return true;
     }
 

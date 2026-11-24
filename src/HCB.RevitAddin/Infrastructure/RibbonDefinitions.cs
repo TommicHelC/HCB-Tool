@@ -223,56 +223,6 @@ namespace HCB.RevitAddin
                             "Dzieli proste ducts i pipes na odcinki produkcyjne z lacznikami.",
                             "Co robi: dzieli proste ducts i pipes na odcinki produkcyjne z lacznikami. Jak uzyc: 1. Wpisz dlugosc produkcyjna i wybierz ducts, pipes albo oba typy. 2. Klikaj elementy blizej strony startowej. 3. ESC konczy. Zakres: dzieli od wskazanej strony i zostawia reszte na przeciwnym koncu. Uwagi: jesli klikniesz juz pocity prosty ciag, narzedzie przebuduje go od najblizszej granicy fittingu lub accessory i przeliczy rozstaw od nowa."),
                         new RibbonPulldownDefinition(
-                            "HcbMepModifyPulldown",
-                            "MEP Modify",
-                            typeof(Features.RotateFittings.RotateFittingsCommand),
-                            null,
-                            "Szybkie edycje MEP: obrot ksztaltek, laczenie, odcinki z konektora, wyrownanie do osi i kolana z odcinkiem.",
-                            "Co zawiera: szybkie edycje polaczen MEP wykonywane kliknieciami w widoku. Zakres: duct, pipe i conduit fittings, ducts, pipes, conduits oraz inne elementy z konektorami. Narzedzia nie pokazuja podsumowan - okno pojawia sie tylko, gdy cos sie nie udalo.",
-                            [
-                                new RibbonPushButtonDefinition(
-                                    "HcbRotateFittingsButton",
-                                    "Rotate Fittings",
-                                    typeof(Features.RotateFittings.RotateFittingsCommand),
-                                    "Otwiera okno w tle: wybierz kat (domyslnie co 45 stopni) i klikaj ksztaltki, aby je obracac.",
-                                    "Co robi: obraca klikniete ksztaltki o wybrany kat wokol osi podlaczonego konektora albo wokol osi pionowej. Jak uzyc: 1. Okno zostaje otwarte obok Revita. 2. Kliknij kat (+/-45, 90, 135, 180) albo wpisz wlasny i Enter. 3. Klikaj ksztaltki - kazde klikniecie obraca o zadany kat. ESC wstrzymuje wskazywanie, a klikniecie kata albo Wskaz ksztaltki wznawia. Zakres: Duct, Pipe i Conduit Fittings. Uwagi: polaczenia na obracanych koncach sa rozlaczane."),
-                                new RibbonPushButtonDefinition(
-                                    "HcbConnectElementsButton",
-                                    "Connect",
-                                    typeof(Features.ConnectElements.ConnectElementsCommand),
-                                    "Dosuwa, wyrownuje i podlacza element do konektora innego elementu w dwoch kliknieciach.",
-                                    "Co robi: przesuwa i obraca drugi element tak, aby jego konektor pokryl sie z konektorem pierwszego, i laczy je bez dopasowywania rozmiarow ani typow. Jak uzyc: 1. Kliknij element, DO KTOREGO laczysz (blisko konektora). 2. Kliknij element, KTORY ma byc dosuniety (blisko konektora). 3. Powtarzaj pary, ESC konczy. Zakres: wszystkie elementy z konektorami tej samej dziedziny. Uwagi: dotychczasowe polaczenia przesuwanego elementu sa rozlaczane."),
-                                new RibbonPushButtonDefinition(
-                                    "HcbConnectorExtendButton",
-                                    "Extend 0.5 m",
-                                    typeof(Features.ConnectorExtend.ConnectorExtendCommand),
-                                    "Klik w wolny konektor wstawia prosty odcinek 500 mm duct, pipe albo conduit w kierunku konektora.",
-                                    "Co robi: z kliknietego wolnego konektora (kolano, trojnik, koniec kanalu, urzadzenie) wstawia prosty odcinek 500 mm w kierunku konektora, w jego rozmiarze, i od razu go podlacza. Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy. Zakres: ducts, pipes, conduits; typ i system z sasiedniego odcinka, a gdy go brak - pierwszy pasujacy typ z projektu."),
-                                new RibbonPushButtonDefinition(
-                                    "HcbAlignToAxisButton",
-                                    "Align To Axis",
-                                    typeof(Features.AlignToAxis.AlignToAxisCommand),
-                                    "Wyrownuje elementy do osi wskazanego prostego odcinka rury lub kanalu bez rozlaczania polaczen.",
-                                    "Co robi: przesuwa kliknieta rure, kanal albo ksztaltke tak, aby jej os przeciela os odcinka odniesienia (dla rownoleglych - aby byly wspolliniowe). Przesuniecie jest tylko w poprzek obu osi, wiec polaczenia zostaja. Jak uzyc: 1. Kliknij prosty odcinek odniesienia. 2. Klikaj dochodzace elementy, np. prostopadla rure. 3. ESC konczy. Zakres: ducts, pipes, conduits i elementy z konektorami."),
-                                new RibbonPushButtonDefinition(
-                                    "HcbElbowUpButton",
-                                    "Elbow Up",
-                                    typeof(Features.ElbowBranch.ElbowUpCommand),
-                                    "Klik w wolny konektor dodaje kolano i odcinek 500 mm w gore (globalna os Z).",
-                                    "Co robi: na kliknietym wolnym konektorze wstawia kolano i prosty odcinek 500 mm skierowany w gore w ukladzie globalnym. Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy; kierunek mozna potem zmienic narzedziem Rotate Fittings. Zakres: ducts, pipes, conduits; kolano z routing preferences typu odcinka. Uwagi: na koncu kanalu kolano zajmuje jego koncowke, na ksztaltce siada bezposrednio na konektorze.",
-                                    null,
-                                    "Features\\ElbowBranch\\Resources\\Up"),
-                                new RibbonPushButtonDefinition(
-                                    "HcbElbowSideButton",
-                                    "Elbow Side",
-                                    typeof(Features.ElbowBranch.ElbowSideCommand),
-                                    "Klik w wolny konektor dodaje kolano i odcinek 500 mm w bok - w prawo, poziomo.",
-                                    "Co robi: na kliknietym wolnym konektorze wstawia kolano i prosty odcinek 500 mm skierowany poziomo w prawo (patrzac wzdluz konektora z gory; dla pionowego konektora w strone globalnej osi X). Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy; na lewo obrocisz narzedziem Rotate Fittings o 180 stopni. Zakres: ducts, pipes, conduits; kolano z routing preferences typu odcinka.",
-                                    null,
-                                    "Features\\ElbowBranch\\Resources\\Side")
-                            ]),
-
-                        new RibbonPulldownDefinition(
                             "HcbAreaPulldown",
                             "Area",
                             typeof(Features.DuctFittingsArea.DuctFittingsAreaLinearCommand),
@@ -296,6 +246,57 @@ namespace HCB.RevitAddin
                                     "Co robi: oblicza HC_Area dla ksztaltek wentylacyjnych MagiCAD. Jak uzyc: 1. Uruchom narzedzie dla rodzin przygotowanych pod MagiCAD. 2. Wybierz zakres albo ustawienia. 3. Zapisz wynik. Zakres: raport i zapis do HC_Area.",
                                     null,
                                     "Resources\\Ribbon\\Area\\Mc")
+                            ])
+                    ]),
+                new RibbonPanelDefinition(
+                    "MEP Modify",
+                    [
+                        // Plain buttons, not a pulldown, so every tool is listed in Revit's Keyboard Shortcuts dialog.
+                        new RibbonPushButtonDefinition(
+                            "HcbRotateFittingsButton",
+                            "Rotate Fittings",
+                            typeof(Features.RotateFittings.RotateFittingsCommand),
+                            "Otwiera okno w tle: wybierz kat (domyslnie co 45 stopni) i klikaj ksztaltki, aby je obracac.",
+                            "Co robi: obraca klikniete ksztaltki o wybrany kat wokol osi podlaczonego konektora albo wokol osi pionowej. Jak uzyc: 1. Okno zostaje otwarte obok Revita. 2. Kliknij kat (+/-45, 90, 135, 180) albo wpisz wlasny i Enter. 3. Klikaj ksztaltki - kazde klikniecie obraca o zadany kat. ESC wstrzymuje wskazywanie, klikniecie kata albo Wskaz ksztaltki wznawia, Zamknij konczy obracanie. Zakres: Duct, Pipe i Conduit Fittings. Uwagi: polaczenia na obracanych koncach sa rozlaczane."),
+                        new RibbonStackDefinition(
+                            [
+                                new RibbonPushButtonDefinition(
+                                    "HcbConnectElementsButton",
+                                    "Connect",
+                                    typeof(Features.ConnectElements.ConnectElementsCommand),
+                                    "Dosuwa element razem z podlaczonymi do niego elementami do konektora innego elementu i laczy je.",
+                                    "Co robi: przesuwa i obraca drugi element razem ze wszystkim, co jest do niego podlaczone, tak aby jego wolny konektor pokryl sie z konektorem pierwszego, i laczy je bez dopasowywania rozmiarow ani typow. Jak uzyc: 1. Kliknij element, DO KTOREGO laczysz (blisko konektora). 2. Kliknij element, KTORY ma byc dosuniety (blisko wolnego konektora). 3. Powtarzaj pary, ESC konczy. Zakres: elementy z konektorami tej samej dziedziny. Uwagi: przesuwana grupa moze miec do 500 elementow i nie moze byc juz polaczona z elementem docelowym."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbConnectorExtendButton",
+                                    "Extend 0.5 m",
+                                    typeof(Features.ConnectorExtend.ConnectorExtendCommand),
+                                    "Klik w wolny konektor wstawia prosty odcinek 500 mm duct, pipe albo conduit w kierunku konektora.",
+                                    "Co robi: z kliknietego wolnego konektora (kolano, trojnik, koniec kanalu, urzadzenie) wstawia prosty odcinek 500 mm w kierunku konektora, w jego rozmiarze, i od razu go podlacza. Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy. Zakres: ducts, pipes, conduits; typ i system z sasiedniego odcinka, a gdy go brak - pierwszy pasujacy typ z projektu."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbAlignToAxisButton",
+                                    "Align To Axis",
+                                    typeof(Features.AlignToAxis.AlignToAxisCommand),
+                                    "Wyrownuje elementy do osi wskazanego prostego odcinka rury lub kanalu bez rozlaczania polaczen.",
+                                    "Co robi: przesuwa kliknieta rure, kanal albo ksztaltke tak, aby jej os przeciela os odcinka odniesienia (dla rownoleglych - aby byly wspolliniowe). Przesuniecie jest tylko w poprzek obu osi, wiec polaczenia zostaja. Jak uzyc: 1. Kliknij prosty odcinek odniesienia. 2. Klikaj dochodzace elementy, np. prostopadla rure. 3. ESC konczy. Zakres: ducts, pipes, conduits i elementy z konektorami.")
+                            ]),
+                        new RibbonStackDefinition(
+                            [
+                                new RibbonPushButtonDefinition(
+                                    "HcbElbowUpButton",
+                                    "Elbow Up",
+                                    typeof(Features.ElbowBranch.ElbowUpCommand),
+                                    "Klik w wolny konektor dodaje kolano i odcinek 500 mm w gore (globalna os Z).",
+                                    "Co robi: na kliknietym wolnym konektorze wstawia kolano i prosty odcinek 500 mm skierowany w gore w ukladzie globalnym. Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy; kierunek mozna potem zmienic narzedziem Rotate Fittings. Zakres: ducts, pipes, conduits; kolano z routing preferences typu odcinka. Uwagi: na koncu kanalu kolano zajmuje jego koncowke, na ksztaltce siada bezposrednio na konektorze.",
+                                    null,
+                                    "Features\\ElbowBranch\\Resources\\Up"),
+                                new RibbonPushButtonDefinition(
+                                    "HcbElbow45Button",
+                                    "Elbow 45",
+                                    typeof(Features.ElbowBranch.Elbow45Command),
+                                    "Klik w wolny konektor dodaje kolano 45 stopni i odcinek 500 mm skierowany w prawo.",
+                                    "Co robi: na kliknietym wolnym konektorze wstawia kolano 45 stopni i prosty odcinek 500 mm odchylony o 45 stopni w prawo (patrzac wzdluz konektora z gory; dla pionowego konektora w strone globalnej osi X). Jak uzyc: klikaj elementy blisko wolnych konektorow, ESC konczy; inny kierunek ustawisz narzedziem Rotate Fittings. Zakres: ducts, pipes, conduits; kolano z routing preferences typu odcinka.",
+                                    null,
+                                    "Features\\ElbowBranch\\Resources\\Side45")
                             ])
                     ]),
                 new RibbonPanelDefinition(

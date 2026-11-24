@@ -56,6 +56,7 @@ public sealed class ConnectElementsCommand : IExternalCommand
 
             using Transaction transaction = new(document, ToolName);
             transaction.Start();
+            WarningSwallower.Attach(transaction);
             ConnectElementsResult result;
             try
             {

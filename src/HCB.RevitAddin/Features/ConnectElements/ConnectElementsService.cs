@@ -13,16 +13,14 @@ public sealed class ConnectElementsService
         return MepConnectorHelper.HasPhysicalConnectors(element);
     }
 
+    // Guards against dragging a whole building when the picked element is part of a large network.
+    private const int MaxGroupSize = 500;
+
     public ConnectElementsResult Connect(Document document, Element target, XYZ? targetPoint, Element moving, XYZ? movingPoint)
     {
         if (target.Id == moving.Id)
         {
             return BuildFailure("wskazano dwa razy ten sam element");
-        }
-
-        if (moving.Pinned)
-        {
-            return BuildFailure($"{MepConnectorHelper.Describe(moving)} jest przypiety (pin)");
         }
 
         Connector? targetConnector = MepConnectorHelper.FindClosestConnector(target, targetPoint, preferFree: true);
@@ -32,9 +30,9 @@ public sealed class ConnectElementsService
         }
 
         Connector? movingConnector = MepConnectorHelper.FindClosestConnector(moving, movingPoint, preferFree: true);
-        if (movingConnector == null)
+        if (movingConnector == null || movingConnector.IsConnected)
         {
-            return BuildFailure($"{MepConnectorHelper.Describe(moving)} nie ma konektorow");
+            return BuildFailure($"{MepConnectorHelper.Describe(moving)} nie ma wolnego konektora");
         }
 
         if (targetConnector.Domain != movingConnector.Domain)
@@ -42,48 +40,49 @@ public sealed class ConnectElementsService
             return BuildFailure($"konektory sa z roznych dziedzin ({targetConnector.Domain} / {movingConnector.Domain})");
         }
 
-        int movingConnectorId = movingConnector.Id;
-        int disconnected = DisconnectAll(moving);
+        // The moved element travels together with everything connected to it, so its connections stay intact.
+        if (!MepConnectorHelper.TryCollectConnectedGroup(moving, MaxGroupSize, out HashSet<ElementId> group))
+        {
+            return BuildFailure($"{MepConnectorHelper.Describe(moving)} jest polaczony z ponad {MaxGroupSize} elementami");
+        }
 
-        AlignDirection(document, moving, movingConnectorId, targetConnector);
-        AlignProfile(document, moving, movingConnectorId, targetConnector);
+        if (group.Contains(target.Id))
+        {
+            return BuildFailure("oba elementy sa juz w jednej polaczonej sieci - nie mozna jej przesunac");
+        }
+
+        Element? pinned = group.Select(document.GetElement).FirstOrDefault(element => element?.Pinned == true);
+        if (pinned != null)
+        {
+            return BuildFailure($"{MepConnectorHelper.Describe(pinned)} w przesuwanej grupie jest przypiety (pin)");
+        }
+
+        List<ElementId> groupIds = group.ToList();
+        int movingConnectorId = movingConnector.Id;
+
+        AlignDirection(document, groupIds, moving, movingConnectorId, targetConnector);
+        AlignProfile(document, groupIds, moving, movingConnectorId, targetConnector);
 
         movingConnector = GetConnectorById(moving, movingConnectorId);
         XYZ translation = targetConnector.Origin - movingConnector.Origin;
         if (translation.GetLength() > MepConnectorHelper.PositionTolerance)
         {
-            ElementTransformUtils.MoveElement(document, moving.Id, translation);
+            ElementTransformUtils.MoveElements(document, groupIds, translation);
             document.Regenerate();
         }
 
         movingConnector = GetConnectorById(moving, movingConnectorId);
         movingConnector.ConnectTo(targetConnector);
 
-        string disconnectText = disconnected > 0 ? $" (rozlaczono {disconnected} wczesniejszych polaczen)" : string.Empty;
+        string groupText = groupIds.Count > 1 ? $" razem z {groupIds.Count - 1} podlaczonymi elementami" : string.Empty;
         return new ConnectElementsResult
         {
             HasChanges = true,
-            DisconnectedCount = disconnected,
-            Message = $"{MepConnectorHelper.Describe(moving)} -> {MepConnectorHelper.Describe(target)}: polaczono{disconnectText}."
+            Message = $"{MepConnectorHelper.Describe(moving)} -> {MepConnectorHelper.Describe(target)}: polaczono{groupText}."
         };
     }
 
-    private static int DisconnectAll(Element element)
-    {
-        int count = 0;
-        foreach (Connector connector in MepConnectorHelper.GetPhysicalConnectors(element).ToList())
-        {
-            foreach (Connector partner in MepConnectorHelper.GetConnectedPartners(connector))
-            {
-                connector.DisconnectFrom(partner);
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private static void AlignDirection(Document document, Element moving, int movingConnectorId, Connector targetConnector)
+    private static void AlignDirection(Document document, ICollection<ElementId> groupIds, Element moving, int movingConnectorId, Connector targetConnector)
     {
         Connector movingConnector = GetConnectorById(moving, movingConnectorId);
         XYZ current = MepConnectorHelper.GetDirection(movingConnector);
@@ -100,10 +99,10 @@ public sealed class ConnectElementsService
             ? MepConnectorHelper.GetAnyPerpendicular(current)
             : axisDirection.Normalize();
 
-        Rotate(document, moving, movingConnector.Origin, axisDirection, angle);
+        Rotate(document, groupIds, movingConnector.Origin, axisDirection, angle);
     }
 
-    private static void AlignProfile(Document document, Element moving, int movingConnectorId, Connector targetConnector)
+    private static void AlignProfile(Document document, ICollection<ElementId> groupIds, Element moving, int movingConnectorId, Connector targetConnector)
     {
         Connector movingConnector = GetConnectorById(moving, movingConnectorId);
         if (targetConnector.Shape is not (ConnectorProfileType.Rectangular or ConnectorProfileType.Oval) ||
@@ -127,7 +126,7 @@ public sealed class ConnectElementsService
             return;
         }
 
-        Rotate(document, moving, movingConnector.Origin, axis, angle);
+        Rotate(document, groupIds, movingConnector.Origin, axis, angle);
     }
 
     private static double SignedAngle(XYZ from, XYZ to, XYZ axis)
@@ -136,9 +135,9 @@ public sealed class ConnectElementsService
         return from.CrossProduct(to).DotProduct(axis) < 0d ? -angle : angle;
     }
 
-    private static void Rotate(Document document, Element element, XYZ origin, XYZ axisDirection, double angle)
+    private static void Rotate(Document document, ICollection<ElementId> groupIds, XYZ origin, XYZ axisDirection, double angle)
     {
-        ElementTransformUtils.RotateElement(document, element.Id, Line.CreateUnbound(origin, axisDirection), angle);
+        ElementTransformUtils.RotateElements(document, groupIds, Line.CreateUnbound(origin, axisDirection), angle);
         document.Regenerate();
     }
 

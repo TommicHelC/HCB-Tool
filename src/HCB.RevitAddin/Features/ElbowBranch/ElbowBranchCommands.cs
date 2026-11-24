@@ -18,13 +18,13 @@ public sealed class ElbowUpCommand : ElbowBranchCommandBase
 }
 
 [Transaction(TransactionMode.Manual)]
-public sealed class ElbowSideCommand : ElbowBranchCommandBase
+public sealed class Elbow45Command : ElbowBranchCommandBase
 {
-    protected override ElbowBranchDirection Direction => ElbowBranchDirection.Right;
+    protected override ElbowBranchDirection Direction => ElbowBranchDirection.Side45;
 
-    protected override string ToolName => "Elbow Side";
+    protected override string ToolName => "Elbow 45";
 
-    protected override string Prompt => "Kliknij element blisko wolnego konektora - kolano + 500 mm w prawo (poziomo). ESC konczy.";
+    protected override string Prompt => "Kliknij element blisko wolnego konektora - kolano 45 st. + 500 mm w prawo. ESC konczy.";
 }
 
 public abstract class ElbowBranchCommandBase : IExternalCommand

@@ -20,14 +20,20 @@ public partial class RotateFittingsWindow : Window
         IncludeConduitFittings = true
     };
 
+    private const uint WmKeyDown = 0x0100;
+    private const uint WmKeyUp = 0x0101;
+    private const int VkEscape = 0x1B;
+
     private readonly ExternalEvent pickEvent;
     private readonly RotateFittingsPickHandler pickHandler;
+    private readonly IntPtr revitWindowHandle;
 
-    public RotateFittingsWindow(ExternalEvent pickEvent, RotateFittingsPickHandler pickHandler)
+    public RotateFittingsWindow(ExternalEvent pickEvent, RotateFittingsPickHandler pickHandler, IntPtr revitWindowHandle)
     {
         InitializeComponent();
         this.pickEvent = pickEvent;
         this.pickHandler = pickHandler;
+        this.revitWindowHandle = revitWindowHandle;
 
         AngleTextBox.Text = lastOptions.AngleDegrees.ToString("0.##", CultureInfo.CurrentCulture);
         ConnectorAxisRadioButton.IsChecked = lastOptions.AxisMode == RotateFittingsAxisMode.ConnectorAxis;
@@ -35,7 +41,32 @@ public partial class RotateFittingsWindow : Window
         DuctFittingsCheckBox.IsChecked = lastOptions.IncludeDuctFittings;
         PipeFittingsCheckBox.IsChecked = lastOptions.IncludePipeFittings;
         ConduitFittingsCheckBox.IsChecked = lastOptions.IncludeConduitFittings;
-        Closed += (_, _) => IsClosed = true;
+        Closed += (_, _) =>
+        {
+            IsClosed = true;
+            CancelRevitPick();
+        };
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    /// <summary>
+    /// PickObject cannot be cancelled through the API, so closing the window sends Revit the same ESC the user would press.
+    /// </summary>
+    private void CancelRevitPick()
+    {
+        if (!pickHandler.IsPicking || revitWindowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
+        SetForegroundWindow(revitWindowHandle);
+        PostMessage(revitWindowHandle, WmKeyDown, (IntPtr)VkEscape, IntPtr.Zero);
+        PostMessage(revitWindowHandle, WmKeyUp, (IntPtr)VkEscape, IntPtr.Zero);
     }
 
     public bool IsClosed { get; private set; }

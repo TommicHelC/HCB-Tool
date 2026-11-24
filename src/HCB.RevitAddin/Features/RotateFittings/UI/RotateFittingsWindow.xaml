@@ -88,7 +88,7 @@
         <TextBlock Margin="0,10,0,0"
                    TextWrapping="Wrap"
                    Style="{StaticResource StatusTextStyle}"
-                   Text="Klikaj ksztaltki w widoku. ESC wstrzymuje wskazywanie - okno zostaje, Revit dziala normalnie. Kat + = przeciwnie do wskazowek zegara, patrzac od strony konektora osi (os Z: z gory)." />
+                   Text="Klikaj ksztaltki w widoku. ESC wstrzymuje wskazywanie - okno zostaje, Revit dziala normalnie. Zamknij konczy obracanie. Kat + = przeciwnie do wskazowek zegara, patrzac od strony konektora osi (os Z: z gory)." />
 
         <controls:DialogFooterBar x:Name="FooterBar"
                                   Margin="0,12,0,0"
