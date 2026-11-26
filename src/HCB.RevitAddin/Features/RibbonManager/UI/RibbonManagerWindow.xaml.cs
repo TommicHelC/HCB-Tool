@@ -128,6 +128,11 @@ public partial class RibbonManagerWindow : Window
         }
 
         details.Add(panel.IsMovable ? "z: " + panel.OriginalTabTitle : "natywny");
+        if (panel.HiddenItems.Count > 0)
+        {
+            details.Add($"ukryte narzędzia: {panel.HiddenItems.Count}");
+        }
+
         return new PanelItem(panel.Key, panel.Title, string.Join(" · ", details), !panel.IsHidden, panel.IsMovable);
     }
 
@@ -286,6 +291,26 @@ public partial class RibbonManagerWindow : Window
         }
 
         return count;
+    }
+
+    private void ShowHiddenItemsButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        HashSet<string> keys = PanelsListBox.SelectedItems.OfType<PanelItem>().Select(panel => panel.Key).ToHashSet();
+        if (keys.Count == 0)
+        {
+            FooterBar.StatusText = "Zaznacz panele.";
+            return;
+        }
+
+        HashSet<string> ids = snapshot
+            .SelectMany(tab => tab.Panels)
+            .Where(panel => keys.Contains(panel.Key))
+            .SelectMany(panel => panel.HiddenItems)
+            .Select(item => item.Id)
+            .ToHashSet();
+
+        int removed = working.HiddenItems.RemoveAll(ids.Contains);
+        ApplyAndRefresh(removed == 0 ? "W zaznaczonych panelach nie ma ukrytych narzędzi." : $"Przywrócono narzędzia: {removed}.");
     }
 
     private void RenamePanelButton_OnClick(object sender, RoutedEventArgs e)

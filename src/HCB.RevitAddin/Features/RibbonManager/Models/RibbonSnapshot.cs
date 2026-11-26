@@ -14,4 +14,8 @@ public sealed record RibbonPanelSnapshot(
     string OriginalTitle,
     string OriginalTabTitle,
     bool IsMovable,
-    bool IsHidden);
+    bool IsHidden,
+    IReadOnlyList<RibbonItemSnapshot> HiddenItems);
+
+/// <summary>A single ribbon tool hidden by the layout.</summary>
+public sealed record RibbonItemSnapshot(string Id, string Name);

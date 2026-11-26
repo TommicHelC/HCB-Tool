@@ -23,6 +23,9 @@ public sealed class RibbonLayoutConfig
 
     public List<string> HiddenPanels { get; set; } = new();
 
+    /// <summary>Ribbon item (button) ids hidden one by one.</summary>
+    public List<string> HiddenItems { get; set; } = new();
+
     /// <summary>Panel key -> target tab id.</summary>
     public Dictionary<string, string> PanelMoves { get; set; } = new();
 
@@ -38,6 +41,7 @@ public sealed class RibbonLayoutConfig
         CustomTabs.Count == 0 &&
         HiddenTabs.Count == 0 &&
         HiddenPanels.Count == 0 &&
+        HiddenItems.Count == 0 &&
         PanelMoves.Count == 0 &&
         TabTitles.Count == 0 &&
         PanelTitles.Count == 0;
@@ -53,6 +57,7 @@ public sealed class RibbonLayoutConfig
             CustomTabs = CustomTabs.Select(tab => new RibbonCustomTab { Id = tab.Id, Title = tab.Title }).ToList(),
             HiddenTabs = new List<string>(HiddenTabs),
             HiddenPanels = new List<string>(HiddenPanels),
+            HiddenItems = new List<string>(HiddenItems),
             PanelMoves = new Dictionary<string, string>(PanelMoves),
             TabTitles = new Dictionary<string, string>(TabTitles),
             PanelTitles = new Dictionary<string, string>(PanelTitles)

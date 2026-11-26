@@ -79,6 +79,18 @@ internal static class RibbonContextMenuService
         if (e.Target == RibbonContextMenuTarget.Item)
         {
             items.AddRange(BuildShortcutItems(e.Item, dispatcher));
+
+            if (RibbonLayoutService.DescribeItem(e.Item) is { } tool)
+            {
+                items.Add(CreateItem($"HCB: Ukryj narzędzie {Quote(tool.Name)}", dispatcher, () =>
+                    RibbonLayoutService.Update(layout =>
+                    {
+                        if (!layout.HiddenItems.Contains(tool.Id))
+                        {
+                            layout.HiddenItems.Add(tool.Id);
+                        }
+                    })));
+            }
         }
 
         bool panelTarget = e.Target is RibbonContextMenuTarget.Panel or RibbonContextMenuTarget.PanelFrame or RibbonContextMenuTarget.Item;
@@ -210,6 +222,22 @@ internal static class RibbonContextMenuService
 
             RibbonLayoutService.Update(layout => SetOrRemove(layout.PanelTitles, panel.Key, title));
         });
+
+        if (panel.HiddenItems.Count > 0)
+        {
+            MenuItem show = new() { Header = $"HCB: Pokaż ukryte narzędzia ({panel.HiddenItems.Count})" };
+            foreach (RibbonItemSnapshot hidden in panel.HiddenItems)
+            {
+                show.Items.Add(CreateItem(hidden.Name, dispatcher, () =>
+                    RibbonLayoutService.Update(layout => layout.HiddenItems.Remove(hidden.Id))));
+            }
+
+            show.Items.Add(new Separator());
+            show.Items.Add(CreateItem("Pokaż wszystkie", dispatcher, () =>
+                RibbonLayoutService.Update(layout =>
+                    layout.HiddenItems.RemoveAll(id => panel.HiddenItems.Any(hidden => hidden.Id == id)))));
+            yield return show;
+        }
 
         yield return CreateItem($"HCB: Ukryj panel {name}", dispatcher, () =>
             RibbonLayoutService.Update(layout =>

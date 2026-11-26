@@ -174,11 +174,24 @@
                                 Click="MovePanelsButton_OnClick" />
                     </Grid>
 
-                    <TextBlock Grid.Row="3"
-                               Margin="{StaticResource Space.Hint}"
-                               Style="{StaticResource HintTextStyle}"
-                               TextWrapping="Wrap"
-                               Text="Panele natywne Revita można ukrywać i przemianowywać, ale nie przenosić (Revit odświeża je przy zmianie kontekstu)." />
+                    <Grid Grid.Row="3"
+                          Margin="0,6,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Style="{StaticResource HintTextStyle}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Text="Panele natywne można ukrywać i przemianowywać, ale nie przenosić. Pojedyncze narzędzia ukryjesz prawym klikiem na wstążce." />
+                        <Button Grid.Column="1"
+                                Margin="6,0,0,0"
+                                VerticalAlignment="Top"
+                                Content="Pokaż ukryte narzędzia"
+                                ToolTip="Przywraca narzędzia ukryte w zaznaczonych panelach"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="ShowHiddenItemsButton_OnClick" />
+                    </Grid>
                 </Grid>
             </GroupBox>
         </Grid>

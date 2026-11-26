@@ -5,7 +5,8 @@ public sealed record RibbonPanelInfo(
     string Title,
     bool IsMovable,
     string OriginalTabId,
-    string? CurrentTabId);
+    string? CurrentTabId,
+    IReadOnlyList<RibbonItemSnapshot> HiddenItems);
 
 public sealed record RibbonTabInfo(
     string Id,

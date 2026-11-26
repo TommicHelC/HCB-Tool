@@ -41,6 +41,7 @@ internal static class RibbonLayoutStore
         config.CustomTabs ??= new List<RibbonCustomTab>();
         config.HiddenTabs ??= new List<string>();
         config.HiddenPanels ??= new List<string>();
+        config.HiddenItems ??= new List<string>();
         config.PanelMoves ??= new Dictionary<string, string>();
         config.TabTitles ??= new Dictionary<string, string>();
         config.PanelTitles ??= new Dictionary<string, string>();
