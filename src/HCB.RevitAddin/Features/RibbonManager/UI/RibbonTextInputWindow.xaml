@@ -1,0 +1,36 @@
+<Window x:Class="HCB.RevitAddin.Features.RibbonManager.UI.RibbonTextInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Ribbon Manager"
+        Width="400"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="{StaticResource Space.DialogPadding}">
+        <controls:DialogHeader x:Name="Header"
+                               Title="Zmień nazwę" />
+
+        <TextBox x:Name="ValueTextBox"
+                 Margin="{StaticResource Space.Section}" />
+        <TextBlock x:Name="HintText"
+                   Margin="{StaticResource Space.Hint}"
+                   Style="{StaticResource HintTextStyle}"
+                   TextWrapping="Wrap" />
+
+        <controls:DialogFooterBar Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="OK"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="OkButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </StackPanel>
+</Window>
