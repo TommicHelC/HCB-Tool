@@ -7,6 +7,8 @@ using System.Windows.Threading;
 using Autodesk.Internal.Windows;
 using HCB.RevitAddin.Features.RibbonManager.Models;
 using HCB.RevitAddin.Features.RibbonManager.UI;
+using HCB.RevitAddin.Features.RibbonShortcuts;
+using HCB.RevitAddin.Features.RibbonShortcuts.UI;
 using AW = Autodesk.Windows;
 
 namespace HCB.RevitAddin.Features.RibbonManager;
@@ -74,6 +76,23 @@ internal static class RibbonContextMenuService
     {
         List<FrameworkElement> items = new();
 
+        if (e.Target == RibbonContextMenuTarget.Item)
+        {
+            items.AddRange(BuildShortcutItems(e.Item, dispatcher));
+
+            if (RibbonLayoutService.DescribeItem(e.Item) is { } tool)
+            {
+                items.Add(CreateItem($"HCB: Ukryj narzędzie {Quote(tool.Name)}", dispatcher, () =>
+                    RibbonLayoutService.Update(layout =>
+                    {
+                        if (!layout.HiddenItems.Contains(tool.Id))
+                        {
+                            layout.HiddenItems.Add(tool.Id);
+                        }
+                    })));
+            }
+        }
+
         bool panelTarget = e.Target is RibbonContextMenuTarget.Panel or RibbonContextMenuTarget.PanelFrame or RibbonContextMenuTarget.Item;
         if (panelTarget && RibbonLayoutService.DescribePanel(e.Panel) is { } panel)
         {
@@ -114,6 +133,44 @@ internal static class RibbonContextMenuService
         }));
 
         return items;
+    }
+
+    private static IEnumerable<FrameworkElement> BuildShortcutItems(AW.RibbonItem? item, Dispatcher dispatcher)
+    {
+        RibbonShortcutService.CommandInfo? command;
+        try
+        {
+            command = RibbonShortcutService.Describe(item);
+        }
+        catch
+        {
+            // UIFramework internals changed or are unavailable: just skip the shortcut entries.
+            yield break;
+        }
+
+        if (command == null)
+        {
+            yield break;
+        }
+
+        string current = command.Shortcuts.Count == 0 ? "brak" : string.Join(", ", command.Shortcuts);
+        string name = Quote(command.Name);
+
+        yield return CreateItem(
+            command.Shortcuts.Count == 0 ? $"HCB: Ustaw skrót dla {name}…" : $"HCB: Zmień skrót {name} ({current})…",
+            dispatcher,
+            () =>
+            {
+                ShortcutEditWindow window = new(command);
+                SetOwner(window);
+                window.ShowDialog();
+            });
+
+        if (command.Shortcuts.Count > 0)
+        {
+            yield return CreateItem($"HCB: Usuń skrót {name} ({current})", dispatcher, () =>
+                RibbonShortcutService.SetShortcuts(command.Id, Array.Empty<string>()));
+        }
     }
 
     private static IEnumerable<FrameworkElement> BuildPanelItems(RibbonPanelInfo panel, Dispatcher dispatcher)
@@ -165,6 +222,22 @@ internal static class RibbonContextMenuService
 
             RibbonLayoutService.Update(layout => SetOrRemove(layout.PanelTitles, panel.Key, title));
         });
+
+        if (panel.HiddenItems.Count > 0)
+        {
+            MenuItem show = new() { Header = $"HCB: Pokaż ukryte narzędzia ({panel.HiddenItems.Count})" };
+            foreach (RibbonItemSnapshot hidden in panel.HiddenItems)
+            {
+                show.Items.Add(CreateItem(hidden.Name, dispatcher, () =>
+                    RibbonLayoutService.Update(layout => layout.HiddenItems.Remove(hidden.Id))));
+            }
+
+            show.Items.Add(new Separator());
+            show.Items.Add(CreateItem("Pokaż wszystkie", dispatcher, () =>
+                RibbonLayoutService.Update(layout =>
+                    layout.HiddenItems.RemoveAll(id => panel.HiddenItems.Any(hidden => hidden.Id == id)))));
+            yield return show;
+        }
 
         yield return CreateItem($"HCB: Ukryj panel {name}", dispatcher, () =>
             RibbonLayoutService.Update(layout =>

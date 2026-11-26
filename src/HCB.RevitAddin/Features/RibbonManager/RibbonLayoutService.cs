@@ -91,7 +91,8 @@ internal static class RibbonLayoutService
             panel.Source?.Title ?? origin.OriginalTitle,
             origin.IsMovable,
             GetTabId(origin.OriginalTab),
-            currentTab == null ? null : GetTabId(currentTab));
+            currentTab == null ? null : GetTabId(currentTab),
+            GetHiddenItems(panel, Current));
     }
 
     public static RibbonTabInfo? DescribeTab(AW.RibbonTab? tab)
@@ -115,6 +116,75 @@ internal static class RibbonLayoutService
             .Where(tab => !tab.IsHidden)
             .Select(tab => new RibbonTabInfo(tab.Id, tab.Title, tab.IsCustom))
             .ToList();
+    }
+
+    /// <summary>Id usable for hiding a single tool, or null (separators, unnamed controls).</summary>
+    public static RibbonItemSnapshot? DescribeItem(AW.RibbonItem? item)
+    {
+        return item == null || string.IsNullOrEmpty(item.Id) ? null : new RibbonItemSnapshot(item.Id, GetItemName(item));
+    }
+
+    private static IReadOnlyList<RibbonItemSnapshot> GetHiddenItems(AW.RibbonPanel panel, RibbonLayoutConfig config)
+    {
+        if (config.HiddenItems.Count == 0)
+        {
+            return Array.Empty<RibbonItemSnapshot>();
+        }
+
+        return EnumerateItems(panel)
+            .Where(item => !string.IsNullOrEmpty(item.Id) && config.HiddenItems.Contains(item.Id))
+            .GroupBy(item => item.Id)
+            .Select(group => new RibbonItemSnapshot(group.Key, GetItemName(group.First())))
+            .ToList();
+    }
+
+    // Walks a panel including stacked rows, the slide-out part and pulldown/split contents.
+    private static IEnumerable<AW.RibbonItem> EnumerateItems(AW.RibbonPanel panel)
+    {
+        if (panel.Source?.Items == null)
+        {
+            yield break;
+        }
+
+        Stack<AW.RibbonItem> pending = new(panel.Source.Items.Reverse());
+        while (pending.Count > 0)
+        {
+            AW.RibbonItem item = pending.Pop();
+            yield return item;
+
+            IEnumerable<AW.RibbonItem>? children = item switch
+            {
+                AW.RibbonRowPanel row => row.Items,
+                AW.RibbonListButton list => list.Items,
+                _ => null
+            };
+
+            if (children != null)
+            {
+                foreach (AW.RibbonItem child in children.Reverse())
+                {
+                    pending.Push(child);
+                }
+            }
+        }
+    }
+
+    private static string GetItemName(AW.RibbonItem item)
+    {
+        string? text = item.Text;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            text = item.AutomationName;
+        }
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            text = item.Name;
+        }
+
+        return string.IsNullOrWhiteSpace(text)
+            ? item.Id
+            : new string(text.Select(c => char.IsControl(c) ? (char)32 : c).ToArray()).Trim();
     }
 
     public static AW.RibbonTab? FindParentTab(AW.RibbonPanel panel)
@@ -197,7 +267,8 @@ internal static class RibbonLayoutService
                     panelOrigin.OriginalTitle,
                     originalTabTitle,
                     panelOrigin.IsMovable,
-                    config.HiddenPanels.Contains(panelOrigin.Key)));
+                    config.HiddenPanels.Contains(panelOrigin.Key),
+                    GetHiddenItems(panel, config)));
             }
 
             result.Add(new RibbonTabSnapshot(
@@ -333,6 +404,14 @@ internal static class RibbonLayoutService
                 }
 
                 SetHidden(panel, config.HiddenPanels.Contains(origin.Key), () => panel.IsVisible, value => panel.IsVisible = value);
+
+                foreach (AW.RibbonItem item in EnumerateItems(panel))
+                {
+                    if (!string.IsNullOrEmpty(item.Id))
+                    {
+                        SetHidden(item, config.HiddenItems.Contains(item.Id), () => item.IsVisible, value => item.IsVisible = value);
+                    }
+                }
             }
             catch
             {

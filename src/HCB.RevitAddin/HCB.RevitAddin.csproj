@@ -43,6 +43,8 @@
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.UIFrameworkServices" Version="$(RevitVersion).*" />
   </ItemGroup>
 
 
@@ -84,6 +86,8 @@
     <Compile Include="Features\RibbonManager\UI\RibbonTextInputWindow.xaml.cs" />
     <Compile Include="Features\RibbonManager\RibbonContextMenuService.cs" />
     <Compile Include="Features\RibbonManager\Models\RibbonElementInfo.cs" />
+    <Compile Include="Features\RibbonShortcuts\RibbonShortcutService.cs" />
+    <Compile Include="Features\RibbonShortcuts\UI\ShortcutEditWindow.xaml.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Features\BatchFileScan\BatchFileScanCommand.cs" />
     <Compile Include="Features\BatchFileScan\BatchFileScanService.cs" />
@@ -328,6 +332,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Page Include="Features\RibbonManager\UI\RibbonManagerWindow.xaml" />
     <Page Include="Features\RibbonManager\UI\RibbonTextInputWindow.xaml" />
+    <Page Include="Features\RibbonShortcuts\UI\ShortcutEditWindow.xaml" />
     <Page Include="Features\CopyFilters\UI\CopyFiltersWindow.xaml" />
     <Page Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml" />
     <Page Include="Features\CopyBetweenProjects\UI\CopyBetweenProjectsWindow.xaml" />
