@@ -20,6 +20,9 @@ internal static class RibbonShortcutService
 
     public sealed record CommandInfo(string Id, string Name, string Paths, IReadOnlyList<string> Shortcuts);
 
+    /// <summary>Another command that already uses <see cref="Shortcut"/>.</summary>
+    public sealed record ShortcutConflict(string Shortcut, string CommandId, string CommandName);
+
     /// <summary>Resolves a ribbon item to a command Revit can bind a shortcut to; null for pulldown headers etc.</summary>
     public static CommandInfo? Describe(AW.RibbonItem? item)
     {
@@ -40,10 +43,10 @@ internal static class RibbonShortcutService
     }
 
     /// <summary>Commands (other than <paramref name="exceptId"/>) that already use any of the given shortcuts.</summary>
-    public static IReadOnlyDictionary<string, List<string>> FindConflicts(IEnumerable<string> shortcuts, string exceptId)
+    public static IReadOnlyList<ShortcutConflict> FindConflicts(IEnumerable<string> shortcuts, string exceptId)
     {
         HashSet<string> wanted = new(shortcuts, StringComparer.OrdinalIgnoreCase);
-        Dictionary<string, List<string>> conflicts = new(StringComparer.OrdinalIgnoreCase);
+        List<ShortcutConflict> conflicts = new();
         if (wanted.Count == 0)
         {
             return conflicts;
@@ -63,12 +66,7 @@ internal static class RibbonShortcutService
 
             foreach (string shortcut in keys.Where(wanted.Contains))
             {
-                if (!conflicts.TryGetValue(shortcut, out List<string>? names))
-                {
-                    conflicts[shortcut] = names = new List<string>();
-                }
-
-                names.Add(name);
+                conflicts.Add(new ShortcutConflict(shortcut, id, name));
             }
         }
 
@@ -94,8 +92,12 @@ internal static class RibbonShortcutService
             : $"„{shortcut}” nie jest poprawnym skrótem (litery/cyfry, max 5 znaków, albo np. Ctrl+Shift+A).";
     }
 
-    /// <summary>Replaces all shortcuts of one command (empty list = remove), applies them live and saves the file.</summary>
-    public static void SetShortcuts(string commandId, IReadOnlyList<string> shortcuts)
+    /// <summary>
+    /// Replaces all shortcuts of one command (empty list = remove), applies them live and saves the file.
+    /// With <paramref name="takeOverFromOthers"/> the same keys are removed from every other command
+    /// ("move" instead of sharing a shortcut) in the same apply.
+    /// </summary>
+    public static void SetShortcuts(string commandId, IReadOnlyList<string> shortcuts, bool takeOverFromOthers = false)
     {
         BackupShortcutFileOnce();
 
@@ -105,12 +107,36 @@ internal static class RibbonShortcutService
             throw new InvalidOperationException("Revit nie zna tej komendy: " + commandId);
         }
 
-        // Hand Revit the complete, current table (like its own dialog does) with only this command changed.
+        HashSet<string> taken = takeOverFromOthers
+            ? new HashSet<string>(shortcuts, StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Hand Revit the complete, current table (like its own dialog does) with only the affected commands changed.
         Dictionary<string, ShortcutItem> table = new(commands.Count, StringComparer.Ordinal);
+        Dictionary<string, string> changed = new(StringComparer.Ordinal);
         foreach (KeyValuePair<string, ShortcutItem> pair in commands)
         {
+            string current = CurrentRep(pair.Value);
+            string rep;
+            if (pair.Key == commandId)
+            {
+                rep = string.Join(Separator, shortcuts);
+            }
+            else if (taken.Count > 0 && Split(current).Any(taken.Contains))
+            {
+                rep = string.Join(Separator, Split(current).Where(key => !taken.Contains(key)));
+            }
+            else
+            {
+                rep = current;
+            }
+
+            if (!string.Equals(rep, current, StringComparison.Ordinal) || pair.Key == commandId)
+            {
+                changed[pair.Key] = rep;
+            }
+
             ShortcutItem copy = new(pair.Value);
-            string rep = pair.Key == commandId ? string.Join(Separator, shortcuts) : CurrentRep(pair.Value);
             Assign(copy, rep);
             table[pair.Key] = copy;
         }
@@ -119,7 +145,11 @@ internal static class RibbonShortcutService
         ShortcutsHelper.SaveShortcuts(table.Values);
 
         // Keep the cached command table in sync for the next menu opening.
-        Assign(commands[commandId], string.Join(Separator, shortcuts));
+        foreach (KeyValuePair<string, string> pair in changed)
+        {
+            Assign(commands[pair.Key], pair.Value);
+        }
+
         shortcutIndex = null;
     }
 

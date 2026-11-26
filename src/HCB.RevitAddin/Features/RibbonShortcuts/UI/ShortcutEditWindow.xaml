@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Skrót klawiszowy"
-        Width="460"
+        Width="480"
         SizeToContent="Height"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -44,6 +44,29 @@
                            Margin="0,8,0,0"
                            TextWrapping="Wrap"
                            Visibility="Collapsed" />
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox x:Name="ConflictGroup"
+                  Margin="{StaticResource Space.Section}"
+                  Header="Skrót jest już przypisany"
+                  Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock x:Name="ConflictText"
+                           Style="{StaticResource WarningTextStyle}"
+                           TextWrapping="Wrap" />
+                <RadioButton x:Name="TakeOverRadioButton"
+                             Margin="0,10,0,6"
+                             GroupName="ConflictMode"
+                             IsChecked="True">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Przenieś: usuń ten skrót z narzędzi powyżej i przypisz tylko tutaj" />
+                </RadioButton>
+                <RadioButton x:Name="ShareRadioButton"
+                             GroupName="ConflictMode">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Dodaj także tutaj: skrót zostaje wspólny (Revit wybiera narzędzie po wciśnięciu Tab)" />
+                </RadioButton>
             </StackPanel>
         </GroupBox>
 

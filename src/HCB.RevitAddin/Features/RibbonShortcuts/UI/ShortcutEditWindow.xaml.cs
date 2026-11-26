@@ -6,7 +6,10 @@ namespace HCB.RevitAddin.Features.RibbonShortcuts.UI;
 
 public partial class ShortcutEditWindow : Window
 {
+    private const int MaxListedCommands = 6;
+
     private readonly string commandId;
+    private IReadOnlyList<RibbonShortcutService.ShortcutConflict> conflicts = Array.Empty<RibbonShortcutService.ShortcutConflict>();
 
     internal ShortcutEditWindow(RibbonShortcutService.CommandInfo command)
     {
@@ -37,21 +40,33 @@ public partial class ShortcutEditWindow : Window
         List<string> errors = shortcuts.Select(RibbonShortcutService.Validate).OfType<string>().ToList();
         if (errors.Count > 0)
         {
+            conflicts = Array.Empty<RibbonShortcutService.ShortcutConflict>();
+            ConflictGroup.Visibility = Visibility.Collapsed;
             ShowStatus(string.Join(Environment.NewLine, errors), "ErrorTextStyle");
             return false;
         }
 
-        IReadOnlyDictionary<string, List<string>> conflicts = RibbonShortcutService.FindConflicts(shortcuts, commandId);
-        if (conflicts.Count > 0)
+        StatusText.Visibility = Visibility.Collapsed;
+        conflicts = RibbonShortcutService.FindConflicts(shortcuts, commandId);
+        if (conflicts.Count == 0)
         {
-            ShowStatus(
-                "Już używane (Revit pozwala na to; przełączasz Tab/strzałkami):" + Environment.NewLine +
-                string.Join(Environment.NewLine, conflicts.Select(pair => $"{pair.Key}: {string.Join(", ", pair.Value.Distinct().Take(4))}")),
-                "WarningTextStyle");
+            ConflictGroup.Visibility = Visibility.Collapsed;
             return true;
         }
 
-        StatusText.Visibility = Visibility.Collapsed;
+        IEnumerable<string> lines = conflicts
+            .GroupBy(conflict => conflict.Shortcut, StringComparer.OrdinalIgnoreCase)
+            .Select(group =>
+            {
+                List<string> names = group.Select(conflict => conflict.CommandName).Distinct().ToList();
+                string listed = string.Join(", ", names.Take(MaxListedCommands));
+                return names.Count > MaxListedCommands
+                    ? $"{group.Key}: {listed} i {names.Count - MaxListedCommands} innych"
+                    : $"{group.Key}: {listed}";
+            });
+
+        ConflictText.Text = string.Join(Environment.NewLine, lines);
+        ConflictGroup.Visibility = Visibility.Visible;
         return true;
     }
 
@@ -80,9 +95,10 @@ public partial class ShortcutEditWindow : Window
             return;
         }
 
+        bool takeOver = conflicts.Count > 0 && TakeOverRadioButton.IsChecked == true;
         try
         {
-            RibbonShortcutService.SetShortcuts(commandId, Entered);
+            RibbonShortcutService.SetShortcuts(commandId, Entered, takeOver);
             DialogResult = true;
         }
         catch (Exception exception)
