@@ -1,0 +1,57 @@
+<Window x:Class="HCB.RevitAddin.Features.RibbonShortcuts.UI.ShortcutEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Skrót klawiszowy"
+        Width="460"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="{StaticResource Space.DialogPadding}">
+        <controls:DialogHeader x:Name="Header"
+                               Title="Skrót klawiszowy" />
+
+        <GroupBox Margin="{StaticResource Space.Section}"
+                  Header="Skróty">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="ShortcutsTextBox"
+                             TextChanged="ShortcutsTextBox_OnTextChanged" />
+                    <Button Grid.Column="1"
+                            Margin="6,0,0,0"
+                            Content="Usuń skrót"
+                            Style="{StaticResource InlineActionButtonStyle}"
+                            Click="ClearButton_OnClick" />
+                </Grid>
+                <TextBlock Margin="{StaticResource Space.Hint}"
+                           Style="{StaticResource HintTextStyle}"
+                           TextWrapping="Wrap"
+                           Text="Np. WA albo Ctrl+Shift+W. Kilka skrótów oddziel średnikiem. Puste pole = brak skrótu." />
+                <TextBlock x:Name="StatusText"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           Visibility="Collapsed" />
+            </StackPanel>
+        </GroupBox>
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Zapisz"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="SaveButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </StackPanel>
+</Window>
