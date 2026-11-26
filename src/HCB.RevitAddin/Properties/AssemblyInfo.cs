@@ -1,8 +1,10 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 [assembly: AssemblyTitle("HCB.RevitAddin")]
 [assembly: AssemblyDescription("Starter Revit add-in for HCB tools.")]
 [assembly: AssemblyCompany("HCB")]
 [assembly: AssemblyProduct("HCB.RevitAddin")]
 [assembly: ComVisible(false)]
+[assembly: SupportedOSPlatform("windows")]

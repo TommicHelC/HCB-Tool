@@ -42,6 +42,7 @@
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
   </ItemGroup>
 
 
@@ -72,6 +73,17 @@
     <EmbeddedResource Include="Resources\**\*.png" />
     <EmbeddedResource Include="Features\**\Resources\**\*.png" />
     <Compile Include="App.cs" />
+    <Compile Include="Features\RibbonManager\Models\RibbonLayoutConfig.cs" />
+    <Compile Include="Features\RibbonManager\Models\RibbonSnapshot.cs" />
+    <Compile Include="Features\RibbonManager\RibbonLayoutStore.cs" />
+    <Compile Include="Features\RibbonManager\RibbonLayoutService.cs" />
+    <Compile Include="Features\RibbonManager\RibbonPanelNameShortener.cs" />
+    <Compile Include="Features\RibbonManager\RibbonManagerCommand.cs" />
+    <Compile Include="Features\RibbonManager\RibbonShortNamesCommand.cs" />
+    <Compile Include="Features\RibbonManager\UI\RibbonManagerWindow.xaml.cs" />
+    <Compile Include="Features\RibbonManager\UI\RibbonTextInputWindow.xaml.cs" />
+    <Compile Include="Features\RibbonManager\RibbonContextMenuService.cs" />
+    <Compile Include="Features\RibbonManager\Models\RibbonElementInfo.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="Features\BatchFileScan\BatchFileScanCommand.cs" />
     <Compile Include="Features\BatchFileScan\BatchFileScanService.cs" />
@@ -314,6 +326,8 @@
     <Compile Include="Infrastructure\WithoutOpen\WithoutOpenFileMetadataService.cs" />
     <Compile Include="Infrastructure\WithoutOpen\WithoutOpenTransmissionDataService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Features\RibbonManager\UI\RibbonManagerWindow.xaml" />
+    <Page Include="Features\RibbonManager\UI\RibbonTextInputWindow.xaml" />
     <Page Include="Features\CopyFilters\UI\CopyFiltersWindow.xaml" />
     <Page Include="Features\AccessoryTerminalNumbering\UI\AccessoryTerminalNumberingWindow.xaml" />
     <Page Include="Features\CopyBetweenProjects\UI\CopyBetweenProjectsWindow.xaml" />

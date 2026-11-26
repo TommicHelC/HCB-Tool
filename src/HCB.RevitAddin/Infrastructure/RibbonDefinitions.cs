@@ -453,7 +453,25 @@ namespace HCB.RevitAddin
                             "Rename Materials",
                             typeof(Features.RenameMaterials.RenameMaterialsCommand),
                             "Zmienia nazwy wybranych materialow.",
-                            "Co robi: seryjnie zmienia nazwy materialow. Jak uzyc: 1. Wybierz materialy. 2. Ustaw prefiks, zamiane tekstu i lub sufiks. 3. Zatwierdz podglad. Zakres: tylko wybrane materialy.")
+                            "Co robi: seryjnie zmienia nazwy materialow. Jak uzyc: 1. Wybierz materialy. 2. Ustaw prefiks, zamiane tekstu i lub sufiks. 3. Zatwierdz podglad. Zakres: tylko wybrane materialy."),
+                        new RibbonStackDefinition(
+                            [
+                                new RibbonPushButtonDefinition(
+                                    "HcbRibbonManagerButton",
+                                    "Ribbon Manager",
+                                    typeof(Features.RibbonManager.RibbonManagerCommand),
+                                    "Porzadkuje wstazke: ukrywa, laczy i przenosi karty oraz panele, takze innych wtyczek.",
+                                    "Co robi: zarzadza ukladem wstazki Revita. Jak uzyc: 1. Zaznacz karte i odznacz niepotrzebne karty lub panele. 2. Utworz wlasna karte i przenies do niej panele wtyczek albo polacz karty. 3. Zmien nazwy i zapisz. Zakres: panele natywne mozna ukrywac i przemianowywac, przenosic mozna panele wtyczek. Uklad zapisuje sie w %AppData%\\HCB\\RibbonLayout.json i mozna go eksportowac dla zespolu.",
+                                    typeof(AlwaysAvailableCommandAvailability)),
+                                new RibbonPushButtonDefinition(
+                                    "HcbRibbonShortNamesButton",
+                                    "Short Names",
+                                    typeof(Features.RibbonManager.RibbonShortNamesCommand),
+                                    "Jednym kliknieciem skraca lub przywraca nazwy wszystkich kart i paneli wstazki, rowniez natywnych.",
+                                    "Co robi: przelacza skrocone nazwy kart (np. Architecture -> Arch, Collaborate -> Collab), dzieki czemu miesci sie wiecej kart, oraz paneli (np. Work Plane -> WPlane). Jak uzyc: kliknij, aby skrocic, kliknij ponownie, aby przywrocic. Osobno karty i panele wlaczysz w Ribbon Manager. Zakres: wszystkie karty i panele; wlasne nazwy ustawione w Ribbon Manager maja pierwszenstwo. Ustawienie jest zapamietywane.",
+                                    typeof(AlwaysAvailableCommandAvailability),
+                                    "Features\\RibbonManager\\Resources\\ShortNames")
+                            ])
                     ])
             ];
         }

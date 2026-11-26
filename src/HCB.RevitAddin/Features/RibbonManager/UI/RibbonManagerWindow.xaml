@@ -1,0 +1,238 @@
+<Window x:Class="HCB.RevitAddin.Features.RibbonManager.UI.RibbonManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Ribbon Manager"
+        Width="860"
+        Height="640"
+        MinWidth="720"
+        MinHeight="520"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Style="{StaticResource DialogRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <controls:DialogHeader Title="Ribbon Manager"
+                               Description="Ukrywaj, łącz i przenoś karty oraz panele wstążki (również innych wtyczek). Zmiany widać od razu; Zapisz utrwala układ dla kolejnych sesji." />
+
+        <Grid Grid.Row="1"
+              Margin="{StaticResource Space.Section}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="1.3*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Karty">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox x:Name="TabsListBox"
+                             SelectionChanged="TabsListBox_OnSelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding IsVisible, Mode=OneWay}"
+                                              Click="TabVisibleCheckBox_OnClick"
+                                              ToolTip="Widoczna na wstążce"
+                                              VerticalAlignment="Center" />
+                                    <TextBlock Margin="6,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding Display}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="1"
+                          Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="TabTitleTextBox"
+                                 ToolTip="Nowa nazwa zaznaczonej karty (pusta = oryginalna / skrócona)" />
+                        <Button Grid.Column="1"
+                                Margin="6,0,0,0"
+                                Content="Zmień nazwę"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="RenameTabButton_OnClick" />
+                    </Grid>
+
+                    <Grid Grid.Row="2"
+                          Margin="0,6,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="MergeTargetComboBox"
+                                  DisplayMemberPath="Title"
+                                  ToolTip="Karta docelowa" />
+                        <Button Grid.Column="1"
+                                Margin="6,0,0,0"
+                                Content="Połącz z…"
+                                ToolTip="Przenosi wszystkie panele wtyczek z zaznaczonej karty do karty docelowej"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="MergeTabButton_OnClick" />
+                    </Grid>
+
+                    <UniformGrid Grid.Row="3"
+                                 Margin="0,6,0,0"
+                                 Columns="2">
+                        <Button Margin="0,0,3,0"
+                                Content="Nowa karta"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="NewTabButton_OnClick" />
+                        <Button Margin="3,0,0,0"
+                                Content="Usuń własną kartę"
+                                ToolTip="Panele wracają na swoje oryginalne karty"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="DeleteTabButton_OnClick" />
+                    </UniformGrid>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Column="2"
+                      Header="Panele zaznaczonej karty">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox x:Name="PanelsListBox"
+                             SelectionMode="Extended"
+                             SelectionChanged="PanelsListBox_OnSelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding IsVisible, Mode=OneWay}"
+                                              Click="PanelVisibleCheckBox_OnClick"
+                                              ToolTip="Widoczny na wstążce"
+                                              VerticalAlignment="Center" />
+                                    <TextBlock Margin="6,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding Title}" />
+                                    <TextBlock Margin="8,0,0,0"
+                                               VerticalAlignment="Center"
+                                               Style="{StaticResource HintTextStyle}"
+                                               Text="{Binding Details}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="1"
+                          Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="PanelTitleTextBox"
+                                 ToolTip="Nowa nazwa zaznaczonego panelu (pusta = oryginalna / skrócona)" />
+                        <Button Grid.Column="1"
+                                Margin="6,0,0,0"
+                                Content="Zmień nazwę"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="RenamePanelButton_OnClick" />
+                    </Grid>
+
+                    <Grid Grid.Row="2"
+                          Margin="0,6,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="MoveTargetComboBox"
+                                  DisplayMemberPath="Title"
+                                  ToolTip="Karta docelowa" />
+                        <Button Grid.Column="1"
+                                Margin="6,0,0,0"
+                                Content="Przenieś zaznaczone"
+                                Style="{StaticResource InlineActionButtonStyle}"
+                                Click="MovePanelsButton_OnClick" />
+                    </Grid>
+
+                    <TextBlock Grid.Row="3"
+                               Margin="{StaticResource Space.Hint}"
+                               Style="{StaticResource HintTextStyle}"
+                               TextWrapping="Wrap"
+                               Text="Panele natywne Revita można ukrywać i przemianowywać, ale nie przenosić (Revit odświeża je przy zmianie kontekstu)." />
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              Margin="{StaticResource Space.Section}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <CheckBox x:Name="ShortNamesCheckBox"
+                      VerticalAlignment="Center"
+                      Content="Skróć nazwy paneli"
+                      Click="OptionCheckBox_OnClick" />
+            <CheckBox x:Name="ShortTabNamesCheckBox"
+                      Grid.Column="1"
+                      Margin="16,0,0,0"
+                      VerticalAlignment="Center"
+                      Content="Skróć nazwy kart"
+                      Click="OptionCheckBox_OnClick" />
+            <CheckBox x:Name="HideEmptyTabsCheckBox"
+                      Grid.Column="2"
+                      Margin="16,0,0,0"
+                      VerticalAlignment="Center"
+                      Content="Ukrywaj puste karty"
+                      Click="OptionCheckBox_OnClick" />
+            <Button Grid.Column="4"
+                    Content="Eksport…"
+                    Style="{StaticResource InlineActionButtonStyle}"
+                    Click="ExportButton_OnClick" />
+            <Button Grid.Column="5"
+                    Margin="6,0,0,0"
+                    Content="Import…"
+                    Style="{StaticResource InlineActionButtonStyle}"
+                    Click="ImportButton_OnClick" />
+            <Button Grid.Column="6"
+                    Margin="6,0,0,0"
+                    Content="Reset"
+                    ToolTip="Przywraca oryginalny układ wstążki"
+                    Style="{StaticResource InlineActionButtonStyle}"
+                    Click="ResetButton_OnClick" />
+        </Grid>
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Grid.Row="3"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Zapisz"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="SaveButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </Grid>
+</Window>

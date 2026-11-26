@@ -1,0 +1,17 @@
+namespace HCB.RevitAddin.Features.RibbonManager.Models;
+
+public sealed record RibbonTabSnapshot(
+    string Id,
+    string Title,
+    string OriginalTitle,
+    bool IsCustom,
+    bool IsHidden,
+    IReadOnlyList<RibbonPanelSnapshot> Panels);
+
+public sealed record RibbonPanelSnapshot(
+    string Key,
+    string Title,
+    string OriginalTitle,
+    string OriginalTabTitle,
+    bool IsMovable,
+    bool IsHidden);

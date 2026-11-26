@@ -44,6 +44,9 @@ namespace HCB.RevitAddin
                 {
                     _pendingPanels = null;
                     StopListening(application);
+
+                    // Other add-ins finished OnStartup before the first idle cycle, so their tabs exist now.
+                    Features.RibbonManager.RibbonLayoutService.Initialize(application);
                     return;
                 }
 
