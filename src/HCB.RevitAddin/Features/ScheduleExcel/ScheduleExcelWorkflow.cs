@@ -84,11 +84,13 @@ internal static class ScheduleExcelWorkflow
         {
             MainInstruction = "Plik o tej nazwie już istnieje.",
             MainContent = $"{path}\n\nZmiany wprowadzone w tym pliku, a niezapisane jeszcze do Revit, zostaną utracone po nadpisaniu.",
-            CommonButtons = TaskDialogCommonButtons.Cancel,
-            DefaultButton = TaskDialogResult.CommandLink2
+            CommonButtons = TaskDialogCommonButtons.Cancel
         };
         dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Nadpisz istniejący plik");
         dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, $"Zapisz jako nowy plik: {Path.GetFileName(alternative)}");
+
+        // Revit validates DefaultButton against existing buttons, so it can only be set after AddCommandLink.
+        dialog.DefaultButton = TaskDialogResult.CommandLink2;
 
         return dialog.Show() switch
         {
