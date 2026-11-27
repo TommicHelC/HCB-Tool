@@ -1979,3 +1979,4 @@ Generated installers are written to:
 - [Porting plan](docs/PortingPlan.md)
 - [Icon workflow](docs/IconWorkflow.md)
 - [Tools documentation workflow](docs/ToolsDocumentation.md)
+- [Deploying to Revit (agents and developers)](docs/DeployToRevit.md)
