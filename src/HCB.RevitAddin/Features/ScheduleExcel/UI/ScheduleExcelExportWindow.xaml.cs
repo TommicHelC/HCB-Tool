@@ -34,7 +34,8 @@ public partial class ScheduleExcelExportWindow : Window
         long? preselectedId,
         string folder,
         bool openAfterExport,
-        bool protectReadOnlyCells)
+        bool protectReadOnlyCells,
+        bool expandGroups)
     {
         InitializeComponent();
 
@@ -49,6 +50,7 @@ public partial class ScheduleExcelExportWindow : Window
         FolderTextBox.Text = folder;
         OpenAfterExportCheckBox.IsChecked = openAfterExport;
         ProtectCheckBox.IsChecked = protectReadOnlyCells;
+        ExpandGroupsCheckBox.IsChecked = expandGroups;
         FooterBar.StatusText = $"Zestawień w modelu: {_items.Count}.";
     }
 
@@ -59,6 +61,8 @@ public partial class ScheduleExcelExportWindow : Window
     public bool OpenAfterExport => OpenAfterExportCheckBox.IsChecked == true;
 
     public bool ProtectReadOnlyCells => ProtectCheckBox.IsChecked == true;
+
+    public bool ExpandGroups => ExpandGroupsCheckBox.IsChecked == true;
 
     private void SearchTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
     {

@@ -39,7 +39,8 @@ internal static class ScheduleExcelWorkflow
             GetPreselectedScheduleId(uiDocument),
             GetDefaultFolder(settings, document),
             settings.OpenAfterExport,
-            settings.ProtectReadOnlyCells);
+            settings.ProtectReadOnlyCells,
+            settings.ExpandGroups);
         if (window.ShowDialog() != true || window.SelectedSchedule == null)
         {
             return null;
@@ -48,6 +49,7 @@ internal static class ScheduleExcelWorkflow
         settings.LastFolder = window.Folder;
         settings.OpenAfterExport = window.OpenAfterExport;
         settings.ProtectReadOnlyCells = window.ProtectReadOnlyCells;
+        settings.ExpandGroups = window.ExpandGroups;
         settings.Save();
 
         var schedule = (ViewSchedule)document.GetElement(new ElementId(window.SelectedSchedule.Id));
@@ -55,7 +57,8 @@ internal static class ScheduleExcelWorkflow
         {
             FilePath = Path.Combine(window.Folder, ToFileName(schedule.Name) + ".xlsx"),
             OpenAfterExport = window.OpenAfterExport,
-            ProtectReadOnlyCells = window.ProtectReadOnlyCells
+            ProtectReadOnlyCells = window.ProtectReadOnlyCells,
+            ExpandGroups = window.ExpandGroups
         };
 
         string? path = ConfirmOverwrite(options.FilePath, title);
@@ -126,7 +129,7 @@ internal static class ScheduleExcelWorkflow
 
         try
         {
-            ScheduleExcelData data = new ScheduleExcelReader(document).Read(schedule);
+            ScheduleExcelData data = new ScheduleExcelReader(document).Read(schedule, options.ExpandGroups);
             WriteWorkbook(data, options);
             ScheduleExcelLog.Info($"Eksport '{schedule.Name}' -> {options.FilePath}: wiersze {data.Rows.Count}, elementy {data.ElementCount}.");
             return data;

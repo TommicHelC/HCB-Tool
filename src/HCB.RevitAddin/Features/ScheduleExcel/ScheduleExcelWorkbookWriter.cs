@@ -61,7 +61,7 @@ internal static class ScheduleExcelWorkbookWriter
 
         bool anyTotals = data.Columns.Any(column => column.TotalFunction.Length > 0);
         int totalsRow = 0;
-        if (data.ShowGrandTotal && anyTotals)
+        if (anyTotals)
         {
             table.ShowTotalsRow = true;
             totalsRow = table.TotalsRow().RowNumber();

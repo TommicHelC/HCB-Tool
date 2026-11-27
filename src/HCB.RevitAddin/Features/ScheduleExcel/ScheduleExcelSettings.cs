@@ -21,6 +21,8 @@ internal sealed class ScheduleExcelSettings
 
     public bool ProtectReadOnlyCells { get; set; }
 
+    public bool ExpandGroups { get; set; }
+
     public static ScheduleExcelSettings Load()
     {
         try

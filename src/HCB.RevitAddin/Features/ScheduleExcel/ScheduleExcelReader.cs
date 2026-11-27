@@ -53,9 +53,14 @@ internal sealed class ScheduleExcelReader
         return null;
     }
 
-    public ScheduleExcelData Read(ViewSchedule schedule)
+    /// <param name="expandGroups">
+    /// One row per element even when the schedule groups rows ("Itemize every instance" off), so single
+    /// instances can be edited.
+    /// </param>
+    public ScheduleExcelData Read(ViewSchedule schedule, bool expandGroups = false)
     {
         ScheduleDefinition definition = schedule.Definition;
+        bool itemized = definition.IsItemized || expandGroups;
         List<Element> elements = new FilteredElementCollector(_document, schedule.Id)
             .WhereElementIsNotElementType()
             .ToElements()
@@ -117,7 +122,7 @@ internal sealed class ScheduleExcelReader
             DocumentTitle = _document.Title,
             DocumentPath = _document.PathName ?? string.Empty,
             DocumentId = GetDocumentId(_document),
-            IsItemized = definition.IsItemized,
+            IsItemized = itemized,
             ElementCount = elements.Count,
             ShowGrandTotal = definition.ShowGrandTotal,
             GrandTotalTitle = definition.ShowGrandTotalTitle ? definition.GrandTotalTitle ?? string.Empty : string.Empty
@@ -133,7 +138,7 @@ internal sealed class ScheduleExcelReader
             .ToList();
 
         IComparer<ElementValues> comparer = new SortKeyComparer(sortFields.Select(sort => sort.Descending).ToArray());
-        IEnumerable<IReadOnlyList<ElementValues>> groups = definition.IsItemized
+        IEnumerable<IReadOnlyList<ElementValues>> groups = itemized
             ? elementValues
                 .OrderBy(item => item, comparer)
                 .ThenBy(item => item.Element.Id.Value)
@@ -162,7 +167,14 @@ internal sealed class ScheduleExcelReader
 
         try
         {
-            ReadScheduleView(schedule, data);
+            if (itemized && !definition.IsItemized)
+            {
+                ReadScheduleViewItemized(schedule, data);
+            }
+            else
+            {
+                ReadScheduleView(schedule, data);
+            }
         }
         catch (Exception exception)
         {
@@ -171,6 +183,36 @@ internal sealed class ScheduleExcelReader
         }
 
         return data;
+    }
+
+    /// <summary>
+    /// Expanded export of a grouped schedule: the view shows groups, so formula values per element exist only
+    /// when the schedule is itemized. Itemize inside a transaction, read the table, roll back - the model and
+    /// its undo history stay untouched.
+    /// </summary>
+    private void ReadScheduleViewItemized(ViewSchedule schedule, ScheduleExcelData data)
+    {
+        if (_document.IsReadOnly || _document.IsModifiable)
+        {
+            ReadScheduleView(schedule, data);
+            return;
+        }
+
+        using var transaction = new Transaction(_document, "HCB Excel - odczyt zestawienia");
+        try
+        {
+            transaction.Start();
+            schedule.Definition.IsItemized = true;
+            _document.Regenerate();
+            ReadScheduleView(schedule, data);
+        }
+        finally
+        {
+            if (transaction.HasStarted() && !transaction.HasEnded())
+            {
+                transaction.RollBack();
+            }
+        }
     }
 
     /// <summary>
@@ -244,27 +286,33 @@ internal sealed class ScheduleExcelReader
             }
         }
 
-        int[] signatureColumns = Enumerable.Range(0, columnCount)
+        // Rows are matched on every column we know from parameters: text columns exactly, numbers within the
+        // precision Revit displays. Text-only matching failed for schedules whose only text column is empty.
+        int[] compareColumns = Enumerable.Range(0, columnCount)
             .Where(column => !data.Columns[column].FromScheduleText
-                && data.Columns[column].ValueKind is ScheduleExcelValueKind.Text or ScheduleExcelValueKind.ElementId)
+                && data.Columns[column].ValueKind is not ScheduleExcelValueKind.YesNo)
             .ToArray();
-        if (signatureColumns.Length == 0)
+        int[] textKeyColumns = compareColumns
+            .Where(column => data.Columns[column].ValueKind is ScheduleExcelValueKind.Text or ScheduleExcelValueKind.ElementId)
+            .ToArray();
+        int[] numberColumns = compareColumns.Except(textKeyColumns).ToArray();
+        if (compareColumns.Length == 0)
         {
             return;
         }
 
-        var candidates = new Dictionary<string, Queue<ScheduleExcelRow>>();
+        var candidates = new Dictionary<string, List<ScheduleExcelRow>>();
         foreach (ScheduleExcelRow row in data.Rows)
         {
-            string signature = string.Join("\u001F", signatureColumns.Select(column => row.Values[column].Mixed
+            string key = string.Join("\u001F", textKeyColumns.Select(column => row.Values[column].Mixed
                 ? string.Empty
                 : ToDisplayText(row.Values[column].Value)));
-            if (!candidates.TryGetValue(signature, out Queue<ScheduleExcelRow>? queue))
+            if (!candidates.TryGetValue(key, out List<ScheduleExcelRow>? list))
             {
-                candidates[signature] = queue = new Queue<ScheduleExcelRow>();
+                candidates[key] = list = [];
             }
 
-            queue.Enqueue(row);
+            list.Add(row);
         }
 
         int[] textColumns = Enumerable.Range(0, columnCount).Where(column => data.Columns[column].FromScheduleText).ToArray();
@@ -273,21 +321,29 @@ internal sealed class ScheduleExcelReader
         var unmatchedSamples = new List<string>();
         for (int bodyRow = headingRow + 1; bodyRow < body.NumberOfRows; bodyRow++)
         {
-            string[] signatureTexts = signatureColumns.Select(column => schedule.GetCellText(SectionType.Body, bodyRow, column)).ToArray();
-            if (signatureTexts.All(string.IsNullOrEmpty)
-                || !candidates.TryGetValue(string.Join("\u001F", signatureTexts), out Queue<ScheduleExcelRow>? queue)
-                || queue.Count == 0)
+            int current = bodyRow;
+            Dictionary<int, string> cellTexts = compareColumns.ToDictionary(column => column, column => schedule.GetCellText(SectionType.Body, current, column));
+            if (cellTexts.Values.All(string.IsNullOrEmpty))
+            {
+                continue;
+            }
+
+            string key = string.Join("\u001F", textKeyColumns.Select(column => cellTexts[column]));
+            ScheduleExcelRow? row = candidates.TryGetValue(key, out List<ScheduleExcelRow>? list)
+                ? list.FirstOrDefault(candidate => numberColumns.All(column => NumberMatches(cellTexts[column], candidate.Values[column])))
+                : null;
+            if (row == null)
             {
                 if (unmatchedSamples.Count < 5)
                 {
-                    unmatchedSamples.Add($"#{bodyRow}: '{string.Join("' | '", signatureTexts)}'");
+                    unmatchedSamples.Add($"#{bodyRow}: '{string.Join("' | '", cellTexts.Values)}'");
                 }
 
                 continue;
             }
 
+            list!.Remove(row);
             matched++;
-            ScheduleExcelRow row = queue.Dequeue();
             for (int column = 0; column < columnCount; column++)
             {
                 row.Styles[column] = ToStyle(body.GetTableCellStyle(bodyRow, column));
@@ -304,12 +360,34 @@ internal sealed class ScheduleExcelReader
             ApplyScheduleText(data, column, texts);
         }
 
-        string ourSamples = string.Join(" ; ", candidates.Keys.Take(3).Select(key => $"'{key.Replace("\u001F", "' | '")}'"));
+        string ourSamples = string.Join(" ; ", data.Rows.Take(3).Select(row => $"'{string.Join("' | '", compareColumns.Select(column => ToDisplayText(row.Values[column].Value)))}'"));
         ScheduleExcelLog.Info(
             $"'{schedule.Name}': body {body.NumberOfRows}x{body.NumberOfColumns}, kolumny {data.Columns.Count}, nagłówek w wierszu {headingRow}, "
-            + $"kolumny dopasowania [{string.Join(", ", signatureColumns.Select(column => data.Columns[column].Header))}], "
+            + $"kolumny dopasowania [{string.Join(", ", compareColumns.Select(column => data.Columns[column].Header))}], "
             + $"kolumny z widoku [{string.Join(", ", textColumns.Select(column => data.Columns[column].Header))}], "
             + $"dopasowano {matched}/{data.Rows.Count}. Nasze: {ourSamples}. Niedopasowane z Revit: {string.Join(" ; ", unmatchedSamples)}");
+    }
+
+    /// <summary>Revit display text vs our value: numbers equal within the precision Revit shows.</summary>
+    private static bool NumberMatches(string text, ScheduleExcelValue value)
+    {
+        if (value.Mixed)
+        {
+            return true;
+        }
+
+        if (value.Value is not double number)
+        {
+            return string.IsNullOrWhiteSpace(text);
+        }
+
+        if (!TryParseDisplayNumber(text, out double shown, out int decimals))
+        {
+            return false;
+        }
+
+        double tolerance = 0.5 * Math.Pow(10, -decimals) + 1e-9 * Math.Max(1, Math.Abs(number));
+        return Math.Abs(number - shown) <= tolerance;
     }
 
     /// <summary>Last body row whose texts match the column headings (grouped headings can take several rows).</summary>
@@ -456,6 +534,23 @@ internal sealed class ScheduleExcelReader
 
             ScheduleExcelValue first = group[0].Values[column];
             bool readOnly = group.Any(item => item.Values[column].ReadOnly);
+
+            // Grouped row of a "Calculate totals" field: Revit shows the group's sum/min/max. Such a cell
+            // stands for many values, so it is read only.
+            string total = fields[column].Column.TotalFunction;
+            if (group.Count > 1 && total.Length > 0 && group.All(item => item.Values[column].Value is double or null))
+            {
+                double[] numbers = group.Select(item => item.Values[column].Value).OfType<double>().ToArray();
+                object? aggregate = numbers.Length == 0 ? null : total switch
+                {
+                    "Min" => numbers.Min(),
+                    "Max" => numbers.Max(),
+                    _ => numbers.Sum()
+                };
+                merged[column] = new ScheduleExcelValue(aggregate, false, true);
+                continue;
+            }
+
             string firstText = ToComparableText(first.Value);
             bool mixed = group.Skip(1).Any(item => ToComparableText(item.Values[column].Value) != firstText);
             merged[column] = mixed

@@ -4,7 +4,7 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Eksport zestawienia do Excel"
         Width="600"
-        Height="560"
+        Height="620"
         MinWidth="500"
         MinHeight="440"
         ResizeMode="CanResizeWithGrip"
@@ -68,6 +68,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Style="{StaticResource FieldLabelStyle}"
@@ -98,6 +100,18 @@
                           Grid.ColumnSpan="2"
                           Margin="{StaticResource Space.Field}"
                           Content="Zablokuj komórki tylko do odczytu (Excel wyłączy wtedy sortowanie)" />
+                <CheckBox x:Name="ExpandGroupsCheckBox"
+                          Grid.Row="4"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Każdy element w osobnym wierszu (rozwiń wiersze grupowane)" />
+                <TextBlock Grid.Row="5"
+                           Grid.Column="1"
+                           Grid.ColumnSpan="2"
+                           Margin="{StaticResource Space.Hint}"
+                           Style="{StaticResource HintTextStyle}"
+                           Text="Pozwala edytować pojedyncze elementy w zestawieniach z wyłączonym &quot;Itemize every instance&quot;. Zestawienie w Revit się nie zmienia." />
             </Grid>
         </GroupBox>
 
