@@ -177,10 +177,6 @@ def build() -> str:
         "Na każdym zrzucie **czerwona ramka** pokazuje, gdzie na wstążce znajduje się opisywane narzędzie.",
         "",
     ]
-    overview = shot("ribbon-overview")
-    if overview:
-        lines += [f'<p align="center"><img src="{rel(overview)}" alt="Karta HCB Tools"></p>', ""]
-
     # Panel navigation cards.
     lines += ["<table>", "<tr>"]
     for p in panels:
@@ -197,14 +193,67 @@ def build() -> str:
     return "\n".join(lines)
 
 
+HERO_START, HERO_END = "<!-- HERO:START -->", "<!-- HERO:END -->"
+REVIT_VERSIONS = ("2025", "2026", "2027")
+
+
+def build_hero() -> str:
+    """Top of the README: title, badges, quick links, ribbon screenshot and a strip of all tool icons."""
+    panels = load()
+    tools = [b for p in panels for b, _ in buttons_of(p)]
+    shields = [
+        badge("Revit " + " | ".join(REVIT_VERSIONS), "0696d7"),
+        badge(f"{len(tools)} narzędzi", "e11d48"),
+        badge(f"{len(panels)} paneli", "475569"),
+        badge(".NET 8 | 10", "512bd4"),
+        badge("Windows x64", "0078d4"),
+        badge("Instalator MSI", "16a34a"),
+    ]
+    icons = " ".join(
+        f'<a href="#{slug(b.text)}" title="{b.text}"><img src="{rel(b.icon(32))}" width="32" alt="{b.text}"></a>'
+        for b in tools
+    )
+    lines = [
+        HERO_START,
+        "<!-- Wygenerowane przez tools/docs/build_readme.py -->",
+        '<div align="center">',
+        "",
+        "# HCB Tools dla Revit",
+        "",
+        "**Natywna wtyczka C# dla Autodesk Revit, stworzona dla projektantów instalacji HVAC i MEP.**<br>",
+        "Numeracja, filtry, parametry, przestrzenie, edycja tras i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.",
+        "",
+        " ".join(shields),
+        "",
+        '<a href="#narzedzia"><b>Narzędzia</b></a> &nbsp;·&nbsp; '
+        '<a href="#instalacja"><b>Instalacja</b></a> &nbsp;·&nbsp; '
+        '<a href="#dla-deweloperow"><b>Dla deweloperów</b></a> &nbsp;·&nbsp; '
+        '<a href="#dokumentacja"><b>Dokumentacja</b></a>',
+        "",
+        "<br>",
+        "",
+    ]
+    overview = shot("ribbon-overview")
+    if overview:
+        lines += [f'<img src="{rel(overview)}" alt="Karta HCB Tools na wstążce Revita">', "", "<br>", ""]
+    lines += [icons, "", "<sub>Kliknij ikonę, aby przejść do opisu narzędzia.</sub>", "", "</div>", HERO_END]
+    return "\n".join(lines)
+
+
+def replace_block(text: str, start: str, end: str, block: str) -> str:
+    return re.sub(re.escape(start) + r".*?" + re.escape(end), lambda _: block, text, flags=re.S)
+
+
 def main() -> None:
     text = README.read_text(encoding="utf-8")
     block = build()
     if START in text:
-        text = re.sub(re.escape(START) + r".*?" + re.escape(END), lambda _: block, text, flags=re.S)
+        text = replace_block(text, START, END, block)
     else:
         marker = "## Repository Overview"
         text = text.replace(marker, block + "\n\n" + marker, 1)
+    if HERO_START in text:
+        text = replace_block(text, HERO_START, HERO_END, build_hero())
     README.write_text(text, encoding="utf-8", newline="\n")
     print(f"README updated: {README}")
 

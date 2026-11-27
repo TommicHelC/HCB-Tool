@@ -1,11 +1,99 @@
-# HCB Revit Add-in
+<!-- HERO:START -->
+<!-- Wygenerowane przez tools/docs/build_readme.py -->
+<div align="center">
 
-Native C# Revit add-in for Autodesk Revit 2025, 2026, and 2027, developed to replace and extend workflows previously maintained in `HCB_Tools`.
+# HCB Tools dla Revit
 
-The repository contains two deliverables:
+**Natywna wtyczka C# dla Autodesk Revit, stworzona dla projektantów instalacji HVAC i MEP.**<br>
+Numeracja, filtry, parametry, przestrzenie, edycja tras i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.
 
-- `HCB.RevitAddin` - the production add-in loaded by Revit
-- `HCB.RevitInstaller` - a WiX-based MSI installer that packages the add-in for end users
+<img src="https://img.shields.io/badge/Revit%202025%20%7C%202026%20%7C%202027-0696d7?style=flat-square" alt="Revit 2025 | 2026 | 2027"> <img src="https://img.shields.io/badge/56%20narz%C4%99dzi-e11d48?style=flat-square" alt="56 narzędzi"> <img src="https://img.shields.io/badge/6%20paneli-475569?style=flat-square" alt="6 paneli"> <img src="https://img.shields.io/badge/.NET%208%20%7C%2010-512bd4?style=flat-square" alt=".NET 8 | 10"> <img src="https://img.shields.io/badge/Windows%20x64-0078d4?style=flat-square" alt="Windows x64"> <img src="https://img.shields.io/badge/Instalator%20MSI-16a34a?style=flat-square" alt="Instalator MSI">
+
+<a href="#narzedzia"><b>Narzędzia</b></a> &nbsp;·&nbsp; <a href="#instalacja"><b>Instalacja</b></a> &nbsp;·&nbsp; <a href="#dla-deweloperow"><b>Dla deweloperów</b></a> &nbsp;·&nbsp; <a href="#dokumentacja"><b>Dokumentacja</b></a>
+
+<br>
+
+<img src="docs/images/ribbon/ribbon-overview.png" alt="Karta HCB Tools na wstążce Revita">
+
+<br>
+
+<a href="#copy-filters" title="Copy Filters"><img src="src/HCB.RevitAddin/Features/CopyFilters/Resources/icon32.png" width="32" alt="Copy Filters"></a> <a href="#bulk-edit" title="Bulk Edit"><img src="src/HCB.RevitAddin/Features/ViewFiltersBulkEdit/Resources/icon32.png" width="32" alt="Bulk Edit"></a> <a href="#levels" title="Levels"><img src="src/HCB.RevitAddin/Features/Levels/Resources/icon32.png" width="32" alt="Levels"></a> <a href="#rename-views" title="Rename Views"><img src="src/HCB.RevitAddin/Features/RenameViews/Resources/icon32.png" width="32" alt="Rename Views"></a> <a href="#rename-sheets" title="Rename Sheets"><img src="src/HCB.RevitAddin/Features/RenameSheets/Resources/icon32.png" width="32" alt="Rename Sheets"></a> <a href="#manual-num" title="Manual Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Manual/icon32.png" width="32" alt="Manual Num"></a> <a href="#ductandfit-num" title="Duct&Fit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctAndFit/icon32.png" width="32" alt="Duct&Fit Num"></a> <a href="#duct-num" title="Duct Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Duct/icon32.png" width="32" alt="Duct Num"></a> <a href="#ductfit-num" title="DuctFit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctFitting/icon32.png" width="32" alt="DuctFit Num"></a> <a href="#duct-acc-num" title="Duct Acc Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/MepItems/icon32.png" width="32" alt="Duct Acc Num"></a> <a href="#space-params" title="Space Params"><img src="src/HCB.RevitAddin/Features/SpaceParamLinked/Resources/icon32.png" width="32" alt="Space Params"></a> <a href="#space-to-element" title="Space To Element"><img src="src/HCB.RevitAddin/Features/SpaceToElement/Resources/icon32.png" width="32" alt="Space To Element"></a> <a href="#space-cleanup" title="Space Cleanup"><img src="src/HCB.RevitAddin/Features/SpaceCleanup/Resources/icon32.png" width="32" alt="Space Cleanup"></a> <a href="#unique-colors" title="Unique Colors"><img src="src/HCB.RevitAddin/Features/ColorUniqueSystems/Resources/icon32.png" width="32" alt="Unique Colors"></a> <a href="#flow" title="Flow"><img src="src/HCB.RevitAddin/Features/FlowChanger/Resources/icon32.png" width="32" alt="Flow"></a> <a href="#velocity" title="Velocity"><img src="src/HCB.RevitAddin/Features/VelocitySizer/Resources/icon32.png" width="32" alt="Velocity"></a> <a href="#hvac-tags" title="HVAC Tags"><img src="src/HCB.RevitAddin/Features/HvacTagging/Resources/icon32.png" width="32" alt="HVAC Tags"></a> <a href="#fittings-angle" title="Fittings Angle"><img src="src/HCB.RevitAddin/Features/FittingsAngle/Resources/icon32.png" width="32" alt="Fittings Angle"></a> <a href="#level-from-hvac" title="Level From HVAC"><img src="src/HCB.RevitAddin/Features/LevelFromHVACElements/Resources/icon32.png" width="32" alt="Level From HVAC"></a> <a href="#system-assigner" title="System Assigner"><img src="src/HCB.RevitAddin/Features/SystemAssigner/Resources/icon32.png" width="32" alt="System Assigner"></a> <a href="#mass" title="Mass"><img src="src/HCB.RevitAddin/Features/MassOfDuctsFittings/Resources/icon32.png" width="32" alt="Mass"></a> <a href="#estimate" title="Estimate"><img src="src/HCB.RevitAddin/Features/Estimate/Resources/icon32.png" width="32" alt="Estimate"></a> <a href="#splitter" title="Splitter"><img src="src/HCB.RevitAddin/Features/Splitter/Resources/icon32.png" width="32" alt="Splitter"></a> <a href="#area-lin" title="Area LIN"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Lin/icon32.png" width="32" alt="Area LIN"></a> <a href="#area-mc" title="Area MC"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Mc/icon32.png" width="32" alt="Area MC"></a> <a href="#rotate-fittings" title="Rotate Fittings"><img src="src/HCB.RevitAddin/Features/RotateFittings/Resources/icon32.png" width="32" alt="Rotate Fittings"></a> <a href="#connect" title="Connect"><img src="src/HCB.RevitAddin/Features/ConnectElements/Resources/icon32.png" width="32" alt="Connect"></a> <a href="#extend-0-5-m" title="Extend 0.5 m"><img src="src/HCB.RevitAddin/Features/ConnectorExtend/Resources/icon32.png" width="32" alt="Extend 0.5 m"></a> <a href="#align-to-axis" title="Align To Axis"><img src="src/HCB.RevitAddin/Features/AlignToAxis/Resources/icon32.png" width="32" alt="Align To Axis"></a> <a href="#elbow-up" title="Elbow Up"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Up/icon32.png" width="32" alt="Elbow Up"></a> <a href="#elbow-45" title="Elbow 45"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Side45/icon32.png" width="32" alt="Elbow 45"></a> <a href="#unhide-all" title="Unhide All"><img src="src/HCB.RevitAddin/Features/UnhideAllElements/Resources/icon32.png" width="32" alt="Unhide All"></a> <a href="#duplicate-views" title="Duplicate Views"><img src="src/HCB.RevitAddin/Features/ViewsDuplicate/Resources/icon32.png" width="32" alt="Duplicate Views"></a> <a href="#view-templates" title="View Templates"><img src="src/HCB.RevitAddin/Features/TransferViewTemplates/Resources/icon32.png" width="32" alt="View Templates"></a> <a href="#schedule-templates" title="Schedule Templates"><img src="src/HCB.RevitAddin/Resources/Ribbon/Templates/Schedule/icon32.png" width="32" alt="Schedule Templates"></a> <a href="#filters-legend" title="Filters Legend"><img src="src/HCB.RevitAddin/Features/ViewFiltersLegend/Resources/icon32.png" width="32" alt="Filters Legend"></a> <a href="#cad-link-vg" title="CAD Link VG"><img src="src/HCB.RevitAddin/Features/CadLinkGraphicsCopy/Resources/icon32.png" width="32" alt="CAD Link VG"></a> <a href="#scan-files" title="Scan Files"><img src="src/HCB.RevitAddin/Features/BatchFileScan/Resources/icon32.png" width="32" alt="Scan Files"></a> <a href="#unload-links" title="Unload Links"><img src="src/HCB.RevitAddin/Features/UnloadLinks/Resources/icon32.png" width="32" alt="Unload Links"></a> <a href="#family-report" title="Family Report"><img src="src/HCB.RevitAddin/Features/FamilyParameterReport/Resources/icon32.png" width="32" alt="Family Report"></a> <a href="#viewer-export" title="Viewer Export"><img src="src/HCB.RevitAddin/Features/ViewerExport/Resources/icon32.png" width="32" alt="Viewer Export"></a> <a href="#upgrade-copy" title="Upgrade Copy"><img src="src/HCB.RevitAddin/Features/UpgradeAndCopy/Resources/icon32.png" width="32" alt="Upgrade Copy"></a> <a href="#add-shared" title="Add Shared"><img src="src/HCB.RevitAddin/Features/BatchAddSharedFamilyParameters/Resources/icon32.png" width="32" alt="Add Shared"></a> <a href="#rename-family-params" title="Rename Family Params"><img src="src/HCB.RevitAddin/Features/RenameFamilyContent/Resources/icon32.png" width="32" alt="Rename Family Params"></a> <a href="#shared-params" title="Shared Params"><img src="src/HCB.RevitAddin/Features/SharedParameters/Resources/icon32.png" width="32" alt="Shared Params"></a> <a href="#param-audit" title="Param Audit"><img src="src/HCB.RevitAddin/Features/ProjectParameterAudit/Resources/icon32.png" width="32" alt="Param Audit"></a> <a href="#param-service" title="Param Service"><img src="src/HCB.RevitAddin/Features/ParameterService/Resources/icon32.png" width="32" alt="Param Service"></a> <a href="#calculator" title="Calculator"><img src="src/HCB.RevitAddin/Features/ParameterCalculator/Resources/icon32.png" width="32" alt="Calculator"></a> <a href="#clear-param" title="Clear Param"><img src="src/HCB.RevitAddin/Features/ParameterClear/Resources/icon32.png" width="32" alt="Clear Param"></a> <a href="#copy-param" title="Copy Param"><img src="src/HCB.RevitAddin/Features/ParameterCopy/Resources/icon32.png" width="32" alt="Copy Param"></a> <a href="#copy-between-projects" title="Copy Between Projects"><img src="src/HCB.RevitAddin/Features/CopyBetweenProjects/Resources/icon32.png" width="32" alt="Copy Between Projects"></a> <a href="#purge-anno" title="Purge Anno"><img src="src/HCB.RevitAddin/Features/PurgeAnnotations/Resources/icon32.png" width="32" alt="Purge Anno"></a> <a href="#hc-wire" title="HC Wire"><img src="src/HCB.RevitAddin/Features/HCWireSize/Resources/icon32.png" width="32" alt="HC Wire"></a> <a href="#rename-materials" title="Rename Materials"><img src="src/HCB.RevitAddin/Features/RenameMaterials/Resources/icon32.png" width="32" alt="Rename Materials"></a> <a href="#ribbon-manager" title="Ribbon Manager"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/icon32.png" width="32" alt="Ribbon Manager"></a> <a href="#short-names" title="Short Names"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/ShortNames/icon32.png" width="32" alt="Short Names"></a>
+
+<sub>Kliknij ikonę, aby przejść do opisu narzędzia.</sub>
+
+</div>
+<!-- HERO:END -->
+
+<br>
+
+## ✨ Najważniejsze
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🔢 Numeracja MEP
+Kanały, kształtki i akcesoria numerowane według wymiarów i systemu. Identyczne elementy dostają wspólny numer.
+
+</td>
+<td width="33%" valign="top">
+
+### 🔧 Szybka edycja tras
+Obracanie kształtek, łączenie, przedłużanie o 0,5 m, kolana jednym kliknięciem i wyrównanie do osi bez rozłączania.
+
+</td>
+<td width="33%" valign="top">
+
+### 🌬️ Obliczenia HVAC
+Dobór średnic do przepływu, masa, powierzchnia kształtek, kosztorys z cennika i dzielenie na odcinki produkcyjne.
+
+</td>
+</tr>
+<tr>
+<td valign="top">
+
+### 📦 Bez otwierania plików
+Skan, upgrade, odłączanie linków, raporty i parametry rodzin. Wiele plików .rvt / .rfa naraz, w tle.
+
+</td>
+<td valign="top">
+
+### ⚙️ Parametry
+Wczytywanie `HC_*`, audyt, kalkulator, kopiowanie i czyszczenie wartości w zaznaczeniu albo w całym modelu.
+
+</td>
+<td valign="top">
+
+### 🧩 Porządek na wstążce
+Ribbon Manager ukrywa, łączy i przenosi karty oraz panele, także innych wtyczek. Short Names skraca nazwy.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+<a id="instalacja"></a>
+
+## 📥 Instalacja
+
+1. Pobierz instalator MSI dla swojej wersji Revita, np. `HCB_Tools_1.0.3_R25.msi` (udostępniany w zespole, pliki MSI nie są w repozytorium).
+2. Zamknij Revit i uruchom instalator. Instalacja jest per-user i nie wymaga uprawnień administratora.
+3. Uruchom Revit. Na wstążce pojawi się karta **HCB Tools**.
+
+| | Revit 2025 | Revit 2026 | Revit 2027 |
+| --- | :---: | :---: | :---: |
+| Instalator | `…_R25.msi` | `…_R26.msi` | `…_R27.msi` |
+| Środowisko | .NET 8 (w Revicie) | .NET 8 (w Revicie) | .NET 10 (w Revicie) |
+
+> [!NOTE]
+> Każda wersja Revita ma osobny instalator i można je instalować obok siebie. Nowsza wersja MSI zastępuje starszą.
+> Odinstalujesz wtyczkę w *Ustawienia › Aplikacje* (pozycja *HCB Revit Addin &lt;rok&gt;*).
+
+> [!WARNING]
+> Jeśli kiedyś była zainstalowana stara wtyczka `HCB.Addin`, usuń raz ręcznie `%AppData%\Autodesk\Revit\Addins\<rok>\HCB.Addin.addin` i folder `HCB.Addin`. Inaczej Revit wczyta obie.
+
+<br>
 
 <!-- TOOLS:START -->
 <!-- Wygenerowane przez tools/docs/build_readme.py – nie edytuj ręcznie, zmień tool_texts.py -->
@@ -15,8 +103,6 @@ The repository contains two deliverables:
 ## 🧰 Narzędzia
 
 Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na każdym zrzucie **czerwona ramka** pokazuje, gdzie na wstążce znajduje się opisywane narzędzie.
-
-<p align="center"><img src="docs/images/ribbon/ribbon-overview.png" alt="Karta HCB Tools"></p>
 
 <table>
 <tr>
@@ -1908,75 +1994,66 @@ Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na k
 
 <!-- TOOLS:END -->
 
-## Repository Overview
+<a id="dla-deweloperow"></a>
 
-- `src/HCB.RevitAddin/` - main add-in project targeting `net8.0-windows` for R25/R26 and `net10.0-windows` for R27
-- `src/HCB.RevitInstaller/` - per-user MSI installer project for Revit 2025, 2026, and 2027
-- `docs/GitHubSolutionOverview.md` - high-level solution description for GitHub publication
-- `docs/Installer.md` - MSI build and versioning notes
-- `docs/WithoutOpenPlan.md` - design notes for batch workflows without opening files
-- `HCB_Tools/` - Python reference implementation used during porting
-- `geeWiz/` - architecture reference used as a structural baseline
-- `kodyfikacja/` - static project data distributed with the add-in
+## 🛠️ Dla deweloperów
 
-## What The Add-in Includes
+### Struktura repozytorium
 
-The add-in exposes a ribbon tab named `HCB Tools` and groups business workflows into isolated feature folders under `src/HCB.RevitAddin/Features/`.
+| Ścieżka | Zawartość |
+| --- | --- |
+| `src/HCB.RevitAddin/` | Wtyczka. `net8.0-windows` dla R25/R26, `net10.0-windows` dla R27. Każde narzędzie w osobnym folderze `Features/<Nazwa>/` |
+| `src/HCB.RevitAddin/Infrastructure/RibbonDefinitions.cs` | Układ wstążki: panele, listy rozwijane, przyciski i podpowiedzi |
+| `src/HCB.RevitInstaller/` | Instalator MSI (WiX), per-user, dla Revit 2025, 2026 i 2027 |
+| `kodyfikacja/` | Dane projektowe dołączane do wtyczki (`Systemy HCB.csv`) |
+| `tools/icons/` | Ikony wstążki: źródła SVG i generator PNG |
+| `tools/docs/` | Generator tej strony i zrzutów wstążki |
+| `docs/` | Dokumentacja techniczna |
 
-Current functional areas include:
-
-- view and filter workflows such as `CopyFilters`, `ViewFiltersBulkEdit`, `ViewFiltersLegend`, and `TransferViewTemplates`
-- renaming and reporting workflows such as `RenameViews`, `RenameSheets`, `RenameMaterials`, `RenameFamilyContent`, and `FamilyParameterReport`
-- MEP-focused utilities such as `FlowChanger`, `HCWireSize`, `SpaceToElement`, `SpaceParamLinked`, `SystemAssigner`, `DuctFittingsArea`, and `MassOfDuctsFittings`
-- batch and offline workflows such as `BatchFileScan`, `UnloadLinks`, and `UpgradeAndCopy`
-
-## Build
-
-Build the solution for the target Revit version:
+### Build
 
 ```powershell
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R25"
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R26"
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R27"
-dotnet build .\Revit_Codex_HCB.sln -c "Release R25"
-dotnet build .\Revit_Codex_HCB.sln -c "Release R26"
-dotnet build .\Revit_Codex_HCB.sln -c "Release R27"
+dotnet build .\Revit_Codex_HCB.sln -c "Debug R25" -p:DeployOnBuild=false -p:DeployRevitAddin=false
 ```
 
-`R27` builds target `net10.0-windows` and require a .NET 10 SDK. `R25` and `R26` remain on `net8.0-windows`.
+Konfiguracje: `Debug R25` / `R26` / `R27` oraz `Release R25` / `R26` / `R27`. Build `R27` wymaga .NET 10 SDK, `R25` i `R26` .NET 8 SDK.
 
-To deploy the add-in directly into the local Revit addins folder during build:
+> [!IMPORTANT]
+> `DeployOnBuild` jest domyślnie włączone, więc zwykły build kopiuje wtyczkę do `%AppData%\Autodesk\Revit\Addins\<rok>\` i nadpisuje zainstalowaną wersję. Do samej kompilacji dodawaj `-p:DeployOnBuild=false -p:DeployRevitAddin=false`, jak wyżej.
+
+### Wdrożenie do lokalnego Revita
 
 ```powershell
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R25 Deploy"
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R26 Deploy"
-dotnet build .\Revit_Codex_HCB.sln -c "Debug R27 Deploy"
+dotnet build .\Revit_Codex_HCB.sln -c "Debug R25 Deploy"   # albo R26 / R27
 ```
 
-## MSI Packaging
+Revit danej wersji musi być zamknięty, bo blokuje `HCB.RevitAddin.dll`. Pełna procedura, także dla agentów AI: [docs/DeployToRevit.md](docs/DeployToRevit.md).
 
-Build the MSI packages from the repository root:
+### Instalator MSI
 
 ```powershell
-dotnet build .\src\HCB.RevitInstaller\HCB.RevitInstaller.wixproj -c "Release R25"
-dotnet build .\src\HCB.RevitInstaller\HCB.RevitInstaller.wixproj -c "Release R26"
-dotnet build .\src\HCB.RevitInstaller\HCB.RevitInstaller.wixproj -c "Release R27"
+dotnet build .\src\HCB.RevitInstaller\HCB.RevitInstaller.wixproj -c "Release R25"   # albo R26 / R27
 ```
 
-The current default MSI product version is `1.0.1`.
+Wynik: `src/HCB.RevitInstaller/bin/Release <R2x>/HCB.RevitInstaller.msi`. Wersję produktu (obecnie `1.0.3`) ustawia `InstallerProductVersion` w `HCB.RevitInstaller.wixproj`. Procedura wydania: [docs/Installer.md](docs/Installer.md).
 
-Generated installers are written to:
+### Ta strona
 
-- `src/HCB.RevitInstaller/bin/Release R25/HCB.RevitInstaller.msi`
-- `src/HCB.RevitInstaller/bin/Release R26/HCB.RevitInstaller.msi`
-- `src/HCB.RevitInstaller/bin/Release R27/HCB.RevitInstaller.msi`
+Sekcje hero i **Narzędzia** są generowane z definicji wstążki. Po dodaniu narzędzia uzupełnij `tools/docs/tool_texts.py` i uruchom `python tools/docs/build_readme.py`. Szczegóły i zrzuty ekranu: [docs/ToolsDocumentation.md](docs/ToolsDocumentation.md).
 
-## Documentation
+<br>
 
-- [Solution overview](docs/GitHubSolutionOverview.md)
-- [Installer notes](docs/Installer.md)
-- [Without-open workflow plan](docs/WithoutOpenPlan.md)
-- [Porting plan](docs/PortingPlan.md)
-- [Icon workflow](docs/IconWorkflow.md)
-- [Tools documentation workflow](docs/ToolsDocumentation.md)
-- [Deploying to Revit (agents and developers)](docs/DeployToRevit.md)
+<a id="dokumentacja"></a>
+
+## 📚 Dokumentacja
+
+| Dokument | O czym |
+| --- | --- |
+| [GitHubSolutionOverview.md](docs/GitHubSolutionOverview.md) | Opis rozwiązania |
+| [DeployToRevit.md](docs/DeployToRevit.md) | Wdrożenie do lokalnego Revita (deweloperzy i agenci AI) |
+| [Installer.md](docs/Installer.md) | Budowa MSI, wersjonowanie, wydanie |
+| [UiGuidelines.md](docs/UiGuidelines.md) | Zasady okien i UI |
+| [IconWorkflow.md](docs/IconWorkflow.md) | Ikony wstążki |
+| [ToolsDocumentation.md](docs/ToolsDocumentation.md) | Generowanie tej strony i zrzutów |
+| [WithoutOpenPlan.md](docs/WithoutOpenPlan.md) | Operacje wsadowe bez otwierania plików |
+| [PortingPlan.md](docs/PortingPlan.md) | Plan przenoszenia narzędzi z `HCB_Tools` |
