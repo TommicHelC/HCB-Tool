@@ -39,6 +39,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Same versions as MLabs Export/Import Excel: Revit 2025 shares one load context, first loaded wins. -->
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.1" />
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
@@ -306,6 +309,15 @@
     <Compile Include="Features\ViewFiltersLegend\UI\ViewFiltersLegendWindow.xaml.cs" />
     <Compile Include="Features\ViewFiltersLegend\ViewFiltersLegendCommand.cs" />
     <Compile Include="Features\ViewFiltersLegend\ViewFiltersLegendService.cs" />
+    <Compile Include="Features\ScheduleExcel\Models\ScheduleExcelData.cs" />
+    <Compile Include="Features\ScheduleExcel\Models\ScheduleExcelExportOptions.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelExportCommand.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelFormat.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelLog.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelReader.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelSettings.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelWorkbookWriter.cs" />
+    <Compile Include="Features\ScheduleExcel\UI\ScheduleExcelExportWindow.xaml.cs" />
     <Compile Include="Features\ViewsDuplicate\Models\ViewsDuplicateOptions.cs" />
     <Compile Include="Features\ViewsDuplicate\Models\ViewsDuplicateResult.cs" />
     <Compile Include="Features\ViewsDuplicate\UI\ViewsDuplicateWindow.xaml.cs" />
@@ -354,6 +366,7 @@
     <Page Include="Features\TransferViewTemplates\UI\TransferViewTemplatesWindow.xaml" />
     <Page Include="Features\ViewFiltersBulkEdit\UI\ViewFiltersBulkEditWindow.xaml" />
     <Page Include="Features\ViewFiltersLegend\UI\ViewFiltersLegendWindow.xaml" />
+    <Page Include="Features\ScheduleExcel\UI\ScheduleExcelExportWindow.xaml" />
     <Page Include="Features\ViewsDuplicate\UI\ViewsDuplicateWindow.xaml" />
     <Page Include="Features\BatchAddSharedFamilyParameters\UI\BatchAddSharedFamilyParametersWindow.xaml" />
     <Page Include="Features\RenameFamilyContent\UI\RenameFamilyContentWindow.xaml" />

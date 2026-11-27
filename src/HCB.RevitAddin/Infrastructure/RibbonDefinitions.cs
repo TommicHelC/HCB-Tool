@@ -347,6 +347,12 @@ namespace HCB.RevitAddin
                             "Tworzy legendy dla filtrow przypisanych do wybranych widokow i szablonow.",
                             "Co robi: tworzy legende filtrow dla wybranych widokow i szablonow. Jak uzyc: 1. Wybierz widoki albo view templates. 2. Uruchom polecenie. 3. Utworzona zostanie legenda z probkami i opisami filtrow. Zakres: generuje nowy widok legendy."),
                         new RibbonPushButtonDefinition(
+                            "HcbScheduleExcelExportButton",
+                            "Schedule to Excel",
+                            typeof(Features.ScheduleExcel.ScheduleExcelExportCommand),
+                            "Eksportuje zestawienie do pliku Excel (.xlsx) z informacja, ktore elementy tworza kazdy wiersz.",
+                            "Co robi: zapisuje dane zestawienia do pliku .xlsx. Liczby trafiaja do Excela jako liczby w jednostkach projektu, a ukryte arkusze pamietaja elementy kazdego wiersza i wartosci z chwili eksportu. Jak uzyc: 1. Wybierz zestawienie (domyslnie aktywne). 2. Wskaz folder. 3. Eksportuj. Zakres: zestawienia elementow; kolorem oznaczono parametry typu i pola tylko do odczytu. Zapis zmian z Excela do Revit - w przygotowaniu."),
+                        new RibbonPushButtonDefinition(
                             "HcbCadLinkGraphicsCopyButton",
                             "CAD Link VG",
                             typeof(Features.CadLinkGraphicsCopy.CadLinkGraphicsCopyCommand),
