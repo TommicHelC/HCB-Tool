@@ -104,8 +104,8 @@ def short(b: Button) -> str:
         return b.tooltip
     first = re.split(r"(?<=[.!?])\s(?=[A-ZĄĆĘŁŃÓŚŹŻ])", what, maxsplit=1)[0]
     # Markdown is not parsed inside a one-line HTML cell.
-    first = re.sub(r"`([^`]+)`", r"<code></code>", first)
-    return re.sub(r"\*([^*]+)\*", r"<i></i>", first)
+    first = re.sub(r"`([^`]+)`", r"<code>\1</code>", first)
+    return re.sub(r"\*([^*]+)\*", r"<i>\1</i>", first)
 
 
 def buttons_of(panel) -> list[tuple[Button, Pulldown | None]]:
