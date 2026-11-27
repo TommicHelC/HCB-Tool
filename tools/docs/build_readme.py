@@ -102,7 +102,10 @@ def short(b: Button) -> str:
     what = T.get(b.id, {}).get("what")
     if not what:
         return b.tooltip
-    return re.split(r"(?<=[.!?])\s(?=[A-ZĄĆĘŁŃÓŚŹŻ])", what, maxsplit=1)[0]
+    first = re.split(r"(?<=[.!?])\s(?=[A-ZĄĆĘŁŃÓŚŹŻ])", what, maxsplit=1)[0]
+    # Markdown is not parsed inside a one-line HTML cell.
+    first = re.sub(r"`([^`]+)`", r"<code></code>", first)
+    return re.sub(r"\*([^*]+)\*", r"<i></i>", first)
 
 
 def buttons_of(panel) -> list[tuple[Button, Pulldown | None]]:
