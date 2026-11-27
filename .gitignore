@@ -28,3 +28,7 @@ dist/
 # Tools documentation captures
 .scrape/
 __pycache__/
+
+# Project data: only the file the add-in ships is tracked
+/kodyfikacja/*
+!/kodyfikacja/Systemy HCB.csv
