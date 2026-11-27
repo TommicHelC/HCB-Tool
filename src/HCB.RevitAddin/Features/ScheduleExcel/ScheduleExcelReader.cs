@@ -57,7 +57,8 @@ internal sealed class ScheduleExcelReader
     /// One row per element even when the schedule groups rows ("Itemize every instance" off), so single
     /// instances can be edited.
     /// </param>
-    public ScheduleExcelData Read(ViewSchedule schedule, bool expandGroups = false)
+    /// <param name="addIdColumn">Adds a read-only first column with the element ids of each row.</param>
+    public ScheduleExcelData Read(ViewSchedule schedule, bool expandGroups = false, bool addIdColumn = false)
     {
         ScheduleDefinition definition = schedule.Definition;
         bool itemized = definition.IsItemized || expandGroups;
@@ -182,7 +183,55 @@ internal sealed class ScheduleExcelReader
             ScheduleExcelLog.Error($"Odczyt widoku zestawienia '{schedule.Name}' nie powiódł się.", exception);
         }
 
+        if (addIdColumn)
+        {
+            // Added after the schedule view was read: view columns map 1:1 to schedule fields by position.
+            AddIdColumn(data);
+        }
+
         return data;
+    }
+
+    private void AddIdColumn(ScheduleExcelData data)
+    {
+        data.Columns.Insert(0, new ScheduleExcelColumn
+        {
+            FieldIndex = -1,
+            Header = "ID",
+            FieldType = "ElementIds",
+            ValueKind = ScheduleExcelValueKind.Text,
+            IsReadOnly = true,
+            ReadOnlyReason = "Identyfikator elementu w Revit (ElementId)."
+        });
+
+        foreach (ScheduleExcelRow row in data.Rows)
+        {
+            string ids = string.Join("; ", row.UniqueIds
+                .Select(uniqueId => _document.GetElement(uniqueId)?.Id.Value.ToString(CultureInfo.InvariantCulture))
+                .Where(id => id != null));
+            if (ids.Length > ScheduleExcelFormat.MaxCellText)
+            {
+                ids = ids[..ScheduleExcelFormat.MaxCellText];
+            }
+
+            object? value = row.UniqueIds.Count == 1 && double.TryParse(ids, NumberStyles.Integer, CultureInfo.InvariantCulture, out double single)
+                ? single
+                : ids;
+            Prepend(row, new ScheduleExcelValue(value, false, true));
+        }
+    }
+
+    private static void Prepend(ScheduleExcelRow row, ScheduleExcelValue value)
+    {
+        ScheduleExcelValue[] values = row.Values;
+        ScheduleExcelCellStyle?[] styles = row.Styles;
+        var newValues = new ScheduleExcelValue[values.Length + 1];
+        var newStyles = new ScheduleExcelCellStyle?[styles.Length + 1];
+        newValues[0] = value;
+        Array.Copy(values, 0, newValues, 1, values.Length);
+        Array.Copy(styles, 0, newStyles, 1, styles.Length);
+        row.Values = newValues;
+        row.Styles = newStyles;
     }
 
     /// <summary>
@@ -654,11 +703,16 @@ internal sealed class ScheduleExcelReader
             numberFormat = "0";
         }
 
+        List<string> choices = kind == ScheduleExcelValueKind.ElementId && sample != null
+            ? CollectChoices(elements, lookup, isType)
+            : [];
+        bool typeChange = sample != null && ScheduleExcelReferences.IsTypeChange(sample);
+
         string readOnlyReason = kind switch
         {
-            ScheduleExcelValueKind.ElementId => "Wartość wskazuje inny element (typ, poziom...) - zmiana w przygotowaniu.",
             _ when sample == null => "Żaden element zestawienia nie ma tego parametru.",
-            _ when sample.IsReadOnly => "Parametr tylko do odczytu w Revit.",
+            ScheduleExcelValueKind.ElementId when choices.Count == 0 => "Brak listy dozwolonych wartości dla tego pola.",
+            _ when sample.IsReadOnly && !typeChange => "Parametr tylko do odczytu w Revit.",
             ScheduleExcelValueKind.Text when storage != StorageType.String => "Wartość z listy (wyliczeniowa) - zmiana w przygotowaniu.",
             _ => string.Empty
         };
@@ -681,10 +735,48 @@ internal sealed class ScheduleExcelReader
             IsReadOnly = readOnlyReason.Length > 0,
             ReadOnlyReason = readOnlyReason,
             TotalFunction = totalFunction,
-            BodyStyle = bodyStyle
+            BodyStyle = bodyStyle,
+            Choices = choices
         };
 
         return new FieldReader(column, element => ScheduleExcelParameterLookup.ReadValue(lookup.Get(ScheduleExcelParameterLookup.GetTarget(_document, element, isType)), kind, unit));
+    }
+
+    /// <summary>
+    /// Drop-down values for a reference column: union of what each element accepts. Valid types depend on the
+    /// element's family/category, so they are collected once per current type, not per element.
+    /// </summary>
+    private List<string> CollectChoices(IReadOnlyList<Element> elements, ScheduleExcelParameterLookup lookup, bool isType)
+    {
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var choices = new List<string>();
+        var visitedKeys = new HashSet<long>();
+        foreach (Element element in elements)
+        {
+            Element? target = ScheduleExcelParameterLookup.GetTarget(_document, element, isType);
+            Parameter? parameter = lookup.Get(target);
+            if (target == null || parameter == null)
+            {
+                continue;
+            }
+
+            long key = ScheduleExcelReferences.IsTypeChange(parameter) ? target.GetTypeId().Value : -1;
+            if (!visitedKeys.Add(key))
+            {
+                continue;
+            }
+
+            foreach ((ElementId _, string text) in ScheduleExcelReferences.Candidates(_document, target, parameter))
+            {
+                if (seen.Add(text))
+                {
+                    choices.Add(text);
+                }
+            }
+        }
+
+        choices.Sort(StringComparer.CurrentCultureIgnoreCase);
+        return choices;
     }
 
     private static ScheduleExcelCellStyle? SafeFieldStyle(ScheduleField field)

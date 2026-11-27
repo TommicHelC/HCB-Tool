@@ -68,6 +68,9 @@ public sealed class ScheduleExcelColumn
     /// <summary>"Sum", "Min", "Max" or empty - from the field's "Calculate totals" setting.</summary>
     public string TotalFunction { get; init; } = string.Empty;
 
+    /// <summary>Allowed display values for a reference column (types, levels...); shown as a drop-down.</summary>
+    public List<string> Choices { get; init; } = [];
+
     public ScheduleExcelCellStyle? HeaderStyle { get; set; }
 
     public ScheduleExcelCellStyle? BodyStyle { get; set; }
@@ -98,10 +101,10 @@ public sealed class ScheduleExcelRow
 
     public List<string> UniqueIds { get; } = [];
 
-    public ScheduleExcelValue[] Values { get; init; } = [];
+    public ScheduleExcelValue[] Values { get; set; } = [];
 
     /// <summary>Per-cell Revit style; null entries when the row was not matched in the schedule view.</summary>
-    public ScheduleExcelCellStyle?[] Styles { get; init; } = [];
+    public ScheduleExcelCellStyle?[] Styles { get; set; } = [];
 
     /// <summary>Display text of the row's value for each <see cref="ScheduleExcelData.GroupLevels"/> entry.</summary>
     public string[] GroupValues { get; init; } = [];

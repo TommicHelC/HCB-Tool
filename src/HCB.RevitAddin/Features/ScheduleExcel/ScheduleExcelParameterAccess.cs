@@ -82,7 +82,8 @@ internal sealed class ScheduleExcelParameterLookup
             return new ScheduleExcelValue(null, false, true);
         }
 
-        bool readOnly = parameter.IsReadOnly;
+        // "Type" / "Family and Type" report read only, yet the type can change (Element.ChangeTypeId).
+        bool readOnly = parameter.IsReadOnly && !ScheduleExcelReferences.IsTypeChange(parameter);
         if (!parameter.HasValue && kind != ScheduleExcelValueKind.Text)
         {
             return new ScheduleExcelValue(null, false, readOnly);

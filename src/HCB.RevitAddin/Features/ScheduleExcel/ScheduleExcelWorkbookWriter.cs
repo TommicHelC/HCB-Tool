@@ -30,18 +30,21 @@ internal static class ScheduleExcelWorkbookWriter
     public static void Write(IReadOnlyList<ScheduleExcelData> schedules, ScheduleExcelExportOptions options)
     {
         using var workbook = new XLWorkbook();
+        IXLWorksheet lists = workbook.Worksheets.Add(ScheduleExcelFormat.ListsSheet);
+        int nextListColumn = 1;
         var dataSheets = new List<IXLWorksheet>();
         var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         for (int index = 0; index < schedules.Count; index++)
         {
             IXLWorksheet sheet = workbook.Worksheets.Add(UniqueSheetName(schedules[index].ScheduleName, usedNames));
             WriteDataSheet(sheet, schedules[index], options, ScheduleExcelFormat.PartTable(index + 1));
+            nextListColumn = AddReferenceLists(sheet, schedules[index], lists, nextListColumn);
             dataSheets.Add(sheet);
         }
 
         WriteLegend(workbook.Worksheets.Add(ScheduleExcelFormat.LegendSheet), schedules, options);
 
-        var hidden = new List<IXLWorksheet>();
+        var hidden = new List<IXLWorksheet> { lists };
         IXLWorksheet meta = workbook.Worksheets.Add(ScheduleExcelFormat.MetaSheet);
         WriteKeyValues(meta, GlobalMeta(schedules));
         hidden.Add(meta);
@@ -65,6 +68,7 @@ internal static class ScheduleExcelWorkbookWriter
             sheet.Visibility = XLWorksheetVisibility.VeryHidden;
         }
 
+        lists.Position = workbook.Worksheets.Count;
         dataSheets[0].SetTabActive();
         workbook.SaveAs(options.FilePath);
     }
@@ -194,6 +198,45 @@ internal static class ScheduleExcelWorkbookWriter
             .WhenIsTrue(formula);
         format.Fill.SetBackgroundColor(XLColor.FromHtml("#D9D9D9"));
         format.Font.SetFontColor(XLColor.FromHtml("#808080"));
+    }
+
+    /// <summary>
+    /// Drop-down of allowed values (types, levels...) for editable reference columns. The values live in the very
+    /// hidden lists sheet: an inline list is limited to 255 characters.
+    /// </summary>
+    private static int AddReferenceLists(IXLWorksheet sheet, ScheduleExcelData data, IXLWorksheet lists, int nextColumn)
+    {
+        IReadOnlyList<int> rows = DataRowsOf(sheet);
+        for (int index = 0; index < data.Columns.Count; index++)
+        {
+            ScheduleExcelColumn column = data.Columns[index];
+            if (column.ValueKind != ScheduleExcelValueKind.ElementId || column.IsReadOnly || column.Choices.Count == 0 || rows.Count == 0)
+            {
+                continue;
+            }
+
+            for (int choice = 0; choice < column.Choices.Count; choice++)
+            {
+                lists.Cell(choice + 1, nextColumn).Value = column.Choices[choice];
+            }
+
+            int excelColumn = ScheduleExcelFormat.FirstValueColumn + index;
+            sheet.Range(rows[0], excelColumn, rows[^1], excelColumn)
+                .CreateDataValidation()
+                .List(lists.Range(1, nextColumn, column.Choices.Count, nextColumn), true);
+            nextColumn++;
+        }
+
+        return nextColumn;
+    }
+
+    /// <summary>Sheet rows that carry a row key (data rows, not group headers/footers).</summary>
+    private static IReadOnlyList<int> DataRowsOf(IXLWorksheet sheet)
+    {
+        int last = sheet.LastRowUsed()?.RowNumber() ?? 0;
+        return Enumerable.Range(ScheduleExcelFormat.FirstDataRow, Math.Max(0, last - ScheduleExcelFormat.FirstDataRow + 1))
+            .Where(row => sheet.Cell(row, ScheduleExcelFormat.KeyColumn).GetString().Length > 0)
+            .ToList();
     }
 
     private static void AddYesNoLists(IXLWorksheet sheet, ScheduleExcelData data, IReadOnlyList<int> dataRows)

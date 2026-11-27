@@ -116,7 +116,7 @@ internal static class ScheduleExcelApplier
                     continue;
                 }
 
-                if (parameter.IsReadOnly)
+                if (parameter.IsReadOnly && !ScheduleExcelReferences.IsTypeChange(parameter))
                 {
                     problem = "Parametr jest tylko do odczytu (np. sterowany formułą w rodzinie).";
                     break;
@@ -256,6 +256,7 @@ internal static class ScheduleExcelApplier
                     parameter.Set((bool)operation.Edit.NewValue! ? 1 : 0),
                 ScheduleExcelValueKind.Text when parameter.StorageType == StorageType.String =>
                     parameter.Set((string?)operation.Edit.NewValue ?? string.Empty),
+                ScheduleExcelValueKind.ElementId => SetReference(operation),
                 _ => false
             };
             return ok ? null : "Revit nie przyjął wartości.";
@@ -264,6 +265,25 @@ internal static class ScheduleExcelApplier
         {
             return $"Revit nie przyjął wartości: {exception.Message}";
         }
+    }
+
+    /// <summary>Maps the chosen display text to an element id; a type change goes through ChangeTypeId.</summary>
+    private static bool SetReference(Operation operation)
+    {
+        string text = (string?)operation.Edit.NewValue ?? string.Empty;
+        Document document = operation.Target.Document;
+        ElementId? id = text.Length == 0 ? null : ScheduleExcelReferences.Resolve(document, operation.Target, operation.Parameter, text);
+        if (id == null)
+        {
+            throw new InvalidOperationException($"wartości '{text}' nie ma na liście dozwolonych dla tego elementu");
+        }
+
+        if (ScheduleExcelReferences.IsTypeChange(operation.Parameter))
+        {
+            return operation.Target.GetTypeId() == id || operation.Target.ChangeTypeId(id) != ElementId.InvalidElementId;
+        }
+
+        return operation.Parameter.Set(id);
     }
 
     private sealed record Operation(

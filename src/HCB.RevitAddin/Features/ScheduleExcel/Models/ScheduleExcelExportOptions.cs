@@ -9,6 +9,9 @@ public sealed class ScheduleExcelExportOptions
     /// <summary>One row per element even when the schedule groups rows.</summary>
     public bool ExpandGroups { get; set; }
 
+    /// <summary>Read-only first column with the element ids of each row.</summary>
+    public bool AddIdColumn { get; set; }
+
     /// <summary>Locks read-only cells. Excel then blocks sorting ranges that contain locked cells.</summary>
     public bool ProtectReadOnlyCells { get; set; }
 }

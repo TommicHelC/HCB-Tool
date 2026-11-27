@@ -316,6 +316,7 @@
     <Compile Include="Features\ScheduleExcel\ScheduleExcelExportCommand.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelImportCommand.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelParameterAccess.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelReferences.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelSyncCommand.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelSyncSession.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelWindows.cs" />

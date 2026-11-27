@@ -23,6 +23,8 @@ internal sealed class ScheduleExcelSettings
 
     public bool ExpandGroups { get; set; }
 
+    public bool AddIdColumn { get; set; }
+
     public static ScheduleExcelSettings Load()
     {
         try

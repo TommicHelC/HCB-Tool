@@ -4,7 +4,7 @@
         xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
         Title="Eksport zestawienia do Excel"
         Width="600"
-        Height="620"
+        Height="650"
         MinWidth="500"
         MinHeight="440"
         ResizeMode="CanResizeWithGrip"
@@ -77,6 +77,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Style="{StaticResource FieldLabelStyle}"
@@ -119,6 +120,12 @@
                            Margin="{StaticResource Space.Hint}"
                            Style="{StaticResource HintTextStyle}"
                            Text="Pozwala edytować pojedyncze elementy w zestawieniach z wyłączonym &quot;Itemize every instance&quot;. Zestawienie w Revit się nie zmienia." />
+                <CheckBox x:Name="IdColumnCheckBox"
+                          Grid.Row="6"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Dodaj kolumnę ID elementu (tylko do odczytu)" />
             </Grid>
         </GroupBox>
 

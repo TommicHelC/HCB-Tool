@@ -24,6 +24,9 @@ internal static class ScheduleExcelFormat
     public const string RowsSheet = "_hcb_rows";
     public const string SnapshotSheet = "_hcb_snapshot";
 
+    /// <summary>Very hidden sheet holding drop-down values (types, levels...) for reference columns.</summary>
+    public const string ListsSheet = "_hcb_lists";
+
     /// <summary>Hidden first column on the data sheet: the row key that links a row to its elements.</summary>
     public const string KeyHeader = "HCB_KEY";
     public const int KeyColumn = 1;
