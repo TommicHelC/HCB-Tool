@@ -24,11 +24,20 @@ public sealed class ScheduleExcelListItem
     public bool IsChecked { get; set; }
 }
 
+/// <summary>Export shows file options; Sync shows editing options (the file always opens, always one file).</summary>
+public enum ScheduleExcelWindowMode
+{
+    Export,
+    Sync
+}
+
 public partial class ScheduleExcelExportWindow : Window
 {
     private readonly IReadOnlyList<ScheduleExcelListItem> _items;
+    private readonly ScheduleExcelWindowMode _mode;
 
     public ScheduleExcelExportWindow(
+        ScheduleExcelWindowMode mode,
         string title,
         string description,
         string primaryButton,
@@ -38,7 +47,8 @@ public partial class ScheduleExcelExportWindow : Window
         bool openAfterExport,
         bool protectReadOnlyCells,
         bool expandGroups,
-        bool addIdColumn)
+        bool addIdColumn,
+        bool separateFiles)
     {
         InitializeComponent();
 
@@ -64,6 +74,13 @@ public partial class ScheduleExcelExportWindow : Window
         ProtectCheckBox.IsChecked = protectReadOnlyCells;
         ExpandGroupsCheckBox.IsChecked = expandGroups;
         IdColumnCheckBox.IsChecked = addIdColumn;
+        SeparateFilesCheckBox.IsChecked = separateFiles;
+
+        bool export = mode == ScheduleExcelWindowMode.Export;
+        Collapse(!export, OpenAfterExportCheckBox, SeparateFilesCheckBox);
+        Collapse(export, ProtectCheckBox, ExpandGroupsCheckBox, ExpandGroupsHintText);
+        _mode = mode;
+        UpdateFileHint();
         UpdateStatus();
     }
 
@@ -92,6 +109,30 @@ public partial class ScheduleExcelExportWindow : Window
 
     public bool AddIdColumn => IdColumnCheckBox.IsChecked == true;
 
+    /// <summary>Export only: one workbook per ticked schedule.</summary>
+    public bool SeparateFiles => _mode == ScheduleExcelWindowMode.Export && SeparateFilesCheckBox.IsChecked == true;
+
+    private static void Collapse(bool collapse, params UIElement[] elements)
+    {
+        foreach (UIElement element in elements)
+        {
+            element.Visibility = collapse ? Visibility.Collapsed : Visibility.Visible;
+        }
+    }
+
+    private void SeparateFilesCheckBox_OnClick(object sender, RoutedEventArgs e)
+    {
+        UpdateFileHint();
+        UpdateStatus();
+    }
+
+    private void UpdateFileHint()
+    {
+        FileHintText.Text = SeparateFiles || _items.Count(item => item.IsChecked) <= 1
+            ? "Nazwa pliku = nazwa zestawienia. Gdy plik już istnieje, pojawi się pytanie o nadpisanie."
+            : "Kilka zestawień trafi do jednego pliku \"<model> - zestawienia.xlsx\", każde do osobnego arkusza.";
+    }
+
     private void SearchTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
     {
         string filter = SearchTextBox.Text.Trim();
@@ -109,6 +150,7 @@ public partial class ScheduleExcelExportWindow : Window
 
     private void ScheduleCheckBox_OnClick(object sender, RoutedEventArgs e)
     {
+        UpdateFileHint();
         UpdateStatus();
     }
 
@@ -120,6 +162,7 @@ public partial class ScheduleExcelExportWindow : Window
         {
             0 => $"Zestawień w modelu: {_items.Count}. Zaznacz jedno lub kilka.",
             1 => "Zaznaczono 1 zestawienie.",
+            _ when SeparateFiles => $"Zaznaczono {ticked} zestawień - każde trafi do osobnego pliku.",
             _ => $"Zaznaczono {ticked} zestawień - każde trafi do osobnego arkusza jednego pliku."
         };
     }

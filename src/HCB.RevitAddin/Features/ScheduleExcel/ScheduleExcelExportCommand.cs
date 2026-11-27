@@ -21,28 +21,49 @@ public sealed class ScheduleExcelExportCommand : IExternalCommand
 
         var picked = ScheduleExcelWorkflow.PickSchedules(
             uiDocument,
+            UI.ScheduleExcelWindowMode.Export,
             Title,
-            "Zapisuje zestawienia do pliku .xlsx (każde w osobnym arkuszu) razem z informacją, które elementy tworzą każdy wiersz.",
+            "Zapisuje zestawienia do Excel (.xlsx): do jednego pliku z arkuszem na zestawienie albo do osobnych plików.",
             "Eksportuj");
         if (picked == null)
         {
             return Result.Cancelled;
         }
 
-        (IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options) = picked.Value;
-        IReadOnlyList<ScheduleExcelData>? data = ScheduleExcelWorkflow.Export(uiDocument.Document, schedules, options, Title);
-        if (data == null)
+        (IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options, IReadOnlyList<string> paths) = picked.Value;
+
+        // One workbook with a sheet per schedule, or one workbook per schedule.
+        var files = new List<(string Path, IReadOnlyList<ScheduleExcelData> Data)>();
+        IReadOnlyList<IReadOnlyList<ViewSchedule>> batches = options.SeparateFiles
+            ? schedules.Select(schedule => (IReadOnlyList<ViewSchedule>)new[] { schedule }).ToList()
+            : [schedules];
+        for (int index = 0; index < batches.Count; index++)
         {
-            return Result.Failed;
+            options.FilePath = paths[index];
+            IReadOnlyList<ScheduleExcelData>? data = ScheduleExcelWorkflow.Export(uiDocument.Document, batches[index], options, Title);
+            if (data == null)
+            {
+                return files.Count > 0 ? Result.Succeeded : Result.Failed;
+            }
+
+            files.Add((paths[index], data));
         }
 
-        if (options.OpenAfterExport)
+        if (options.OpenAfterExport && files.Count <= 3)
         {
-            ScheduleExcelWorkflow.OpenFile(options.FilePath, Title);
+            foreach ((string path, _) in files)
+            {
+                ScheduleExcelWorkflow.OpenFile(path, Title);
+            }
+        }
+        else if (options.OpenAfterExport)
+        {
+            // Many files: open the folder instead of a stack of Excel windows.
+            ScheduleExcelWorkflow.OpenFile(Path.GetDirectoryName(files[0].Path)!, Title);
         }
         else
         {
-            TaskDialog.Show(Title, ScheduleExcelWorkflow.Summarize(data, options.FilePath));
+            TaskDialog.Show(Title, string.Join("\n\n", files.Select(file => ScheduleExcelWorkflow.Summarize(file.Data, file.Path))));
         }
 
         return Result.Succeeded;

@@ -25,6 +25,8 @@ internal sealed class ScheduleExcelSettings
 
     public bool AddIdColumn { get; set; }
 
+    public bool SeparateFiles { get; set; }
+
     public static ScheduleExcelSettings Load()
     {
         try

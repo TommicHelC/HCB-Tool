@@ -11,9 +11,13 @@ namespace HCB.RevitAddin.Features.ScheduleExcel;
 /// <summary>Steps shared by the export, sync and import commands.</summary>
 internal static class ScheduleExcelWorkflow
 {
-    /// <summary>Shows the schedule picker (one or many). Null when the user cancels or there is nothing to export.</summary>
-    public static (IReadOnlyList<ViewSchedule> Schedules, ScheduleExcelExportOptions Options)? PickSchedules(
+    /// <summary>
+    /// Shows the schedule picker (one or many). Returns the schedules, the options and the files to write:
+    /// one file, or one per schedule when the export asks for separate files. Null when cancelled.
+    /// </summary>
+    public static (IReadOnlyList<ViewSchedule> Schedules, ScheduleExcelExportOptions Options, IReadOnlyList<string> Paths)? PickSchedules(
         UIDocument uiDocument,
+        ScheduleExcelWindowMode mode,
         string title,
         string description,
         string primaryButton)
@@ -32,6 +36,7 @@ internal static class ScheduleExcelWorkflow
             .ToList();
 
         var window = new ScheduleExcelExportWindow(
+            mode,
             title,
             description,
             primaryButton,
@@ -41,70 +46,89 @@ internal static class ScheduleExcelWorkflow
             settings.OpenAfterExport,
             settings.ProtectReadOnlyCells,
             settings.ExpandGroups,
-            settings.AddIdColumn);
+            settings.AddIdColumn,
+            settings.SeparateFiles);
         if (window.ShowDialog() != true || window.SelectedSchedules.Count == 0)
         {
             return null;
         }
 
+        bool sync = mode == ScheduleExcelWindowMode.Sync;
         settings.LastFolder = window.Folder;
-        settings.OpenAfterExport = window.OpenAfterExport;
-        settings.ProtectReadOnlyCells = window.ProtectReadOnlyCells;
-        settings.ExpandGroups = window.ExpandGroups;
         settings.AddIdColumn = window.AddIdColumn;
+        if (sync)
+        {
+            settings.ProtectReadOnlyCells = window.ProtectReadOnlyCells;
+            settings.ExpandGroups = window.ExpandGroups;
+        }
+        else
+        {
+            settings.OpenAfterExport = window.OpenAfterExport;
+            settings.SeparateFiles = window.SeparateFiles;
+        }
+
         settings.Save();
 
         List<ViewSchedule> picked = window.SelectedSchedules
             .Select(item => (ViewSchedule)document.GetElement(new ElementId(item.Id)))
             .ToList();
-        string fileName = picked.Count == 1 ? picked[0].Name : $"{document.Title} - zestawienia";
+
+        // Editing options belong to Sync; a plain export always writes the schedule as Revit shows it.
         var options = new ScheduleExcelExportOptions
         {
-            FilePath = Path.Combine(window.Folder, ToFileName(fileName) + ".xlsx"),
-            OpenAfterExport = window.OpenAfterExport,
-            ProtectReadOnlyCells = window.ProtectReadOnlyCells,
-            ExpandGroups = window.ExpandGroups,
-            AddIdColumn = window.AddIdColumn
+            OpenAfterExport = sync || window.OpenAfterExport,
+            ProtectReadOnlyCells = sync && window.ProtectReadOnlyCells,
+            ExpandGroups = sync && window.ExpandGroups,
+            AddIdColumn = window.AddIdColumn,
+            SeparateFiles = window.SeparateFiles && picked.Count > 1
         };
 
-        string? path = ConfirmOverwrite(options.FilePath, title);
-        if (path == null)
+        List<string> paths = options.SeparateFiles
+            ? picked.Select(schedule => Path.Combine(window.Folder, ToFileName(schedule.Name) + ".xlsx")).ToList()
+            : [Path.Combine(window.Folder, ToFileName(picked.Count == 1 ? picked[0].Name : $"{document.Title} - zestawienia") + ".xlsx")];
+
+        IReadOnlyList<string>? confirmed = ConfirmOverwrite(paths, title);
+        if (confirmed == null)
         {
             return null;
         }
 
-        options.FilePath = path;
-        return (picked, options);
+        options.FilePath = confirmed[0];
+        return (picked, options, confirmed);
     }
 
     /// <summary>
-    /// Asks before replacing an existing file: overwrite, save under a free name ("Name (2).xlsx") or cancel.
-    /// Returns the path to write, or null when the user cancels.
+    /// Asks once before replacing existing files: overwrite them, save the clashing ones under a free name
+    /// ("Name (2).xlsx") or cancel. Returns the paths to write, or null when the user cancels.
     /// </summary>
-    private static string? ConfirmOverwrite(string path, string title)
+    private static IReadOnlyList<string>? ConfirmOverwrite(IReadOnlyList<string> paths, string title)
     {
-        if (!File.Exists(path))
+        List<string> existing = paths.Where(File.Exists).ToList();
+        if (existing.Count == 0)
         {
-            return path;
+            return paths;
         }
 
-        string alternative = GetFreePath(path);
+        string listed = string.Join("\n", existing.Take(8).Select(Path.GetFileName))
+            + (existing.Count > 8 ? $"\n... i {existing.Count - 8} więcej" : string.Empty);
         var dialog = new TaskDialog(title)
         {
-            MainInstruction = "Plik o tej nazwie już istnieje.",
-            MainContent = $"{path}\n\nZmiany wprowadzone w tym pliku, a niezapisane jeszcze do Revit, zostaną utracone po nadpisaniu.",
+            MainInstruction = existing.Count == 1 ? "Plik o tej nazwie już istnieje." : $"Istnieje już {existing.Count} plików o tych nazwach.",
+            MainContent = $"{Path.GetDirectoryName(existing[0])}\n{listed}\n\nZmiany wprowadzone w tych plikach, a niezapisane jeszcze do Revit, zostaną utracone po nadpisaniu.",
             CommonButtons = TaskDialogCommonButtons.Cancel
         };
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Nadpisz istniejący plik");
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, $"Zapisz jako nowy plik: {Path.GetFileName(alternative)}");
+        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, existing.Count == 1 ? "Nadpisz istniejący plik" : "Nadpisz istniejące pliki");
+        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, existing.Count == 1
+            ? $"Zapisz jako nowy plik: {Path.GetFileName(GetFreePath(existing[0]))}"
+            : "Zapisz jako nowe pliki z numerem, np. \"Nazwa (2).xlsx\"");
 
         // Revit validates DefaultButton against existing buttons, so it can only be set after AddCommandLink.
         dialog.DefaultButton = TaskDialogResult.CommandLink2;
 
         return dialog.Show() switch
         {
-            TaskDialogResult.CommandLink1 => path,
-            TaskDialogResult.CommandLink2 => alternative,
+            TaskDialogResult.CommandLink1 => paths,
+            TaskDialogResult.CommandLink2 => paths.Select(path => File.Exists(path) ? GetFreePath(path) : path).ToList(),
             _ => null
         };
     }

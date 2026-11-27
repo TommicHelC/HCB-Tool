@@ -78,6 +78,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Style="{StaticResource FieldLabelStyle}"
@@ -89,11 +90,13 @@
                         Style="{StaticResource SecondaryButtonStyle}"
                         Content="Wybierz..."
                         Click="BrowseButton_OnClick" />
-                <TextBlock Grid.Row="1"
+                <TextBlock x:Name="FileHintText"
+                           Grid.Row="1"
                            Grid.Column="1"
                            Grid.ColumnSpan="2"
                            Margin="{StaticResource Space.Hint}"
                            Style="{StaticResource HintTextStyle}"
+                           TextWrapping="Wrap"
                            Text="Nazwa pliku = nazwa zestawienia. Gdy plik już istnieje, pojawi się pytanie o nadpisanie." />
 
                 <CheckBox x:Name="OpenAfterExportCheckBox"
@@ -114,7 +117,8 @@
                           Grid.ColumnSpan="2"
                           Margin="{StaticResource Space.Field}"
                           Content="Każdy element w osobnym wierszu (rozwiń wiersze grupowane)" />
-                <TextBlock Grid.Row="5"
+                <TextBlock x:Name="ExpandGroupsHintText"
+                           Grid.Row="5"
                            Grid.Column="1"
                            Grid.ColumnSpan="2"
                            Margin="{StaticResource Space.Hint}"
@@ -126,6 +130,13 @@
                           Grid.ColumnSpan="2"
                           Margin="{StaticResource Space.Field}"
                           Content="Dodaj kolumnę ID elementu (tylko do odczytu)" />
+                <CheckBox x:Name="SeparateFilesCheckBox"
+                          Grid.Row="7"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Każde zestawienie do osobnego pliku"
+                          Click="SeparateFilesCheckBox_OnClick" />
             </Grid>
         </GroupBox>
 

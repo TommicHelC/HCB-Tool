@@ -12,6 +12,9 @@ public sealed class ScheduleExcelExportOptions
     /// <summary>Read-only first column with the element ids of each row.</summary>
     public bool AddIdColumn { get; set; }
 
+    /// <summary>Export only: one workbook per schedule instead of one sheet per schedule.</summary>
+    public bool SeparateFiles { get; set; }
+
     /// <summary>Locks read-only cells. Excel then blocks sorting ranges that contain locked cells.</summary>
     public bool ProtectReadOnlyCells { get; set; }
 }

@@ -34,6 +34,7 @@ public sealed class ScheduleExcelSyncCommand : IExternalCommand
 
         var picked = ScheduleExcelWorkflow.PickSchedules(
             uiDocument,
+            UI.ScheduleExcelWindowMode.Sync,
             Title,
             "Otwiera zestawienia w Excel (każde w osobnym arkuszu). Każde zapisanie pliku (Ctrl+S) przenosi zmiany do Revit.",
             "Start");
@@ -42,7 +43,7 @@ public sealed class ScheduleExcelSyncCommand : IExternalCommand
             return Result.Cancelled;
         }
 
-        (IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options) = picked.Value;
+        (IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options, _) = picked.Value;
         ViewSchedule schedule = schedules[0];
         string sessionName = schedules.Count == 1 ? schedule.Name : $"{schedules.Count} zestawień";
 
