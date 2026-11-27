@@ -325,6 +325,18 @@ def i_schedule_templates():
     return table(2, 2, 23, 20, rows=5, cols=3, head=NAVY) + badge("right", "green")
 
 
+def i_schedule_excel():
+    return table(1, 2, 22, 21, rows=5, cols=3, head=NAVY) + block_arrow_h(15, 31, 24, "green", 5)
+
+
+def i_schedule_excel_sync():
+    return table(1, 2, 22, 21, rows=5, cols=3, head=NAVY) + badge_text("⇄", "green", size=9)
+
+
+def i_schedule_excel_import():
+    return table(9, 2, 22, 21, rows=5, cols=3, head=NAVY) + block_arrow_h(1, 17, 24, "orange", 5)
+
+
 def i_copy_between_projects():
     return (doc(1, 1, 16, 21, lines=3) + doc(12, 7, 17, 22, lines=0) + cube(20.5, 15, 5.2)
             + badge("right", "green"))
@@ -502,6 +514,9 @@ ICONS = {
     "templates": (i_templates, ["Resources/Ribbon/Templates"]),
     "view-templates": (i_view_templates, ["Features/TransferViewTemplates/Resources"]),
     "schedule-templates": (i_schedule_templates, ["Resources/Ribbon/Templates/Schedule"]),
+    "schedule-excel": (i_schedule_excel, ["Features/ScheduleExcel/Resources"]),
+    "schedule-excel-sync": (i_schedule_excel_sync, ["Features/ScheduleExcel/Resources/Sync"]),
+    "schedule-excel-import": (i_schedule_excel_import, ["Features/ScheduleExcel/Resources/Import"]),
     "copy-between-projects": (i_copy_between_projects, ["Features/CopyBetweenProjects/Resources"]),
     "cad-link-vg": (i_cad_link_vg, ["Features/CadLinkGraphicsCopy/Resources"]),
     "without-open": (i_without_open, ["Resources/Ribbon/WithoutOpen"]),

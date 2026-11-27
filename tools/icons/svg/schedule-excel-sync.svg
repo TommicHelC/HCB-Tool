@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+<defs>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E8EEF5"/>
+  </linearGradient>
+  <linearGradient id="blueFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC2F3"/><stop offset="0.45" stop-color="#3194DD"/>
+    <stop offset="1" stop-color="#2477BE"/>
+  </linearGradient>
+  <linearGradient id="steelFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEF3F8"/><stop offset="0.5" stop-color="#D8E2EC"/>
+    <stop offset="1" stop-color="#AFBFD1"/>
+  </linearGradient>
+  <linearGradient id="orangeFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC870"/><stop offset="1" stop-color="#FAA425"/>
+  </linearGradient>
+  <linearGradient id="navyFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A6894"/><stop offset="1" stop-color="#2E466F"/>
+  </linearGradient>
+  <linearGradient id="goldFace" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFD36B"/><stop offset="1" stop-color="#F2A81D"/>
+  </linearGradient>
+</defs>
+<rect x="1.5" y="2.5" width="21" height="20" rx="1" fill="url(#paper)" stroke="#374E6D"/><path d="M1.5,6.5 V3.5 Q1.5,2.5 2.5,2.5 H21.5 Q22.5,2.5 22.5,3.5 V6.5 Z" fill="#2E466F" stroke="#374E6D"/><path d="M2,10.5 H22" stroke="#93A6BD"/><path d="M2,14.5 H22" stroke="#93A6BD"/><path d="M2,18.5 H22" stroke="#93A6BD"/><path d="M8.333333333333332,6.5 V22" stroke="#93A6BD"/><path d="M15.666666666666666,6.5 V22" stroke="#93A6BD"/><circle cx="25" cy="25" r="7.5" fill="#fff"/><circle cx="25" cy="25" r="6.0" fill="#2FA84F" stroke="#1E7A38"/><text x="25" y="28.24" font-family="Segoe UI" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">⇄</text></svg>

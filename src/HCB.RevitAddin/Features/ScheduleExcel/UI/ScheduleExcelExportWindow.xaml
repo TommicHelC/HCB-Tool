@@ -1,0 +1,151 @@
+<Window x:Class="HCB.RevitAddin.Features.ScheduleExcel.UI.ScheduleExcelExportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:HCB.RevitAddin.UI.Controls"
+        Title="Eksport zestawienia do Excel"
+        Width="600"
+        Height="650"
+        MinWidth="500"
+        MinHeight="440"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Style="{DynamicResource HcbWindowStyle}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/HCB.RevitAddin;component/UI/Styles/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Style="{StaticResource DialogRootStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <controls:DialogHeader x:Name="Header"
+                               Title="Eksport zestawienia do Excel"
+                               Description="Zapisuje dane zestawienia do pliku .xlsx razem z informacją, które elementy tworzą każdy wiersz." />
+
+        <GroupBox Grid.Row="1"
+                  Margin="{StaticResource Space.Section}"
+                  Header="Zestawienia">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top"
+                           Margin="0,0,0,4"
+                           Style="{StaticResource SectionLabelStyle}"
+                           Text="Szukaj" />
+                <TextBox x:Name="SearchTextBox"
+                         DockPanel.Dock="Top"
+                         TextChanged="SearchTextBox_OnTextChanged" />
+                <TextBlock x:Name="ScheduleInfoText"
+                           DockPanel.Dock="Bottom"
+                           Margin="{StaticResource Space.Hint}"
+                           Style="{StaticResource HintTextStyle}"
+                           TextWrapping="Wrap" />
+                <ListBox x:Name="ScheduleListBox"
+                         Margin="{StaticResource Space.Field}"
+                         SelectionMode="Single"
+                         SelectionChanged="ScheduleListBox_OnSelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Name}"
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                      Click="ScheduleCheckBox_OnClick" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2"
+                  Margin="{StaticResource Space.Section}"
+                  Header="Plik">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource FormLabelColumnWidth}" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Text="Folder" />
+                <TextBox x:Name="FolderTextBox"
+                         Grid.Column="1" />
+                <Button Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Content="Wybierz..."
+                        Click="BrowseButton_OnClick" />
+                <TextBlock x:Name="FileHintText"
+                           Grid.Row="1"
+                           Grid.Column="1"
+                           Grid.ColumnSpan="2"
+                           Margin="{StaticResource Space.Hint}"
+                           Style="{StaticResource HintTextStyle}"
+                           TextWrapping="Wrap"
+                           Text="Nazwa pliku = nazwa zestawienia. Gdy plik już istnieje, pojawi się pytanie o nadpisanie." />
+
+                <CheckBox x:Name="OpenAfterExportCheckBox"
+                          Grid.Row="2"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Otwórz plik w Excel po eksporcie" />
+                <CheckBox x:Name="ProtectCheckBox"
+                          Grid.Row="3"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Zablokuj komórki tylko do odczytu (Excel wyłączy wtedy sortowanie)" />
+                <CheckBox x:Name="ExpandGroupsCheckBox"
+                          Grid.Row="4"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Każdy element w osobnym wierszu (rozwiń wiersze grupowane)" />
+                <TextBlock x:Name="ExpandGroupsHintText"
+                           Grid.Row="5"
+                           Grid.Column="1"
+                           Grid.ColumnSpan="2"
+                           Margin="{StaticResource Space.Hint}"
+                           Style="{StaticResource HintTextStyle}"
+                           Text="Pozwala edytować pojedyncze elementy w zestawieniach z wyłączonym &quot;Itemize every instance&quot;. Zestawienie w Revit się nie zmienia." />
+                <CheckBox x:Name="IdColumnCheckBox"
+                          Grid.Row="6"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Dodaj kolumnę ID elementu (tylko do odczytu)" />
+                <CheckBox x:Name="SeparateFilesCheckBox"
+                          Grid.Row="7"
+                          Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="{StaticResource Space.Field}"
+                          Content="Każde zestawienie do osobnego pliku"
+                          Click="SeparateFilesCheckBox_OnClick" />
+            </Grid>
+        </GroupBox>
+
+        <controls:DialogFooterBar x:Name="FooterBar"
+                                  Grid.Row="3"
+                                  Margin="{StaticResource Space.Section}"
+                                  PrimaryButtonText="Eksportuj"
+                                  SecondaryButtonText="Anuluj"
+                                  PrimaryButtonClick="ExportButton_OnClick"
+                                  SecondaryButtonClick="CancelButton_OnClick" />
+    </Grid>
+</Window>
