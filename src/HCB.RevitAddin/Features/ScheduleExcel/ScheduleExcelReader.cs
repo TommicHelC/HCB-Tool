@@ -131,12 +131,27 @@ internal sealed class ScheduleExcelReader
         data.Columns.AddRange(visibleFields.Select(reader => reader.Column));
         data.GroupLevels.AddRange(groupLevels);
 
+        // Revit groups by the displayed value: round numbers to the column's format accuracy.
         List<ElementValues> elementValues = elements
             .Select(element => new ElementValues(
                 element,
                 visibleFields.Select(reader => reader.Read(element)).ToArray(),
-                sortFields.Select(sort => sort.Reader.Read(element).Value).ToArray()))
+                sortFields.Select(sort => RoundForDisplay(sort.Reader.Read(element).Value, sort.Reader.Column.DisplayAccuracy)).ToArray()))
             .ToList();
+
+        // Sorting/grouping by a formula field: the API cannot evaluate it, so read each element's value from a
+        // temporarily itemized view (rolled back) - otherwise rows Revit keeps apart would be merged.
+        if (!itemized && sortFields.Any(sort => sort.Reader.Column.FromScheduleText))
+        {
+            try
+            {
+                FillFormulaSortKeys(schedule, data, elementValues, visibleFields, sortFields.Select(sort => sort.Reader).ToList());
+            }
+            catch (Exception exception)
+            {
+                ScheduleExcelLog.Error($"Odczyt formuł do grupowania '{schedule.Name}' nie powiódł się.", exception);
+            }
+        }
 
         IComparer<ElementValues> comparer = new SortKeyComparer(sortFields.Select(sort => sort.Descending).ToArray());
         IEnumerable<IReadOnlyList<ElementValues>> groups = itemized
@@ -239,6 +254,49 @@ internal sealed class ScheduleExcelReader
     /// when the schedule is itemized. Itemize inside a transaction, read the table, roll back - the model and
     /// its undo history stay untouched.
     /// </summary>
+    private static object? RoundForDisplay(object? value, double accuracy)
+    {
+        return value is double number && accuracy > 0 ? Math.Round(number / accuracy) * accuracy : value;
+    }
+
+    private void FillFormulaSortKeys(
+        ViewSchedule schedule,
+        ScheduleExcelData data,
+        List<ElementValues> elementValues,
+        List<FieldReader> visibleFields,
+        List<FieldReader> sortReaders)
+    {
+        var probe = new ScheduleExcelData { ScheduleName = data.ScheduleName, IsItemized = true };
+        probe.Columns.AddRange(data.Columns);
+        var rowOf = new Dictionary<ElementValues, ScheduleExcelRow>();
+        foreach (ElementValues item in elementValues)
+        {
+            var row = new ScheduleExcelRow
+            {
+                Key = item.Element.UniqueId,
+                Values = (ScheduleExcelValue[])item.Values.Clone(),
+                Styles = new ScheduleExcelCellStyle?[item.Values.Length]
+            };
+            probe.Rows.Add(row);
+            rowOf[item] = row;
+        }
+
+        ReadScheduleViewItemized(schedule, probe);
+        for (int sort = 0; sort < sortReaders.Count; sort++)
+        {
+            int visibleIndex = visibleFields.IndexOf(sortReaders[sort]);
+            if (!sortReaders[sort].Column.FromScheduleText || visibleIndex < 0)
+            {
+                continue;
+            }
+
+            foreach (ElementValues item in elementValues)
+            {
+                item.SortKey[sort] = rowOf[item].Values[visibleIndex].Value;
+            }
+        }
+    }
+
     private void ReadScheduleViewItemized(ViewSchedule schedule, ScheduleExcelData data)
     {
         if (_document.IsReadOnly || _document.IsModifiable)
@@ -341,10 +399,15 @@ internal sealed class ScheduleExcelReader
             .Where(column => !data.Columns[column].FromScheduleText
                 && data.Columns[column].ValueKind is not ScheduleExcelValueKind.YesNo)
             .ToArray();
+        // Exact key: real strings and element names only. Enum-like texts come from the API in English while the
+        // view may show them translated, so they are not compared at all.
         int[] textKeyColumns = compareColumns
-            .Where(column => data.Columns[column].ValueKind is ScheduleExcelValueKind.Text or ScheduleExcelValueKind.ElementId)
+            .Where(column => data.Columns[column].ValueKind == ScheduleExcelValueKind.ElementId
+                || data.Columns[column].ValueKind == ScheduleExcelValueKind.Text && data.Columns[column].StorageType == nameof(StorageType.String))
             .ToArray();
-        int[] numberColumns = compareColumns.Except(textKeyColumns).ToArray();
+        int[] numberColumns = compareColumns
+            .Where(column => data.Columns[column].ValueKind is ScheduleExcelValueKind.Number or ScheduleExcelValueKind.Integer)
+            .ToArray();
         if (compareColumns.Length == 0)
         {
             return;
@@ -367,6 +430,7 @@ internal sealed class ScheduleExcelReader
         int[] textColumns = Enumerable.Range(0, columnCount).Where(column => data.Columns[column].FromScheduleText).ToArray();
         var texts = new Dictionary<(ScheduleExcelRow Row, int Column), string>();
         int matched = 0;
+        var matchedRows = new HashSet<ScheduleExcelRow>();
         var unmatchedSamples = new List<string>();
         for (int bodyRow = headingRow + 1; bodyRow < body.NumberOfRows; bodyRow++)
         {
@@ -379,8 +443,16 @@ internal sealed class ScheduleExcelReader
 
             string key = string.Join("\u001F", textKeyColumns.Select(column => cellTexts[column]));
             ScheduleExcelRow? row = candidates.TryGetValue(key, out List<ScheduleExcelRow>? list)
-                ? list.FirstOrDefault(candidate => numberColumns.All(column => NumberMatches(cellTexts[column], candidate.Values[column])))
+                ? BestCandidate(list, numberColumns, cellTexts, data.Columns)
                 : null;
+
+            // Fallback for rows whose key text differs in the view ("Not Placed", translated values...):
+            // best overall agreement on every compared column, at least 60 %.
+            if (row == null)
+            {
+                row = BestOverall(data.Rows, matchedRows, textKeyColumns, numberColumns, cellTexts, data.Columns);
+                list = row == null ? null : candidates.Values.FirstOrDefault(bucket => bucket.Contains(row));
+            }
             if (row == null)
             {
                 if (unmatchedSamples.Count < 5)
@@ -391,7 +463,8 @@ internal sealed class ScheduleExcelReader
                 continue;
             }
 
-            list!.Remove(row);
+            list?.Remove(row);
+            matchedRows.Add(row);
             matched++;
             for (int column = 0; column < columnCount; column++)
             {
@@ -417,8 +490,91 @@ internal sealed class ScheduleExcelReader
             + $"dopasowano {matched}/{data.Rows.Count}. Nasze: {ourSamples}. Niedopasowane z Revit: {string.Join(" ; ", unmatchedSamples)}");
     }
 
+    /// <summary>
+    /// The candidate whose numbers agree with the most view cells. Some numbers never agree (e.g. "not computed"
+    /// shown as text), so 60 % of the number columns is enough; ties keep schedule order.
+    /// </summary>
+    private static ScheduleExcelRow? BestCandidate(
+        List<ScheduleExcelRow> candidates,
+        int[] numberColumns,
+        Dictionary<int, string> cellTexts,
+        List<ScheduleExcelColumn> columns)
+    {
+        if (numberColumns.Length == 0)
+        {
+            return candidates.FirstOrDefault();
+        }
+
+        // Cells the view shows as text ("Calculating...", "Not Computed") cannot be compared - leave them out.
+        int[] comparable = numberColumns.Where(column => IsComparableNumber(cellTexts[column])).ToArray();
+        if (comparable.Length == 0)
+        {
+            return candidates.FirstOrDefault();
+        }
+
+        ScheduleExcelRow? best = null;
+        int bestScore = -1;
+        foreach (ScheduleExcelRow candidate in candidates)
+        {
+            int score = comparable.Count(column => NumberMatches(cellTexts[column], candidate.Values[column], columns[column].DisplayAccuracy));
+            if (score > bestScore)
+            {
+                best = candidate;
+                bestScore = score;
+                if (score == comparable.Length)
+                {
+                    break;
+                }
+            }
+        }
+
+        return bestScore >= Math.Ceiling(comparable.Length * 0.6) ? best : null;
+    }
+
+    private static bool IsComparableNumber(string text)
+    {
+        return string.IsNullOrWhiteSpace(text) || TryParseDisplayNumber(text, out _, out _);
+    }
+
+    private static ScheduleExcelRow? BestOverall(
+        List<ScheduleExcelRow> rows,
+        HashSet<ScheduleExcelRow> matchedRows,
+        int[] textColumns,
+        int[] numberColumns,
+        Dictionary<int, string> cellTexts,
+        List<ScheduleExcelColumn> columns)
+    {
+        int[] texts = textColumns.Where(column => cellTexts[column].Length > 0).ToArray();
+        int[] numbers = numberColumns.Where(column => cellTexts[column].Length > 0 && IsComparableNumber(cellTexts[column])).ToArray();
+        int total = texts.Length + numbers.Length;
+        if (total < 2)
+        {
+            return null;
+        }
+
+        ScheduleExcelRow? best = null;
+        int bestScore = -1;
+        foreach (ScheduleExcelRow row in rows)
+        {
+            if (matchedRows.Contains(row))
+            {
+                continue;
+            }
+
+            int score = texts.Count(column => !row.Values[column].Mixed && ToDisplayText(row.Values[column].Value) == cellTexts[column])
+                + numbers.Count(column => NumberMatches(cellTexts[column], row.Values[column], columns[column].DisplayAccuracy));
+            if (score > bestScore)
+            {
+                best = row;
+                bestScore = score;
+            }
+        }
+
+        return bestScore >= Math.Max(2, Math.Ceiling(total * 0.6)) ? best : null;
+    }
+
     /// <summary>Revit display text vs our value: numbers equal within the precision Revit shows.</summary>
-    private static bool NumberMatches(string text, ScheduleExcelValue value)
+    private static bool NumberMatches(string text, ScheduleExcelValue value, double accuracy = 0)
     {
         if (value.Mixed)
         {
@@ -435,7 +591,8 @@ internal sealed class ScheduleExcelReader
             return false;
         }
 
-        double tolerance = 0.5 * Math.Pow(10, -decimals) + 1e-9 * Math.Max(1, Math.Abs(number));
+        // Revit rounds to the format accuracy, which can be 0.5 or 5, not only a power of ten.
+        double tolerance = Math.Max(0.5 * Math.Pow(10, -decimals), accuracy / 2) + 1e-9 * Math.Max(1, Math.Abs(number));
         return Math.Abs(number - shown) <= tolerance;
     }
 
@@ -693,9 +850,10 @@ internal sealed class ScheduleExcelReader
         string unitLabel = string.Empty;
         string numberFormat = string.Empty;
         ForgeTypeId? unit = null;
+        double accuracy = 0;
         if (kind == ScheduleExcelValueKind.Number)
         {
-            (unit, unitLabel, numberFormat) = GetDisplayUnit(field, spec);
+            (unit, unitLabel, numberFormat, accuracy) = GetDisplayUnit(field, spec);
             unitTypeId = unit?.TypeId ?? string.Empty;
         }
         else if (kind == ScheduleExcelValueKind.Integer)
@@ -736,7 +894,8 @@ internal sealed class ScheduleExcelReader
             ReadOnlyReason = readOnlyReason,
             TotalFunction = totalFunction,
             BodyStyle = bodyStyle,
-            Choices = choices
+            Choices = choices,
+            DisplayAccuracy = accuracy
         };
 
         return new FieldReader(column, element => ScheduleExcelParameterLookup.ReadValue(lookup.Get(ScheduleExcelParameterLookup.GetTarget(_document, element, isType)), kind, unit));
@@ -833,13 +992,13 @@ internal sealed class ScheduleExcelReader
         }
     }
 
-    private (ForgeTypeId? Unit, string Label, string NumberFormat) GetDisplayUnit(ScheduleField field, ForgeTypeId spec)
+    private (ForgeTypeId? Unit, string Label, string NumberFormat, double Accuracy) GetDisplayUnit(ScheduleField field, ForgeTypeId spec)
     {
         try
         {
             if (spec.Empty() || !UnitUtils.IsMeasurableSpec(spec))
             {
-                return (null, string.Empty, "0.###");
+                return (null, string.Empty, "0.###", 0);
             }
 
             FormatOptions options = field.GetFormatOptions();
@@ -849,12 +1008,12 @@ internal sealed class ScheduleExcelReader
             }
 
             ForgeTypeId unit = options.GetUnitTypeId();
-            return (unit, GetUnitSymbol(options, unit), ToNumberFormat(options.Accuracy));
+            return (unit, GetUnitSymbol(options, unit), ToNumberFormat(options.Accuracy), options.Accuracy);
         }
         catch (Exception)
         {
             // Unit lookup must never stop the export; write internal units instead.
-            return (null, string.Empty, "0.###");
+            return (null, string.Empty, "0.###", 0);
         }
     }
 

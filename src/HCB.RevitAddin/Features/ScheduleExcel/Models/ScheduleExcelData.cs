@@ -71,6 +71,9 @@ public sealed class ScheduleExcelColumn
     /// <summary>Allowed display values for a reference column (types, levels...); shown as a drop-down.</summary>
     public List<string> Choices { get; init; } = [];
 
+    /// <summary>Rounding step of the displayed number (format accuracy), e.g. 0.01 or 0.5.</summary>
+    public double DisplayAccuracy { get; init; }
+
     public ScheduleExcelCellStyle? HeaderStyle { get; set; }
 
     public ScheduleExcelCellStyle? BodyStyle { get; set; }

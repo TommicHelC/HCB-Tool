@@ -280,7 +280,16 @@ internal static class ScheduleExcelApplier
 
         if (ScheduleExcelReferences.IsTypeChange(operation.Parameter))
         {
-            return operation.Target.GetTypeId() == id || operation.Target.ChangeTypeId(id) != ElementId.InvalidElementId;
+            if (operation.Target.GetTypeId() == id)
+            {
+                return true;
+            }
+
+            // ChangeTypeId returns InvalidElementId when the element keeps its id (the normal case) and a new id
+            // only when it had to be replaced (e.g. groups) - so check the resulting type instead.
+            ElementId newId = operation.Target.ChangeTypeId(id);
+            Element? changed = newId != ElementId.InvalidElementId ? document.GetElement(newId) : operation.Target;
+            return changed?.GetTypeId() == id;
         }
 
         return operation.Parameter.Set(id);
