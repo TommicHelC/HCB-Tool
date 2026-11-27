@@ -5,9 +5,9 @@
 # HCB Tools dla Revit
 
 **Natywna wtyczka C# dla Autodesk Revit, stworzona dla projektantów instalacji HVAC i MEP.**<br>
-Numeracja, filtry, parametry, przestrzenie, edycja tras i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.
+Numeracja, filtry, parametry, przestrzenie, edycja tras, zestawienia w Excelu i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.
 
-<img src="https://img.shields.io/badge/Revit%202025%20%7C%202026%20%7C%202027-0696d7?style=flat-square" alt="Revit 2025 | 2026 | 2027"> <img src="https://img.shields.io/badge/56%20narz%C4%99dzi-e11d48?style=flat-square" alt="56 narzędzi"> <img src="https://img.shields.io/badge/6%20paneli-475569?style=flat-square" alt="6 paneli"> <img src="https://img.shields.io/badge/.NET%208%20%7C%2010-512bd4?style=flat-square" alt=".NET 8 | 10"> <img src="https://img.shields.io/badge/Windows%20x64-0078d4?style=flat-square" alt="Windows x64"> <img src="https://img.shields.io/badge/Instalator%20MSI-16a34a?style=flat-square" alt="Instalator MSI">
+<img src="https://img.shields.io/badge/Revit%202025%20%7C%202026%20%7C%202027-0696d7?style=flat-square" alt="Revit 2025 | 2026 | 2027"> <img src="https://img.shields.io/badge/59%20narz%C4%99dzi-e11d48?style=flat-square" alt="59 narzędzi"> <img src="https://img.shields.io/badge/6%20paneli-475569?style=flat-square" alt="6 paneli"> <img src="https://img.shields.io/badge/.NET%208%20%7C%2010-512bd4?style=flat-square" alt=".NET 8 | 10"> <img src="https://img.shields.io/badge/Windows%20x64-0078d4?style=flat-square" alt="Windows x64"> <img src="https://img.shields.io/badge/Instalator%20MSI-16a34a?style=flat-square" alt="Instalator MSI">
 
 <a href="#narzedzia"><b>Narzędzia</b></a> &nbsp;·&nbsp; <a href="#instalacja"><b>Instalacja</b></a> &nbsp;·&nbsp; <a href="#dla-deweloperow"><b>Dla deweloperów</b></a> &nbsp;·&nbsp; <a href="#dokumentacja"><b>Dokumentacja</b></a>
 
@@ -17,7 +17,7 @@ Numeracja, filtry, parametry, przestrzenie, edycja tras i operacje wsadowe na pl
 
 <br>
 
-<a href="#copy-filters" title="Copy Filters"><img src="src/HCB.RevitAddin/Features/CopyFilters/Resources/icon32.png" width="32" alt="Copy Filters"></a> <a href="#bulk-edit" title="Bulk Edit"><img src="src/HCB.RevitAddin/Features/ViewFiltersBulkEdit/Resources/icon32.png" width="32" alt="Bulk Edit"></a> <a href="#levels" title="Levels"><img src="src/HCB.RevitAddin/Features/Levels/Resources/icon32.png" width="32" alt="Levels"></a> <a href="#rename-views" title="Rename Views"><img src="src/HCB.RevitAddin/Features/RenameViews/Resources/icon32.png" width="32" alt="Rename Views"></a> <a href="#rename-sheets" title="Rename Sheets"><img src="src/HCB.RevitAddin/Features/RenameSheets/Resources/icon32.png" width="32" alt="Rename Sheets"></a> <a href="#manual-num" title="Manual Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Manual/icon32.png" width="32" alt="Manual Num"></a> <a href="#ductandfit-num" title="Duct&Fit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctAndFit/icon32.png" width="32" alt="Duct&Fit Num"></a> <a href="#duct-num" title="Duct Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Duct/icon32.png" width="32" alt="Duct Num"></a> <a href="#ductfit-num" title="DuctFit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctFitting/icon32.png" width="32" alt="DuctFit Num"></a> <a href="#duct-acc-num" title="Duct Acc Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/MepItems/icon32.png" width="32" alt="Duct Acc Num"></a> <a href="#space-params" title="Space Params"><img src="src/HCB.RevitAddin/Features/SpaceParamLinked/Resources/icon32.png" width="32" alt="Space Params"></a> <a href="#space-to-element" title="Space To Element"><img src="src/HCB.RevitAddin/Features/SpaceToElement/Resources/icon32.png" width="32" alt="Space To Element"></a> <a href="#space-cleanup" title="Space Cleanup"><img src="src/HCB.RevitAddin/Features/SpaceCleanup/Resources/icon32.png" width="32" alt="Space Cleanup"></a> <a href="#unique-colors" title="Unique Colors"><img src="src/HCB.RevitAddin/Features/ColorUniqueSystems/Resources/icon32.png" width="32" alt="Unique Colors"></a> <a href="#flow" title="Flow"><img src="src/HCB.RevitAddin/Features/FlowChanger/Resources/icon32.png" width="32" alt="Flow"></a> <a href="#velocity" title="Velocity"><img src="src/HCB.RevitAddin/Features/VelocitySizer/Resources/icon32.png" width="32" alt="Velocity"></a> <a href="#hvac-tags" title="HVAC Tags"><img src="src/HCB.RevitAddin/Features/HvacTagging/Resources/icon32.png" width="32" alt="HVAC Tags"></a> <a href="#fittings-angle" title="Fittings Angle"><img src="src/HCB.RevitAddin/Features/FittingsAngle/Resources/icon32.png" width="32" alt="Fittings Angle"></a> <a href="#level-from-hvac" title="Level From HVAC"><img src="src/HCB.RevitAddin/Features/LevelFromHVACElements/Resources/icon32.png" width="32" alt="Level From HVAC"></a> <a href="#system-assigner" title="System Assigner"><img src="src/HCB.RevitAddin/Features/SystemAssigner/Resources/icon32.png" width="32" alt="System Assigner"></a> <a href="#mass" title="Mass"><img src="src/HCB.RevitAddin/Features/MassOfDuctsFittings/Resources/icon32.png" width="32" alt="Mass"></a> <a href="#estimate" title="Estimate"><img src="src/HCB.RevitAddin/Features/Estimate/Resources/icon32.png" width="32" alt="Estimate"></a> <a href="#splitter" title="Splitter"><img src="src/HCB.RevitAddin/Features/Splitter/Resources/icon32.png" width="32" alt="Splitter"></a> <a href="#area-lin" title="Area LIN"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Lin/icon32.png" width="32" alt="Area LIN"></a> <a href="#area-mc" title="Area MC"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Mc/icon32.png" width="32" alt="Area MC"></a> <a href="#rotate-fittings" title="Rotate Fittings"><img src="src/HCB.RevitAddin/Features/RotateFittings/Resources/icon32.png" width="32" alt="Rotate Fittings"></a> <a href="#connect" title="Connect"><img src="src/HCB.RevitAddin/Features/ConnectElements/Resources/icon32.png" width="32" alt="Connect"></a> <a href="#extend-0-5-m" title="Extend 0.5 m"><img src="src/HCB.RevitAddin/Features/ConnectorExtend/Resources/icon32.png" width="32" alt="Extend 0.5 m"></a> <a href="#align-to-axis" title="Align To Axis"><img src="src/HCB.RevitAddin/Features/AlignToAxis/Resources/icon32.png" width="32" alt="Align To Axis"></a> <a href="#elbow-up" title="Elbow Up"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Up/icon32.png" width="32" alt="Elbow Up"></a> <a href="#elbow-45" title="Elbow 45"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Side45/icon32.png" width="32" alt="Elbow 45"></a> <a href="#unhide-all" title="Unhide All"><img src="src/HCB.RevitAddin/Features/UnhideAllElements/Resources/icon32.png" width="32" alt="Unhide All"></a> <a href="#duplicate-views" title="Duplicate Views"><img src="src/HCB.RevitAddin/Features/ViewsDuplicate/Resources/icon32.png" width="32" alt="Duplicate Views"></a> <a href="#view-templates" title="View Templates"><img src="src/HCB.RevitAddin/Features/TransferViewTemplates/Resources/icon32.png" width="32" alt="View Templates"></a> <a href="#schedule-templates" title="Schedule Templates"><img src="src/HCB.RevitAddin/Resources/Ribbon/Templates/Schedule/icon32.png" width="32" alt="Schedule Templates"></a> <a href="#filters-legend" title="Filters Legend"><img src="src/HCB.RevitAddin/Features/ViewFiltersLegend/Resources/icon32.png" width="32" alt="Filters Legend"></a> <a href="#cad-link-vg" title="CAD Link VG"><img src="src/HCB.RevitAddin/Features/CadLinkGraphicsCopy/Resources/icon32.png" width="32" alt="CAD Link VG"></a> <a href="#scan-files" title="Scan Files"><img src="src/HCB.RevitAddin/Features/BatchFileScan/Resources/icon32.png" width="32" alt="Scan Files"></a> <a href="#unload-links" title="Unload Links"><img src="src/HCB.RevitAddin/Features/UnloadLinks/Resources/icon32.png" width="32" alt="Unload Links"></a> <a href="#family-report" title="Family Report"><img src="src/HCB.RevitAddin/Features/FamilyParameterReport/Resources/icon32.png" width="32" alt="Family Report"></a> <a href="#viewer-export" title="Viewer Export"><img src="src/HCB.RevitAddin/Features/ViewerExport/Resources/icon32.png" width="32" alt="Viewer Export"></a> <a href="#upgrade-copy" title="Upgrade Copy"><img src="src/HCB.RevitAddin/Features/UpgradeAndCopy/Resources/icon32.png" width="32" alt="Upgrade Copy"></a> <a href="#add-shared" title="Add Shared"><img src="src/HCB.RevitAddin/Features/BatchAddSharedFamilyParameters/Resources/icon32.png" width="32" alt="Add Shared"></a> <a href="#rename-family-params" title="Rename Family Params"><img src="src/HCB.RevitAddin/Features/RenameFamilyContent/Resources/icon32.png" width="32" alt="Rename Family Params"></a> <a href="#shared-params" title="Shared Params"><img src="src/HCB.RevitAddin/Features/SharedParameters/Resources/icon32.png" width="32" alt="Shared Params"></a> <a href="#param-audit" title="Param Audit"><img src="src/HCB.RevitAddin/Features/ProjectParameterAudit/Resources/icon32.png" width="32" alt="Param Audit"></a> <a href="#param-service" title="Param Service"><img src="src/HCB.RevitAddin/Features/ParameterService/Resources/icon32.png" width="32" alt="Param Service"></a> <a href="#calculator" title="Calculator"><img src="src/HCB.RevitAddin/Features/ParameterCalculator/Resources/icon32.png" width="32" alt="Calculator"></a> <a href="#clear-param" title="Clear Param"><img src="src/HCB.RevitAddin/Features/ParameterClear/Resources/icon32.png" width="32" alt="Clear Param"></a> <a href="#copy-param" title="Copy Param"><img src="src/HCB.RevitAddin/Features/ParameterCopy/Resources/icon32.png" width="32" alt="Copy Param"></a> <a href="#copy-between-projects" title="Copy Between Projects"><img src="src/HCB.RevitAddin/Features/CopyBetweenProjects/Resources/icon32.png" width="32" alt="Copy Between Projects"></a> <a href="#purge-anno" title="Purge Anno"><img src="src/HCB.RevitAddin/Features/PurgeAnnotations/Resources/icon32.png" width="32" alt="Purge Anno"></a> <a href="#hc-wire" title="HC Wire"><img src="src/HCB.RevitAddin/Features/HCWireSize/Resources/icon32.png" width="32" alt="HC Wire"></a> <a href="#rename-materials" title="Rename Materials"><img src="src/HCB.RevitAddin/Features/RenameMaterials/Resources/icon32.png" width="32" alt="Rename Materials"></a> <a href="#ribbon-manager" title="Ribbon Manager"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/icon32.png" width="32" alt="Ribbon Manager"></a> <a href="#short-names" title="Short Names"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/ShortNames/icon32.png" width="32" alt="Short Names"></a>
+<a href="#copy-filters" title="Copy Filters"><img src="src/HCB.RevitAddin/Features/CopyFilters/Resources/icon32.png" width="32" alt="Copy Filters"></a> <a href="#bulk-edit" title="Bulk Edit"><img src="src/HCB.RevitAddin/Features/ViewFiltersBulkEdit/Resources/icon32.png" width="32" alt="Bulk Edit"></a> <a href="#levels" title="Levels"><img src="src/HCB.RevitAddin/Features/Levels/Resources/icon32.png" width="32" alt="Levels"></a> <a href="#rename-views" title="Rename Views"><img src="src/HCB.RevitAddin/Features/RenameViews/Resources/icon32.png" width="32" alt="Rename Views"></a> <a href="#rename-sheets" title="Rename Sheets"><img src="src/HCB.RevitAddin/Features/RenameSheets/Resources/icon32.png" width="32" alt="Rename Sheets"></a> <a href="#manual-num" title="Manual Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Manual/icon32.png" width="32" alt="Manual Num"></a> <a href="#ductandfit-num" title="Duct&Fit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctAndFit/icon32.png" width="32" alt="Duct&Fit Num"></a> <a href="#duct-num" title="Duct Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/Duct/icon32.png" width="32" alt="Duct Num"></a> <a href="#ductfit-num" title="DuctFit Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/DuctFitting/icon32.png" width="32" alt="DuctFit Num"></a> <a href="#duct-acc-num" title="Duct Acc Num"><img src="src/HCB.RevitAddin/Resources/Ribbon/Numbering/MepItems/icon32.png" width="32" alt="Duct Acc Num"></a> <a href="#space-params" title="Space Params"><img src="src/HCB.RevitAddin/Features/SpaceParamLinked/Resources/icon32.png" width="32" alt="Space Params"></a> <a href="#space-to-element" title="Space To Element"><img src="src/HCB.RevitAddin/Features/SpaceToElement/Resources/icon32.png" width="32" alt="Space To Element"></a> <a href="#space-cleanup" title="Space Cleanup"><img src="src/HCB.RevitAddin/Features/SpaceCleanup/Resources/icon32.png" width="32" alt="Space Cleanup"></a> <a href="#unique-colors" title="Unique Colors"><img src="src/HCB.RevitAddin/Features/ColorUniqueSystems/Resources/icon32.png" width="32" alt="Unique Colors"></a> <a href="#flow" title="Flow"><img src="src/HCB.RevitAddin/Features/FlowChanger/Resources/icon32.png" width="32" alt="Flow"></a> <a href="#velocity" title="Velocity"><img src="src/HCB.RevitAddin/Features/VelocitySizer/Resources/icon32.png" width="32" alt="Velocity"></a> <a href="#hvac-tags" title="HVAC Tags"><img src="src/HCB.RevitAddin/Features/HvacTagging/Resources/icon32.png" width="32" alt="HVAC Tags"></a> <a href="#fittings-angle" title="Fittings Angle"><img src="src/HCB.RevitAddin/Features/FittingsAngle/Resources/icon32.png" width="32" alt="Fittings Angle"></a> <a href="#level-from-hvac" title="Level From HVAC"><img src="src/HCB.RevitAddin/Features/LevelFromHVACElements/Resources/icon32.png" width="32" alt="Level From HVAC"></a> <a href="#system-assigner" title="System Assigner"><img src="src/HCB.RevitAddin/Features/SystemAssigner/Resources/icon32.png" width="32" alt="System Assigner"></a> <a href="#mass" title="Mass"><img src="src/HCB.RevitAddin/Features/MassOfDuctsFittings/Resources/icon32.png" width="32" alt="Mass"></a> <a href="#estimate" title="Estimate"><img src="src/HCB.RevitAddin/Features/Estimate/Resources/icon32.png" width="32" alt="Estimate"></a> <a href="#splitter" title="Splitter"><img src="src/HCB.RevitAddin/Features/Splitter/Resources/icon32.png" width="32" alt="Splitter"></a> <a href="#area-lin" title="Area LIN"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Lin/icon32.png" width="32" alt="Area LIN"></a> <a href="#area-mc" title="Area MC"><img src="src/HCB.RevitAddin/Resources/Ribbon/Area/Mc/icon32.png" width="32" alt="Area MC"></a> <a href="#rotate-fittings" title="Rotate Fittings"><img src="src/HCB.RevitAddin/Features/RotateFittings/Resources/icon32.png" width="32" alt="Rotate Fittings"></a> <a href="#connect" title="Connect"><img src="src/HCB.RevitAddin/Features/ConnectElements/Resources/icon32.png" width="32" alt="Connect"></a> <a href="#extend-0-5-m" title="Extend 0.5 m"><img src="src/HCB.RevitAddin/Features/ConnectorExtend/Resources/icon32.png" width="32" alt="Extend 0.5 m"></a> <a href="#align-to-axis" title="Align To Axis"><img src="src/HCB.RevitAddin/Features/AlignToAxis/Resources/icon32.png" width="32" alt="Align To Axis"></a> <a href="#elbow-up" title="Elbow Up"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Up/icon32.png" width="32" alt="Elbow Up"></a> <a href="#elbow-45" title="Elbow 45"><img src="src/HCB.RevitAddin/Features/ElbowBranch/Resources/Side45/icon32.png" width="32" alt="Elbow 45"></a> <a href="#unhide-all" title="Unhide All"><img src="src/HCB.RevitAddin/Features/UnhideAllElements/Resources/icon32.png" width="32" alt="Unhide All"></a> <a href="#duplicate-views" title="Duplicate Views"><img src="src/HCB.RevitAddin/Features/ViewsDuplicate/Resources/icon32.png" width="32" alt="Duplicate Views"></a> <a href="#view-templates" title="View Templates"><img src="src/HCB.RevitAddin/Features/TransferViewTemplates/Resources/icon32.png" width="32" alt="View Templates"></a> <a href="#schedule-templates" title="Schedule Templates"><img src="src/HCB.RevitAddin/Resources/Ribbon/Templates/Schedule/icon32.png" width="32" alt="Schedule Templates"></a> <a href="#filters-legend" title="Filters Legend"><img src="src/HCB.RevitAddin/Features/ViewFiltersLegend/Resources/icon32.png" width="32" alt="Filters Legend"></a> <a href="#excel-sync" title="Excel Sync"><img src="docs/images/icons/ScheduleExcel-Sync-icon32.png" width="32" alt="Excel Sync"></a> <a href="#export-to-excel" title="Export to Excel"><img src="docs/images/icons/ScheduleExcel-icon32.png" width="32" alt="Export to Excel"></a> <a href="#import-from-excel" title="Import from Excel"><img src="docs/images/icons/ScheduleExcel-Import-icon32.png" width="32" alt="Import from Excel"></a> <a href="#cad-link-vg" title="CAD Link VG"><img src="src/HCB.RevitAddin/Features/CadLinkGraphicsCopy/Resources/icon32.png" width="32" alt="CAD Link VG"></a> <a href="#scan-files" title="Scan Files"><img src="src/HCB.RevitAddin/Features/BatchFileScan/Resources/icon32.png" width="32" alt="Scan Files"></a> <a href="#unload-links" title="Unload Links"><img src="src/HCB.RevitAddin/Features/UnloadLinks/Resources/icon32.png" width="32" alt="Unload Links"></a> <a href="#family-report" title="Family Report"><img src="src/HCB.RevitAddin/Features/FamilyParameterReport/Resources/icon32.png" width="32" alt="Family Report"></a> <a href="#viewer-export" title="Viewer Export"><img src="src/HCB.RevitAddin/Features/ViewerExport/Resources/icon32.png" width="32" alt="Viewer Export"></a> <a href="#upgrade-copy" title="Upgrade Copy"><img src="src/HCB.RevitAddin/Features/UpgradeAndCopy/Resources/icon32.png" width="32" alt="Upgrade Copy"></a> <a href="#add-shared" title="Add Shared"><img src="src/HCB.RevitAddin/Features/BatchAddSharedFamilyParameters/Resources/icon32.png" width="32" alt="Add Shared"></a> <a href="#rename-family-params" title="Rename Family Params"><img src="src/HCB.RevitAddin/Features/RenameFamilyContent/Resources/icon32.png" width="32" alt="Rename Family Params"></a> <a href="#shared-params" title="Shared Params"><img src="src/HCB.RevitAddin/Features/SharedParameters/Resources/icon32.png" width="32" alt="Shared Params"></a> <a href="#param-audit" title="Param Audit"><img src="src/HCB.RevitAddin/Features/ProjectParameterAudit/Resources/icon32.png" width="32" alt="Param Audit"></a> <a href="#param-service" title="Param Service"><img src="src/HCB.RevitAddin/Features/ParameterService/Resources/icon32.png" width="32" alt="Param Service"></a> <a href="#calculator" title="Calculator"><img src="src/HCB.RevitAddin/Features/ParameterCalculator/Resources/icon32.png" width="32" alt="Calculator"></a> <a href="#clear-param" title="Clear Param"><img src="src/HCB.RevitAddin/Features/ParameterClear/Resources/icon32.png" width="32" alt="Clear Param"></a> <a href="#copy-param" title="Copy Param"><img src="src/HCB.RevitAddin/Features/ParameterCopy/Resources/icon32.png" width="32" alt="Copy Param"></a> <a href="#copy-between-projects" title="Copy Between Projects"><img src="src/HCB.RevitAddin/Features/CopyBetweenProjects/Resources/icon32.png" width="32" alt="Copy Between Projects"></a> <a href="#purge-anno" title="Purge Anno"><img src="src/HCB.RevitAddin/Features/PurgeAnnotations/Resources/icon32.png" width="32" alt="Purge Anno"></a> <a href="#hc-wire" title="HC Wire"><img src="src/HCB.RevitAddin/Features/HCWireSize/Resources/icon32.png" width="32" alt="HC Wire"></a> <a href="#rename-materials" title="Rename Materials"><img src="src/HCB.RevitAddin/Features/RenameMaterials/Resources/icon32.png" width="32" alt="Rename Materials"></a> <a href="#ribbon-manager" title="Ribbon Manager"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/icon32.png" width="32" alt="Ribbon Manager"></a> <a href="#short-names" title="Short Names"><img src="src/HCB.RevitAddin/Features/RibbonManager/Resources/ShortNames/icon32.png" width="32" alt="Short Names"></a>
 
 <sub>Kliknij ikonę, aby przejść do opisu narzędzia.</sub>
 
@@ -102,14 +102,14 @@ Ribbon Manager ukrywa, łączy i przenosi karty oraz panele, także innych wtycz
 
 ## 🧰 Narzędzia
 
-Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na każdym zrzucie **czerwona ramka** pokazuje, gdzie na wstążce znajduje się opisywane narzędzie.
+Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **59 narzędziami**. Na każdym zrzucie **czerwona ramka** pokazuje, gdzie na wstążce znajduje się opisywane narzędzie.
 
 <table>
 <tr>
 <td align="center" valign="top"><a href="#panel-modify"><b>✏️<br>Modify</b></a><br><sub>10 narzędzi</sub></td>
 <td align="center" valign="top"><a href="#panel-hvac"><b>🌬️<br>HVAC</b></a><br><sub>15 narzędzi</sub></td>
 <td align="center" valign="top"><a href="#panel-mep-modify"><b>🔧<br>MEP Modify</b></a><br><sub>6 narzędzi</sub></td>
-<td align="center" valign="top"><a href="#panel-views"><b>🖼️<br>Views</b></a><br><sub>6 narzędzi</sub></td>
+<td align="center" valign="top"><a href="#panel-views"><b>🖼️<br>Views</b></a><br><sub>9 narzędzi</sub></td>
 <td align="center" valign="top"><a href="#panel-withoutopen"><b>📦<br>WithoutOpen</b></a><br><sub>7 narzędzi</sub></td>
 <td align="center" valign="top"><a href="#panel-manage"><b>⚙️<br>Manage</b></a><br><sub>12 narzędzi</sub></td>
 </tr>
@@ -1167,7 +1167,7 @@ Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na k
 
 ## 🖼️ Panel Views
 
-<img src="https://img.shields.io/badge/6%20narz%C4%99dzi-059669?style=flat-square" alt="6 narzędzi">
+<img src="https://img.shields.io/badge/9%20narz%C4%99dzi-059669?style=flat-square" alt="9 narzędzi">
 
 > Praca z widokami: odkrywanie, duplikowanie, szablony, legendy filtrów, zestawienia w Excelu i grafika linków CAD.
 
@@ -1181,6 +1181,10 @@ Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na k
 <tr><td><img src="src/HCB.RevitAddin/Features/TransferViewTemplates/Resources/icon16.png" width="16" alt=""></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#view-templates">View Templates</a></td><td>Kopiuje wybrane szablony widoków (view templates) między otwartymi projektami.</td></tr>
 <tr><td><img src="src/HCB.RevitAddin/Resources/Ribbon/Templates/Schedule/icon16.png" width="16" alt=""></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#schedule-templates">Schedule Templates</a></td><td>Kopiuje wybrane szablony zestawień między otwartymi projektami.</td></tr>
 <tr><td><img src="src/HCB.RevitAddin/Features/ViewFiltersLegend/Resources/icon16.png" width="16" alt=""></td><td><a href="#filters-legend">Filters Legend</a></td><td>Tworzy widok legendy z próbkami grafiki i opisami filtrów przypisanych do wybranych widoków i szablonów.</td></tr>
+<tr><td><img src="docs/images/icons/ScheduleExcel-icon16.png" width="16" alt=""></td><td colspan="2"><b>▾ Excel</b> <sub>– Lista rozwijana z eksportem zestawień do Excela, synchronizacją na żywo i importem zmian z pliku.</sub></td></tr>
+<tr><td><img src="docs/images/icons/ScheduleExcel-Sync-icon16.png" width="16" alt=""></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#excel-sync">Excel Sync</a></td><td>Otwiera zestawienie w Excelu i utrzymuje synchronizację na żywo.</td></tr>
+<tr><td><img src="docs/images/icons/ScheduleExcel-icon16.png" width="16" alt=""></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#export-to-excel">Export to Excel</a></td><td>Eksportuje zestawienie do pliku <code>.xlsx</code> z tytułem, grupami, kolorami i sumami jak w Revicie.</td></tr>
+<tr><td><img src="docs/images/icons/ScheduleExcel-Import-icon16.png" width="16" alt=""></td><td>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#import-from-excel">Import from Excel</a></td><td>Wczytuje zmiany z wcześniej wyeksportowanego pliku Excel.</td></tr>
 <tr><td><img src="src/HCB.RevitAddin/Features/CadLinkGraphicsCopy/Resources/icon16.png" width="16" alt=""></td><td><a href="#cad-link-vg">CAD Link VG</a></td><td>Kopiuje ustawienia widoczności i nadpisania warstw z jednego linku CAD do drugiego.</td></tr>
 </table>
 
@@ -1324,6 +1328,102 @@ Wtyczka dodaje kartę **HCB Tools** z **6 panelami** i **56 narzędziami**. Na k
 </td>
 </tr>
 </table>
+
+<p align="right"><sub><a href="#narzedzia">↑ do spisu narzędzi</a></sub></p>
+
+<br>
+
+<a id="excel-sync"></a>
+
+### <img src="docs/images/icons/ScheduleExcel-Sync-icon32.png" width="28" align="top" alt=""> Excel Sync
+
+<img src="https://img.shields.io/badge/Views%20%E2%80%BA%20Excel%20%E2%80%BA%20Excel%20Sync-059669?style=flat-square" alt="Views › Excel › Excel Sync"> <img src="https://img.shields.io/badge/Excel-e2e8f0?style=flat-square" alt="Excel"> <img src="https://img.shields.io/badge/Synchronizacja%20na%20%C5%BCywo-e2e8f0?style=flat-square" alt="Synchronizacja na żywo">
+
+<table>
+<tr>
+<td width="440" align="center" valign="top"><img src="docs/images/ribbon/excel-sync.png" alt="Excel Sync – położenie na wstążce" width="387"></td>
+<td valign="top">
+
+**Co robi**<br>Otwiera zestawienie w Excelu i utrzymuje synchronizację na żywo. Każde `Ctrl+S` w Excelu zapisuje do Revita tylko zmienione komórki.
+
+**Jak użyć**
+
+1. Wybierz zestawienie.
+2. Edytuj wartości w Excelu.
+3. Naciśnij `Ctrl+S`. Zmiany trafiają do Revita od razu.
+
+**Zakres**<br>Zestawienia elementów: parametry egzemplarza i typu, liczby w jednostkach projektu. Każdy zapis to jedna transakcja, którą cofa jedno `Ctrl+Z`.
+
+</td>
+</tr>
+</table>
+
+> [!NOTE]
+> Konflikty (wartość zmieniona w Revicie po eksporcie) i elementy zajęte przez innych użytkowników są pomijane i raportowane. Sesja kończy się po zamknięciu pliku, modelu albo przyciskiem *Stop*.
+
+<p align="right"><sub><a href="#narzedzia">↑ do spisu narzędzi</a></sub></p>
+
+<br>
+
+<a id="export-to-excel"></a>
+
+### <img src="docs/images/icons/ScheduleExcel-icon32.png" width="28" align="top" alt=""> Export to Excel
+
+<img src="https://img.shields.io/badge/Views%20%E2%80%BA%20Excel%20%E2%80%BA%20Export%20to%20Excel-059669?style=flat-square" alt="Views › Excel › Export to Excel"> <img src="https://img.shields.io/badge/Excel-e2e8f0?style=flat-square" alt="Excel"> <img src="https://img.shields.io/badge/.xlsx-e2e8f0?style=flat-square" alt=".xlsx">
+
+<table>
+<tr>
+<td width="440" align="center" valign="top"><img src="docs/images/ribbon/export-to-excel.png" alt="Export to Excel – położenie na wstążce" width="387"></td>
+<td valign="top">
+
+**Co robi**<br>Eksportuje zestawienie do pliku `.xlsx` z tytułem, grupami, kolorami i sumami jak w Revicie. Liczby trafiają do Excela jako liczby w jednostkach projektu.
+
+**Jak użyć**
+
+1. Wybierz zestawienie (domyślnie aktywne albo zaznaczone).
+2. Wskaż folder.
+3. Kliknij *Eksportuj*.
+
+**Zakres**<br>Ukryte arkusze pamiętają, które elementy tworzą każdy wiersz, i wartości z chwili eksportu.
+
+</td>
+</tr>
+</table>
+
+> [!TIP]
+> Plik możesz później edytować i wczytać z powrotem poleceniem Import from Excel.
+
+<p align="right"><sub><a href="#narzedzia">↑ do spisu narzędzi</a></sub></p>
+
+<br>
+
+<a id="import-from-excel"></a>
+
+### <img src="docs/images/icons/ScheduleExcel-Import-icon32.png" width="28" align="top" alt=""> Import from Excel
+
+<img src="https://img.shields.io/badge/Views%20%E2%80%BA%20Excel%20%E2%80%BA%20Import%20from%20Excel-059669?style=flat-square" alt="Views › Excel › Import from Excel"> <img src="https://img.shields.io/badge/Excel-e2e8f0?style=flat-square" alt="Excel"> <img src="https://img.shields.io/badge/Podgl%C4%85d%20zmian-e2e8f0?style=flat-square" alt="Podgląd zmian">
+
+<table>
+<tr>
+<td width="440" align="center" valign="top"><img src="docs/images/ribbon/import-from-excel.png" alt="Import from Excel – położenie na wstążce" width="387"></td>
+<td valign="top">
+
+**Co robi**<br>Wczytuje zmiany z wcześniej wyeksportowanego pliku Excel. Porównuje plik z wartościami z chwili eksportu i zapisuje do Revita tylko zmienione komórki.
+
+**Jak użyć**
+
+1. Wskaż plik `.xlsx` wyeksportowany z tego modelu.
+2. Sprawdź listę zmian.
+3. Potwierdź zapis.
+
+**Zakres**<br>Tylko kolumny edytowalne. Zapis w jednej transakcji.
+
+</td>
+</tr>
+</table>
+
+> [!NOTE]
+> Konflikty i elementy zajęte przez innych użytkowników są pomijane i raportowane.
 
 <p align="right"><sub><a href="#narzedzia">↑ do spisu narzędzi</a></sub></p>
 

@@ -55,3 +55,6 @@ Notes:
   when captured in an older Revit. The README then shows the icon instead.
 - `HCB_RIBBON_DEFINITIONS=<path to RibbonDefinitions.cs>` makes the scripts follow the ribbon of
   another checkout, e.g. to prepare images for a feature branch before it is merged.
+  Icons of such tools are copied to `docs/images/icons/`, because they do not exist in this checkout yet.
+  Once the branch is merged, regenerate without the variable and delete `docs/images/icons/`
+  (the README then links the icons in `src/` directly).

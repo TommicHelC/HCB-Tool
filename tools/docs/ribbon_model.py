@@ -14,6 +14,14 @@ REPO = Path(__file__).resolve().parents[2]
 ADDIN = REPO / "src" / "HCB.RevitAddin"
 # HCB_RIBBON_DEFINITIONS lets the image script follow a ribbon from another checkout (e.g. a feature branch).
 DEFINITIONS = Path(os.environ.get("HCB_RIBBON_DEFINITIONS") or ADDIN / "Infrastructure" / "RibbonDefinitions.cs")
+# Add-in folder of the checkout the definitions come from (differs from ADDIN only with the override).
+SOURCE_ADDIN = DEFINITIONS.resolve().parents[1]
+
+
+def _icon(rel_dir: str, size: int) -> Path:
+    """Icon from this checkout, or from the definitions' checkout for tools not here yet."""
+    own = ADDIN / rel_dir / f"icon{size}.png"
+    return own if own.exists() else SOURCE_ADDIN / rel_dir / f"icon{size}.png"
 
 
 @dataclass
@@ -31,8 +39,7 @@ class Button:
         return self.command.split(".")[1]
 
     def icon(self, size: int = 32) -> Path:
-        base = ADDIN / (self.icon_dir.replace("\\", "/") if self.icon_dir else f"Features/{self.feature}/Resources")
-        return base / f"icon{size}.png"
+        return _icon(self.icon_dir.replace("\\", "/") if self.icon_dir else f"Features/{self.feature}/Resources", size)
 
 
 @dataclass
@@ -46,8 +53,7 @@ class Pulldown:
     buttons: list[Button] = field(default_factory=list)
 
     def icon(self, size: int = 32) -> Path:
-        base = ADDIN / (self.icon_dir.replace("\\", "/") if self.icon_dir else f"Features/{self.command.split('.')[1]}/Resources")
-        return base / f"icon{size}.png"
+        return _icon(self.icon_dir.replace("\\", "/") if self.icon_dir else f"Features/{self.command.split('.')[1]}/Resources", size)
 
 
 @dataclass

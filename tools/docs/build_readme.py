@@ -12,6 +12,7 @@ Only the block between <!-- TOOLS:START --> and <!-- TOOLS:END --> is replaced.
 from __future__ import annotations
 
 import re
+import shutil
 import sys
 from pathlib import Path
 from urllib.parse import quote
@@ -40,8 +41,21 @@ def slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower().replace("&", "and")).strip("-")
 
 
+ICONS = REPO / "docs" / "images" / "icons"
+
+
 def rel(path: Path) -> str:
-    return path.relative_to(REPO).as_posix()
+    """Repo-relative link. Icons of tools that exist only in another checkout (HCB_RIBBON_DEFINITIONS)
+    are copied to docs/images/icons so the README has no broken images before that branch is merged."""
+    path = path.resolve()
+    try:
+        return path.relative_to(REPO.resolve()).as_posix()
+    except ValueError:
+        parts = path.parts[path.parts.index("HCB.RevitAddin") + 1:]
+        target = ICONS / "-".join(p for p in parts if p not in ("Features", "Resources"))
+        ICONS.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+        return target.relative_to(REPO.resolve()).as_posix()
 
 
 def badge(text: str, color: str) -> str:
@@ -221,7 +235,7 @@ def build_hero() -> str:
         "# HCB Tools dla Revit",
         "",
         "**Natywna wtyczka C# dla Autodesk Revit, stworzona dla projektantów instalacji HVAC i MEP.**<br>",
-        "Numeracja, filtry, parametry, przestrzenie, edycja tras i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.",
+        "Numeracja, filtry, parametry, przestrzenie, edycja tras, zestawienia w Excelu i operacje wsadowe na plikach, zebrane na jednej karcie wstążki.",
         "",
         " ".join(shields),
         "",
