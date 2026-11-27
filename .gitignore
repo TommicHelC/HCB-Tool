@@ -24,3 +24,7 @@
 dist/
 # Claude Code local state (worktrees, local settings)
 /.claude/
+
+# Tools documentation captures
+.scrape/
+__pycache__/
