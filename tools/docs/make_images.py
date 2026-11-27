@@ -109,7 +109,17 @@ def main(raw: Path) -> None:
     top = min(p["rect"]["y"] for p in layout["panels"]) - origin["y"] - 2
 
     # Overview: panels only (the tab row shows the user's own tabs, so it is cut off).
-    crop(ribbon, (0, top, ribbon.width, ribbon.height)).save(IMAGES / "ribbon-overview.png", optimize=True)
+    # The full strip is ~2000 px wide and unreadable in the README column, so it is split at the
+    # panel boundary closest to the middle and the two halves are stacked.
+    strip = crop(ribbon, (0, top, ribbon.width, ribbon.height))
+    edges = [p["rect"]["x"] + p["rect"]["w"] - origin["x"] for p in layout["panels"]][:-1]
+    cut = min(edges, key=lambda x: abs(x - strip.width / 2)) if edges else strip.width
+    left, right = strip.crop((0, 0, cut, strip.height)), strip.crop((cut, 0, strip.width, strip.height))
+    gap = 8
+    overview = Image.new("RGB", (max(left.width, right.width), strip.height * 2 + gap), (46, 46, 46))
+    overview.paste(left, (0, 0))
+    overview.paste(right, (0, strip.height + gap))
+    overview.save(IMAGES / "ribbon-overview.png", optimize=True)
 
     # Pulldown captures, numbered in tab order.
     pulldown_shots = {}
