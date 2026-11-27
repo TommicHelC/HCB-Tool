@@ -97,6 +97,14 @@ def tool_block(b: Button, panel: str, parent: Pulldown | None) -> str:
     return "\n".join(lines)
 
 
+def short(b: Button) -> str:
+    """First sentence of the Polish description, falling back to the ribbon tooltip."""
+    what = T.get(b.id, {}).get("what")
+    if not what:
+        return b.tooltip
+    return re.split(r"(?<=[.!?])\s(?=[A-ZĄĆĘŁŃÓŚŹŻ])", what, maxsplit=1)[0]
+
+
 def buttons_of(panel) -> list[tuple[Button, Pulldown | None]]:
     out = []
     for it in panel.items:
@@ -141,7 +149,7 @@ def panel_block(panel) -> str:
         lines.append(
             f'<tr><td><img src="{rel(b.icon(16))}" width="16" alt=""></td>'
             f'<td>{indent}<a href="#{slug(b.text)}">{b.text}</a></td>'
-            f"<td>{b.tooltip}</td></tr>"
+            f"<td>{short(b)}</td></tr>"
         )
     lines += ["</table>", "", "<br>", ""]
 

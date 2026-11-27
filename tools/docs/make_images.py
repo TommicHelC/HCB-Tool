@@ -128,7 +128,7 @@ def main(raw: Path) -> None:
         view = (pbox[0] - MARGIN, top, pbox[2] + MARGIN, ribbon.height)
 
         img = focus(ribbon, [pbox], [box(praw["rect"], origin, -1)])
-        crop(img, (0, top, ribbon.width, ribbon.height)).save(IMAGES / f"panel-{slug(panel.name)}.png", optimize=True)
+        crop(img, (pbox[0] - 140, top, pbox[2] + 140, ribbon.height)).save(IMAGES / f"panel-{slug(panel.name)}.png", optimize=True)
         written.append(f"panel-{slug(panel.name)}")
 
         by_text = {i["text"]: i for i in praw["items"]}
