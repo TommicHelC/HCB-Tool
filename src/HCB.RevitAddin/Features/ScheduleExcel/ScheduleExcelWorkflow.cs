@@ -57,7 +57,60 @@ internal static class ScheduleExcelWorkflow
             OpenAfterExport = window.OpenAfterExport,
             ProtectReadOnlyCells = window.ProtectReadOnlyCells
         };
+
+        string? path = ConfirmOverwrite(options.FilePath, title);
+        if (path == null)
+        {
+            return null;
+        }
+
+        options.FilePath = path;
         return (schedule, options);
+    }
+
+    /// <summary>
+    /// Asks before replacing an existing file: overwrite, save under a free name ("Name (2).xlsx") or cancel.
+    /// Returns the path to write, or null when the user cancels.
+    /// </summary>
+    private static string? ConfirmOverwrite(string path, string title)
+    {
+        if (!File.Exists(path))
+        {
+            return path;
+        }
+
+        string alternative = GetFreePath(path);
+        var dialog = new TaskDialog(title)
+        {
+            MainInstruction = "Plik o tej nazwie już istnieje.",
+            MainContent = $"{path}\n\nZmiany wprowadzone w tym pliku, a niezapisane jeszcze do Revit, zostaną utracone po nadpisaniu.",
+            CommonButtons = TaskDialogCommonButtons.Cancel,
+            DefaultButton = TaskDialogResult.CommandLink2
+        };
+        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Nadpisz istniejący plik");
+        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, $"Zapisz jako nowy plik: {Path.GetFileName(alternative)}");
+
+        return dialog.Show() switch
+        {
+            TaskDialogResult.CommandLink1 => path,
+            TaskDialogResult.CommandLink2 => alternative,
+            _ => null
+        };
+    }
+
+    private static string GetFreePath(string path)
+    {
+        string folder = Path.GetDirectoryName(path)!;
+        string name = Path.GetFileNameWithoutExtension(path);
+        string extension = Path.GetExtension(path);
+        for (int number = 2; ; number++)
+        {
+            string candidate = Path.Combine(folder, $"{name} ({number}){extension}");
+            if (!File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
     }
 
     /// <summary>Reads the schedule and writes the workbook. Returns null after showing the error to the user.</summary>

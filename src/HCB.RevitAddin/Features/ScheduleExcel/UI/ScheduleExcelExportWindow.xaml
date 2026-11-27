@@ -84,7 +84,7 @@
                            Grid.ColumnSpan="2"
                            Margin="{StaticResource Space.Hint}"
                            Style="{StaticResource HintTextStyle}"
-                           Text="Nazwa pliku = nazwa zestawienia. Istniejący plik zostanie nadpisany." />
+                           Text="Nazwa pliku = nazwa zestawienia. Gdy plik już istnieje, pojawi się pytanie o nadpisanie." />
 
                 <CheckBox x:Name="OpenAfterExportCheckBox"
                           Grid.Row="2"
