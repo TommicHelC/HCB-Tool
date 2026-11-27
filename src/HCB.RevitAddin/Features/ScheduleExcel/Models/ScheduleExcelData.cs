@@ -26,6 +26,9 @@ public sealed class ScheduleExcelColumn
 
     public string Header { get; init; } = string.Empty;
 
+    /// <summary>Unique heading text written to the Excel table; sync finds the column by it.</summary>
+    public string Heading { get; set; } = string.Empty;
+
     public string FieldType { get; init; } = string.Empty;
 
     /// <summary>Parameter ElementId value (negative = BuiltInParameter); 0 when the field has no parameter.</summary>
@@ -53,6 +56,9 @@ public sealed class ScheduleExcelColumn
     public string NumberFormat { get; set; } = string.Empty;
 
     public bool IsReadOnly { get; set; }
+
+    /// <summary>Editable column in which some cells are read only (e.g. a parameter locked for some elements).</summary>
+    public bool HasReadOnlyCells { get; set; }
 
     public string ReadOnlyReason { get; set; } = string.Empty;
 

@@ -311,7 +311,17 @@
     <Compile Include="Features\ViewFiltersLegend\ViewFiltersLegendService.cs" />
     <Compile Include="Features\ScheduleExcel\Models\ScheduleExcelData.cs" />
     <Compile Include="Features\ScheduleExcel\Models\ScheduleExcelExportOptions.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelApplier.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelChangeSet.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelExportCommand.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelImportCommand.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelParameterAccess.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelSyncCommand.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelSyncSession.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelWindows.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelWorkbookReader.cs" />
+    <Compile Include="Features\ScheduleExcel\ScheduleExcelWorkflow.cs" />
+    <Compile Include="Features\ScheduleExcel\UI\ScheduleExcelOverlayWindow.xaml.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelFormat.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelLog.cs" />
     <Compile Include="Features\ScheduleExcel\ScheduleExcelReader.cs" />
@@ -367,6 +377,7 @@
     <Page Include="Features\ViewFiltersBulkEdit\UI\ViewFiltersBulkEditWindow.xaml" />
     <Page Include="Features\ViewFiltersLegend\UI\ViewFiltersLegendWindow.xaml" />
     <Page Include="Features\ScheduleExcel\UI\ScheduleExcelExportWindow.xaml" />
+    <Page Include="Features\ScheduleExcel\UI\ScheduleExcelOverlayWindow.xaml" />
     <Page Include="Features\ViewsDuplicate\UI\ViewsDuplicateWindow.xaml" />
     <Page Include="Features\BatchAddSharedFamilyParameters\UI\BatchAddSharedFamilyParametersWindow.xaml" />
     <Page Include="Features\RenameFamilyContent\UI\RenameFamilyContentWindow.xaml" />

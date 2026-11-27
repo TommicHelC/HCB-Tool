@@ -26,7 +26,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <controls:DialogHeader Title="Eksport zestawienia do Excel"
+        <controls:DialogHeader x:Name="Header"
+                               Title="Eksport zestawienia do Excel"
                                Description="Zapisuje dane zestawienia do pliku .xlsx razem z informacją, które elementy tworzą każdy wiersz." />
 
         <GroupBox Grid.Row="1"

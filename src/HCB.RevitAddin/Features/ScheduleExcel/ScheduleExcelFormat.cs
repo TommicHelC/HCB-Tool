@@ -6,7 +6,10 @@ namespace HCB.RevitAddin.Features.ScheduleExcel;
 /// </summary>
 internal static class ScheduleExcelFormat
 {
-    public const int FormatVersion = 1;
+    public const int FormatVersion = 2;
+
+    /// <summary>Oldest file layout this version can sync (v2 added the lock column).</summary>
+    public const int MinFormatVersion = 2;
     public const string ToolId = "HCB.ScheduleExcel";
 
     public const string LegendSheet = "Legenda";
@@ -18,7 +21,11 @@ internal static class ScheduleExcelFormat
     /// <summary>Hidden first column on the data sheet: the row key that links a row to its elements.</summary>
     public const string KeyHeader = "HCB_KEY";
     public const int KeyColumn = 1;
-    public const int FirstValueColumn = 2;
+
+    /// <summary>Hidden second column: per-row mask, '1' = cell is read only (moves with the row when sorted).</summary>
+    public const string LockHeader = "HCB_LOCK";
+    public const int LockColumn = 2;
+    public const int FirstValueColumn = 3;
     public const int TitleRow = 1;
     /// <summary>Row above the headings saying per column: editable / type parameter / read only.</summary>
     public const int EditStateRow = 2;

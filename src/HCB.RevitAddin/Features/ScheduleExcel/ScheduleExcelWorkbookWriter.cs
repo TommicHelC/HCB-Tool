@@ -68,7 +68,7 @@ internal static class ScheduleExcelWorkbookWriter
             for (int index = 0; index < columnCount; index++)
             {
                 ScheduleExcelColumn column = data.Columns[index];
-                IXLTableField field = table.Field(index + 1);
+                IXLTableField field = table.Field(index + ScheduleExcelFormat.FirstValueColumn - 1);
                 field.TotalsRowFunction = column.TotalFunction switch
                 {
                     "Sum" => XLTotalsRowFunction.Sum,
@@ -84,7 +84,7 @@ internal static class ScheduleExcelWorkbookWriter
 
             if (columnCount > 0 && data.Columns[0].TotalFunction.Length == 0)
             {
-                table.Field(1).TotalsRowLabel = data.GrandTotalTitle.Length > 0 ? data.GrandTotalTitle : "Suma";
+                table.Field(ScheduleExcelFormat.FirstValueColumn - 1).TotalsRowLabel = data.GrandTotalTitle.Length > 0 ? data.GrandTotalTitle : "Suma";
             }
 
             IXLRange totals = sheet.Range(totalsRow, firstColumn, totalsRow, lastColumn);
@@ -102,6 +102,8 @@ internal static class ScheduleExcelWorkbookWriter
         SetColumnWidths(sheet, data, lastRow);
         sheet.SheetView.FreezeRows(ScheduleExcelFormat.HeaderRow);
         sheet.Column(ScheduleExcelFormat.KeyColumn).Hide();
+        sheet.Column(ScheduleExcelFormat.LockColumn).Hide();
+        AddReadOnlyHighlight(sheet, data, lastColumn, lastRow);
 
         if (options.ProtectReadOnlyCells)
         {
@@ -121,6 +123,47 @@ internal static class ScheduleExcelWorkbookWriter
                 .AllowElement(XLSheetProtectionElements.FormatRows)
                 .AllowElement(XLSheetProtectionElements.SelectEverything);
         }
+    }
+
+    /// <summary>
+    /// A TAK/NIE switch next to the title: TAK greys out every read-only cell (conditional formatting reading the
+    /// hidden lock mask of its row), NIE shows the Revit colours. One rule for the whole body, so sorting is safe.
+    /// </summary>
+    private static void AddReadOnlyHighlight(IXLWorksheet sheet, ScheduleExcelData data, int lastColumn, int lastRow)
+    {
+        if (data.Columns.Count == 0)
+        {
+            return;
+        }
+
+        IXLCell label = sheet.Cell(ScheduleExcelFormat.TitleRow, lastColumn + 2);
+        IXLCell toggle = sheet.Cell(ScheduleExcelFormat.TitleRow, lastColumn + 3);
+        label.Value = "Pokaż komórki tylko do odczytu:";
+        label.Style.Font.Italic = true;
+        label.Style.Font.FontColor = ReadOnlyFont;
+        label.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
+        toggle.Value = "NIE";
+        toggle.Style.Font.Bold = true;
+        toggle.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        toggle.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+        toggle.Style.Fill.BackgroundColor = MixedFill;
+        toggle.Style.Protection.Locked = false;
+        toggle.CreateDataValidation().List("\"TAK,NIE\"", true);
+        toggle.CreateComment().AddText("Wybierz TAK, aby wyszarzyć komórki, których zmiana nie wróci do Revit.");
+        sheet.Column(lastColumn + 2).Width = Math.Max(sheet.Column(lastColumn + 2).Width, 30);
+        sheet.Column(lastColumn + 3).Width = 7;
+
+        int first = ScheduleExcelFormat.FirstDataRow;
+        string firstLetter = XLHelper.GetColumnLetterFromNumber(ScheduleExcelFormat.FirstValueColumn);
+        string lockLetter = XLHelper.GetColumnLetterFromNumber(ScheduleExcelFormat.LockColumn);
+        string toggleRef = $"${toggle.WorksheetColumn().ColumnLetter()}${toggle.Address.RowNumber}";
+        string formula = $"AND({toggleRef}=\"TAK\",MID(${lockLetter}{first},COLUMN()-COLUMN(${firstLetter}${first})+1,1)=\"1\")";
+
+        IXLStyle format = sheet.Range(first, ScheduleExcelFormat.FirstValueColumn, Math.Max(first, lastRow), lastColumn)
+            .AddConditionalFormat()
+            .WhenIsTrue(formula);
+        format.Fill.SetBackgroundColor(XLColor.FromHtml("#D9D9D9"));
+        format.Font.SetFontColor(XLColor.FromHtml("#808080"));
     }
 
     private static void WriteTitle(IXLWorksheet sheet, ScheduleExcelData data, int firstColumn, int lastColumn)
@@ -143,7 +186,9 @@ internal static class ScheduleExcelWorkbookWriter
             IXLCell cell = sheet.Cell(ScheduleExcelFormat.EditStateRow, ScheduleExcelFormat.FirstValueColumn + index);
             (string text, XLColor color) = column.IsReadOnly
                 ? ("tylko odczyt", ReadOnlyFont)
-                : column.IsTypeParameter ? ("edycja: typ", TypeFont) : ("edycja", EditableFont);
+                : column.IsTypeParameter ? ("edycja: typ", TypeFont)
+                : column.HasReadOnlyCells ? ("edycja (część)", EditableFont)
+                : ("edycja", EditableFont);
             cell.Value = text;
             cell.Style.Font.FontColor = color;
             cell.Style.Font.FontSize = 8;
@@ -155,7 +200,8 @@ internal static class ScheduleExcelWorkbookWriter
     private static void WriteHeadings(IXLWorksheet sheet, ScheduleExcelData data)
     {
         sheet.Cell(ScheduleExcelFormat.HeaderRow, ScheduleExcelFormat.KeyColumn).Value = ScheduleExcelFormat.KeyHeader;
-        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ScheduleExcelFormat.KeyHeader };
+        sheet.Cell(ScheduleExcelFormat.HeaderRow, ScheduleExcelFormat.LockColumn).Value = ScheduleExcelFormat.LockHeader;
+        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ScheduleExcelFormat.KeyHeader, ScheduleExcelFormat.LockHeader };
         for (int index = 0; index < data.Columns.Count; index++)
         {
             ScheduleExcelColumn column = data.Columns[index];
@@ -175,6 +221,7 @@ internal static class ScheduleExcelWorkbookWriter
             }
 
             cell.Value = unique;
+            column.Heading = unique;
             cell.Style.Font.Bold = true;
             cell.Style.Alignment.WrapText = true;
             cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
@@ -308,6 +355,9 @@ internal static class ScheduleExcelWorkbookWriter
     private static void WriteDataRow(IXLWorksheet sheet, ScheduleExcelData data, ScheduleExcelRow dataRow, int row)
     {
         sheet.Cell(row, ScheduleExcelFormat.KeyColumn).Value = dataRow.Key;
+        sheet.Cell(row, ScheduleExcelFormat.LockColumn).Value = new string(data.Columns
+            .Select((column, index) => column.IsReadOnly || dataRow.Values[index].ReadOnly ? '1' : '0')
+            .ToArray());
         for (int index = 0; index < data.Columns.Count; index++)
         {
             ScheduleExcelColumn column = data.Columns[index];
@@ -509,7 +559,7 @@ internal static class ScheduleExcelWorkbookWriter
         [
             "Column", "Header", "FieldIndex", "FieldType", "ParameterId", "ParameterName", "ParameterGuid",
             "IsTypeParameter", "StorageType", "ValueKind", "SpecTypeId", "UnitTypeId", "UnitLabel", "ReadOnly",
-            "ReadOnlyReason", "FromScheduleText", "TotalFunction"
+            "ReadOnlyReason", "FromScheduleText", "TotalFunction", "Heading"
         ];
         for (int index = 0; index < headers.Length; index++)
         {
@@ -526,7 +576,7 @@ internal static class ScheduleExcelWorkbookWriter
                 column.ParameterId.ToString(CultureInfo.InvariantCulture), column.ParameterName, column.ParameterGuid,
                 column.IsTypeParameter ? "1" : "0", column.StorageType, column.ValueKind.ToString(), column.SpecTypeId,
                 column.UnitTypeId, column.UnitLabel, column.IsReadOnly ? "1" : "0", column.ReadOnlyReason,
-                column.FromScheduleText ? "1" : "0", column.TotalFunction
+                column.FromScheduleText ? "1" : "0", column.TotalFunction, column.Heading
             ];
             for (int valueIndex = 0; valueIndex < values.Length; valueIndex++)
             {

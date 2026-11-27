@@ -158,6 +158,8 @@ internal sealed class ScheduleExcelReader
             data.Rows.Add(row);
         }
 
+        ResolveColumnEditability(data);
+
         try
         {
             ReadScheduleView(schedule, data);
@@ -169,6 +171,42 @@ internal sealed class ScheduleExcelReader
         }
 
         return data;
+    }
+
+    /// <summary>
+    /// A parameter can be read only for some elements and editable for others (e.g. Number of People on spaces).
+    /// The column stays editable when any cell is; the locked cells are marked per row.
+    /// </summary>
+    private static void ResolveColumnEditability(ScheduleExcelData data)
+    {
+        for (int index = 0; index < data.Columns.Count; index++)
+        {
+            ScheduleExcelColumn column = data.Columns[index];
+            bool parameterColumn = column.FieldType is "Instance" or "ElementType"
+                && !column.FromScheduleText
+                && column.ValueKind != ScheduleExcelValueKind.ElementId
+                && !(column.ValueKind == ScheduleExcelValueKind.Text && column.StorageType != nameof(StorageType.String));
+            if (!parameterColumn || data.Rows.Count == 0)
+            {
+                continue;
+            }
+
+            int column_ = index;
+            bool anyEditable = data.Rows.Any(row => !row.Values[column_].ReadOnly);
+            bool anyLocked = data.Rows.Any(row => row.Values[column_].ReadOnly);
+            if (anyEditable && column.IsReadOnly)
+            {
+                column.IsReadOnly = false;
+                column.ReadOnlyReason = string.Empty;
+            }
+            else if (!anyEditable && !column.IsReadOnly)
+            {
+                column.IsReadOnly = true;
+                column.ReadOnlyReason = "Parametr tylko do odczytu dla wszystkich elementów.";
+            }
+
+            column.HasReadOnlyCells = !column.IsReadOnly && anyLocked;
+        }
     }
 
     /// <summary>
@@ -480,7 +518,7 @@ internal sealed class ScheduleExcelReader
         }
 
         bool supported = fieldType == ScheduleFieldType.Instance || fieldType == ScheduleFieldType.ElementType;
-        ParameterLookup? lookup = supported ? ParameterLookup.Create(_document, field.ParameterId) : null;
+        ScheduleExcelParameterLookup? lookup = supported ? ScheduleExcelParameterLookup.Create(_document, field.ParameterId) : null;
         if (lookup == null)
         {
             return FieldReader.Unsupported(new ScheduleExcelColumn
@@ -500,7 +538,7 @@ internal sealed class ScheduleExcelReader
 
         bool isType = fieldType == ScheduleFieldType.ElementType;
         Parameter? sample = elements
-            .Select(element => lookup.Get(GetTarget(element, isType)))
+            .Select(element => lookup.Get(ScheduleExcelParameterLookup.GetTarget(_document, element, isType)))
             .FirstOrDefault(parameter => parameter != null);
 
         ForgeTypeId spec = SafeSpec(field, sample);
@@ -526,6 +564,7 @@ internal sealed class ScheduleExcelReader
             ScheduleExcelValueKind.ElementId => "Wartość wskazuje inny element (typ, poziom...) - zmiana w przygotowaniu.",
             _ when sample == null => "Żaden element zestawienia nie ma tego parametru.",
             _ when sample.IsReadOnly => "Parametr tylko do odczytu w Revit.",
+            ScheduleExcelValueKind.Text when storage != StorageType.String => "Wartość z listy (wyliczeniowa) - zmiana w przygotowaniu.",
             _ => string.Empty
         };
 
@@ -550,7 +589,7 @@ internal sealed class ScheduleExcelReader
             BodyStyle = bodyStyle
         };
 
-        return new FieldReader(column, element => ReadValue(lookup.Get(GetTarget(element, isType)), kind, unit));
+        return new FieldReader(column, element => ScheduleExcelParameterLookup.ReadValue(lookup.Get(ScheduleExcelParameterLookup.GetTarget(_document, element, isType)), kind, unit));
     }
 
     private static ScheduleExcelCellStyle? SafeFieldStyle(ScheduleField field)
@@ -563,17 +602,6 @@ internal sealed class ScheduleExcelReader
         {
             return null;
         }
-    }
-
-    private Element? GetTarget(Element element, bool isType)
-    {
-        if (!isType)
-        {
-            return element;
-        }
-
-        ElementId typeId = element.GetTypeId();
-        return typeId == ElementId.InvalidElementId ? null : _document.GetElement(typeId);
     }
 
     private static ForgeTypeId SafeSpec(ScheduleField field, Parameter? sample)
@@ -667,39 +695,7 @@ internal sealed class ScheduleExcelReader
         return decimals == 0 ? "#,##0" : "#,##0." + new string('0', decimals);
     }
 
-    private static ScheduleExcelValue ReadValue(Parameter? parameter, ScheduleExcelValueKind kind, ForgeTypeId? unit)
-    {
-        if (parameter == null)
-        {
-            return new ScheduleExcelValue(null, false, true);
-        }
-
-        bool readOnly = parameter.IsReadOnly;
-        if (!parameter.HasValue && kind != ScheduleExcelValueKind.Text)
-        {
-            return new ScheduleExcelValue(null, false, readOnly);
-        }
-
-        object? value = kind switch
-        {
-            ScheduleExcelValueKind.Number => unit == null
-                ? parameter.AsDouble()
-                : UnitUtils.ConvertFromInternalUnits(parameter.AsDouble(), unit),
-            ScheduleExcelValueKind.Integer => (double)parameter.AsInteger(),
-            ScheduleExcelValueKind.YesNo => parameter.AsInteger() == 1,
-            ScheduleExcelValueKind.ElementId => parameter.AsValueString(),
-            _ => parameter.StorageType == StorageType.String ? parameter.AsString() : parameter.AsValueString()
-        };
-
-        if (value is string text && text.Length == 0)
-        {
-            value = null;
-        }
-
-        return new ScheduleExcelValue(value, false, readOnly);
-    }
-
-    private static string GetDocumentId(Document document)
+    internal static string GetDocumentId(Document document)
     {
         try
         {
@@ -735,61 +731,6 @@ internal sealed class ScheduleExcelReader
 
         public static FieldReader Unsupported(ScheduleExcelColumn column) =>
             new(column, _ => new ScheduleExcelValue(null, false, true));
-    }
-
-    private sealed class ParameterLookup
-    {
-        private readonly BuiltInParameter _builtIn;
-        private readonly Definition? _definition;
-
-        private ParameterLookup(BuiltInParameter builtIn, Guid? guid, Definition? definition)
-        {
-            _builtIn = builtIn;
-            Guid = guid;
-            _definition = definition;
-        }
-
-        public Guid? Guid { get; }
-
-        public static ParameterLookup? Create(Document document, ElementId parameterId)
-        {
-            if (parameterId == null || parameterId == ElementId.InvalidElementId)
-            {
-                return null;
-            }
-
-            if (parameterId.Value < 0)
-            {
-                return new ParameterLookup((BuiltInParameter)parameterId.Value, null, null);
-            }
-
-            return document.GetElement(parameterId) switch
-            {
-                SharedParameterElement shared => new ParameterLookup(BuiltInParameter.INVALID, shared.GuidValue, null),
-                ParameterElement parameterElement => new ParameterLookup(BuiltInParameter.INVALID, null, parameterElement.GetDefinition()),
-                _ => null
-            };
-        }
-
-        public Parameter? Get(Element? element)
-        {
-            if (element == null)
-            {
-                return null;
-            }
-
-            if (_builtIn != BuiltInParameter.INVALID)
-            {
-                return element.get_Parameter(_builtIn);
-            }
-
-            if (Guid.HasValue)
-            {
-                return element.get_Parameter(Guid.Value);
-            }
-
-            return _definition == null ? null : element.get_Parameter(_definition);
-        }
     }
 
     private sealed class SortKeyComparer : IComparer<ElementValues>

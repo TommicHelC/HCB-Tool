@@ -27,6 +27,9 @@ public partial class ScheduleExcelExportWindow : Window
     private readonly IReadOnlyList<ScheduleExcelListItem> _items;
 
     public ScheduleExcelExportWindow(
+        string title,
+        string description,
+        string primaryButton,
         IReadOnlyList<ScheduleExcelListItem> items,
         long? preselectedId,
         string folder,
@@ -35,6 +38,10 @@ public partial class ScheduleExcelExportWindow : Window
     {
         InitializeComponent();
 
+        Title = title;
+        Header.Title = title;
+        Header.Description = description;
+        FooterBar.PrimaryButtonText = primaryButton;
         _items = items;
         ScheduleListBox.ItemsSource = _items;
         ScheduleListBox.SelectedItem = _items.FirstOrDefault(item => item.Id == preselectedId) ?? _items.FirstOrDefault();
