@@ -346,6 +346,37 @@ namespace HCB.RevitAddin
                             typeof(Features.ViewFiltersLegend.ViewFiltersLegendCommand),
                             "Tworzy legendy dla filtrow przypisanych do wybranych widokow i szablonow.",
                             "Co robi: tworzy legende filtrow dla wybranych widokow i szablonow. Jak uzyc: 1. Wybierz widoki albo view templates. 2. Uruchom polecenie. 3. Utworzona zostanie legenda z probkami i opisami filtrow. Zakres: generuje nowy widok legendy."),
+                        new RibbonPulldownDefinition(
+                            "HcbScheduleExcelPulldown",
+                            "Excel",
+                            typeof(Features.ScheduleExcel.ScheduleExcelExportCommand),
+                            null,
+                            "Eksport zestawien do Excel i zapis zmian z Excel z powrotem do Revit.",
+                            "Co zawiera: eksport zestawienia do .xlsx, synchronizacje na zywo (Ctrl+S w Excel zapisuje zmiany do Revit) oraz jednorazowy import zmian z pliku. Zakres: zestawienia elementow; parametry egzemplarza i typu, liczby w jednostkach projektu.",
+                            [
+                                new RibbonPushButtonDefinition(
+                                    "HcbScheduleExcelSyncButton",
+                                    "Excel Sync",
+                                    typeof(Features.ScheduleExcel.ScheduleExcelSyncCommand),
+                                    "Otwiera zestawienie w Excel; kazde Ctrl+S zapisuje zmiany do Revit.",
+                                    "Co robi: eksportuje zestawienie, otwiera je w Excel i przelacza Revit na to zestawienie. Kazde zapisanie pliku w Excel (Ctrl+S) zapisuje do Revit tylko zmienione komorki, w jednej transakcji (jedno Ctrl+Z cofa caly zapis). Konflikty (wartosc zmieniona w Revit po eksporcie) i elementy zajete przez innych sa pomijane i raportowane. Jak uzyc: 1. Wybierz zestawienie. 2. Edytuj w Excel. 3. Ctrl+S. Sesja konczy sie po zamknieciu pliku, modelu albo przyciskiem Stop.",
+                                    null,
+                                    "Features\\ScheduleExcel\\Resources\\Sync"),
+                                new RibbonPushButtonDefinition(
+                                    "HcbScheduleExcelExportButton",
+                                    "Export to Excel",
+                                    typeof(Features.ScheduleExcel.ScheduleExcelExportCommand),
+                                    "Eksportuje zestawienie do pliku Excel (.xlsx) z informacja, ktore elementy tworza kazdy wiersz.",
+                                    "Co robi: zapisuje dane zestawienia do pliku .xlsx z tytulem, grupami, kolorami i sumami jak w Revit. Liczby trafiaja do Excela jako liczby w jednostkach projektu, a ukryte arkusze pamietaja elementy kazdego wiersza i wartosci z chwili eksportu. Jak uzyc: 1. Wybierz zestawienie (domyslnie aktywne lub zaznaczone). 2. Wskaz folder. 3. Eksportuj. Plik mozna pozniej wczytac poleceniem Import from Excel."),
+                                new RibbonPushButtonDefinition(
+                                    "HcbScheduleExcelImportButton",
+                                    "Import from Excel",
+                                    typeof(Features.ScheduleExcel.ScheduleExcelImportCommand),
+                                    "Wczytuje zmiany z wczesniej wyeksportowanego pliku Excel do Revit.",
+                                    "Co robi: porownuje plik z wartosciami z chwili eksportu i zapisuje do Revit tylko zmienione komorki, po potwierdzeniu, w jednej transakcji. Jak uzyc: 1. Wskaz plik .xlsx wyeksportowany z tego modelu. 2. Sprawdz liste zmian. 3. Potwierdz. Zakres: tylko kolumny edytowalne; konflikty i elementy zajete przez innych sa pomijane i raportowane.",
+                                    null,
+                                    "Features\\ScheduleExcel\\Resources\\Import")
+                            ]),
                         new RibbonPushButtonDefinition(
                             "HcbCadLinkGraphicsCopyButton",
                             "CAD Link VG",
