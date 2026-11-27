@@ -32,7 +32,7 @@
 
         <GroupBox Grid.Row="1"
                   Margin="{StaticResource Space.Section}"
-                  Header="Zestawienie">
+                  Header="Zestawienia">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top"
                            Margin="0,0,0,4"
@@ -44,13 +44,20 @@
                 <TextBlock x:Name="ScheduleInfoText"
                            DockPanel.Dock="Bottom"
                            Margin="{StaticResource Space.Hint}"
-                           Style="{StaticResource HintTextStyle}" />
+                           Style="{StaticResource HintTextStyle}"
+                           TextWrapping="Wrap" />
                 <ListBox x:Name="ScheduleListBox"
                          Margin="{StaticResource Space.Field}"
-                         DisplayMemberPath="Name"
                          SelectionMode="Single"
-                         SelectionChanged="ScheduleListBox_OnSelectionChanged"
-                         MouseDoubleClick="ScheduleListBox_OnMouseDoubleClick" />
+                         SelectionChanged="ScheduleListBox_OnSelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Name}"
+                                      IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                      Click="ScheduleCheckBox_OnClick" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </DockPanel>
         </GroupBox>
 

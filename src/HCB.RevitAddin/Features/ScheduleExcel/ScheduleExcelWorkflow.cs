@@ -11,8 +11,8 @@ namespace HCB.RevitAddin.Features.ScheduleExcel;
 /// <summary>Steps shared by the export, sync and import commands.</summary>
 internal static class ScheduleExcelWorkflow
 {
-    /// <summary>Shows the schedule picker. Null when the user cancels or there is nothing to export.</summary>
-    public static (ViewSchedule Schedule, ScheduleExcelExportOptions Options)? PickSchedule(
+    /// <summary>Shows the schedule picker (one or many). Null when the user cancels or there is nothing to export.</summary>
+    public static (IReadOnlyList<ViewSchedule> Schedules, ScheduleExcelExportOptions Options)? PickSchedules(
         UIDocument uiDocument,
         string title,
         string description,
@@ -36,12 +36,12 @@ internal static class ScheduleExcelWorkflow
             description,
             primaryButton,
             items,
-            GetPreselectedScheduleId(uiDocument),
+            GetPreselectedScheduleIds(uiDocument),
             GetDefaultFolder(settings, document),
             settings.OpenAfterExport,
             settings.ProtectReadOnlyCells,
             settings.ExpandGroups);
-        if (window.ShowDialog() != true || window.SelectedSchedule == null)
+        if (window.ShowDialog() != true || window.SelectedSchedules.Count == 0)
         {
             return null;
         }
@@ -52,10 +52,13 @@ internal static class ScheduleExcelWorkflow
         settings.ExpandGroups = window.ExpandGroups;
         settings.Save();
 
-        var schedule = (ViewSchedule)document.GetElement(new ElementId(window.SelectedSchedule.Id));
+        List<ViewSchedule> picked = window.SelectedSchedules
+            .Select(item => (ViewSchedule)document.GetElement(new ElementId(item.Id)))
+            .ToList();
+        string fileName = picked.Count == 1 ? picked[0].Name : $"{document.Title} - zestawienia";
         var options = new ScheduleExcelExportOptions
         {
-            FilePath = Path.Combine(window.Folder, ToFileName(schedule.Name) + ".xlsx"),
+            FilePath = Path.Combine(window.Folder, ToFileName(fileName) + ".xlsx"),
             OpenAfterExport = window.OpenAfterExport,
             ProtectReadOnlyCells = window.ProtectReadOnlyCells,
             ExpandGroups = window.ExpandGroups
@@ -68,7 +71,7 @@ internal static class ScheduleExcelWorkflow
         }
 
         options.FilePath = path;
-        return (schedule, options);
+        return (picked, options);
     }
 
     /// <summary>
@@ -118,8 +121,8 @@ internal static class ScheduleExcelWorkflow
         }
     }
 
-    /// <summary>Reads the schedule and writes the workbook. Returns null after showing the error to the user.</summary>
-    public static ScheduleExcelData? Export(Document document, ViewSchedule schedule, ScheduleExcelExportOptions options, string title)
+    /// <summary>Reads the schedules and writes one workbook. Returns null after showing the error to the user.</summary>
+    public static IReadOnlyList<ScheduleExcelData>? Export(Document document, IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options, string title)
     {
         if (IsFileLocked(options.FilePath))
         {
@@ -129,9 +132,11 @@ internal static class ScheduleExcelWorkflow
 
         try
         {
-            ScheduleExcelData data = new ScheduleExcelReader(document).Read(schedule, options.ExpandGroups);
+            var reader = new ScheduleExcelReader(document);
+            List<ScheduleExcelData> data = schedules.Select(schedule => reader.Read(schedule, options.ExpandGroups)).ToList();
             WriteWorkbook(data, options);
-            ScheduleExcelLog.Info($"Eksport '{schedule.Name}' -> {options.FilePath}: wiersze {data.Rows.Count}, elementy {data.ElementCount}.");
+            ScheduleExcelLog.Info($"Eksport {data.Count} zestawień -> {options.FilePath}: "
+                + string.Join("; ", data.Select(item => $"'{item.ScheduleName}' wiersze {item.Rows.Count}, elementy {item.ElementCount}")));
             return data;
         }
         catch (Exception exception) when (exception is FileLoadException or FileNotFoundException or TypeLoadException or MissingMethodException)
@@ -144,7 +149,7 @@ internal static class ScheduleExcelWorkflow
         }
         catch (Exception exception)
         {
-            ScheduleExcelLog.Error($"Eksport '{schedule.Name}' nie powiódł się.", exception);
+            ScheduleExcelLog.Error($"Eksport do {options.FilePath} nie powiódł się.", exception);
             TaskDialog.Show(title, $"Eksport nie powiódł się.\n\n{exception.Message}");
             return null;
         }
@@ -152,14 +157,14 @@ internal static class ScheduleExcelWorkflow
 
     /// <summary>Separate method so a missing ClosedXML assembly fails inside the caller's try block, not at JIT.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void WriteWorkbook(ScheduleExcelData data, ScheduleExcelExportOptions options)
+    private static void WriteWorkbook(IReadOnlyList<ScheduleExcelData> data, ScheduleExcelExportOptions options)
     {
         ScheduleExcelWorkbookWriter.Write(data, options);
     }
 
     /// <summary>Reads an HCB workbook; null after showing the error to the user.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static ScheduleExcelWorkbookContent? ReadWorkbook(string path, string title)
+    public static ScheduleExcelWorkbook? ReadWorkbook(string path, string title)
     {
         try
         {
@@ -173,12 +178,11 @@ internal static class ScheduleExcelWorkflow
         }
     }
 
-    public static string Summarize(ScheduleExcelData data, string filePath)
+    public static string Summarize(IReadOnlyList<ScheduleExcelData> schedules, string filePath)
     {
-        int readOnly = data.Columns.Count(column => column.IsReadOnly);
-        return $"Zapisano: {filePath}\n\n"
-            + $"Wiersze: {data.Rows.Count}, elementy: {data.ElementCount}.\n"
-            + $"Kolumny: {data.Columns.Count}, w tym tylko do odczytu: {readOnly}.";
+        return $"Zapisano: {filePath}\n\n" + string.Join("\n", schedules.Select(data =>
+            $"{data.ScheduleName}: wiersze {data.Rows.Count}, elementy {data.ElementCount}, "
+            + $"kolumny {data.Columns.Count} (tylko do odczytu: {data.Columns.Count(column => column.IsReadOnly)})."));
     }
 
     public static string DescribeSkipped(IReadOnlyList<ScheduleExcelSkip> skipped, int max = 10)
@@ -188,7 +192,8 @@ internal static class ScheduleExcelWorkflow
             return string.Empty;
         }
 
-        IEnumerable<string> lines = skipped.Take(max).Select(skip => $"- {skip.Column}: {skip.Reason}");
+        IEnumerable<string> lines = skipped.Take(max).Select(skip =>
+            $"- {(skip.Schedule.Length > 0 ? skip.Schedule + " / " : string.Empty)}{skip.Column}: {skip.Reason}");
         return string.Join("\n", lines) + (skipped.Count > max ? $"\n... i {skipped.Count - max} więcej (szczegóły w logu)" : string.Empty);
     }
 
@@ -226,22 +231,30 @@ internal static class ScheduleExcelWorkflow
         }
     }
 
-    /// <summary>Schedule picked in the Project Browser or placed on the active sheet, else the open schedule view.</summary>
-    private static long? GetPreselectedScheduleId(UIDocument uiDocument)
+    /// <summary>Schedules picked in the Project Browser or placed on the active sheet, else the open schedule view.</summary>
+    private static IReadOnlyCollection<long> GetPreselectedScheduleIds(UIDocument uiDocument)
     {
         Document document = uiDocument.Document;
+        var ids = new HashSet<long>();
         foreach (ElementId id in uiDocument.Selection.GetElementIds())
         {
             switch (document.GetElement(id))
             {
                 case ViewSchedule schedule:
-                    return schedule.Id.Value;
+                    ids.Add(schedule.Id.Value);
+                    break;
                 case ScheduleSheetInstance instance:
-                    return instance.ScheduleId.Value;
+                    ids.Add(instance.ScheduleId.Value);
+                    break;
             }
         }
 
-        return document.ActiveView is ViewSchedule active ? active.Id.Value : null;
+        if (ids.Count == 0 && document.ActiveView is ViewSchedule active)
+        {
+            ids.Add(active.Id.Value);
+        }
+
+        return ids;
     }
 
     private static string Describe(ViewSchedule schedule)

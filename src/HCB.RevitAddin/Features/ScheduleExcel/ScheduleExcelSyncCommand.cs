@@ -32,28 +32,30 @@ public sealed class ScheduleExcelSyncCommand : IExternalCommand
             return Result.Cancelled;
         }
 
-        var picked = ScheduleExcelWorkflow.PickSchedule(
+        var picked = ScheduleExcelWorkflow.PickSchedules(
             uiDocument,
             Title,
-            "Otwiera zestawienie w Excel. Każde zapisanie pliku (Ctrl+S) przenosi zmiany do Revit.",
+            "Otwiera zestawienia w Excel (każde w osobnym arkuszu). Każde zapisanie pliku (Ctrl+S) przenosi zmiany do Revit.",
             "Start");
         if (picked == null)
         {
             return Result.Cancelled;
         }
 
-        (ViewSchedule schedule, ScheduleExcelExportOptions options) = picked.Value;
+        (IReadOnlyList<ViewSchedule> schedules, ScheduleExcelExportOptions options) = picked.Value;
+        ViewSchedule schedule = schedules[0];
+        string sessionName = schedules.Count == 1 ? schedule.Name : $"{schedules.Count} zestawień";
 
         // The file is rewritten on start, so an old session on it must end first.
         ScheduleExcelSyncManager.Find(options.FilePath)?.Stop("nowa sesja dla tego pliku");
 
-        ScheduleExcelData? data = ScheduleExcelWorkflow.Export(document, schedule, options, Title);
+        IReadOnlyList<ScheduleExcelData>? data = ScheduleExcelWorkflow.Export(document, schedules, options, Title);
         if (data == null)
         {
             return Result.Failed;
         }
 
-        ScheduleExcelWorkbookContent? content = ScheduleExcelWorkflow.ReadWorkbook(options.FilePath, Title);
+        ScheduleExcelWorkbook? content = ScheduleExcelWorkflow.ReadWorkbook(options.FilePath, Title);
         if (content == null)
         {
             return Result.Failed;
@@ -62,7 +64,7 @@ public sealed class ScheduleExcelSyncCommand : IExternalCommand
         ScheduleExcelSyncSession session;
         try
         {
-            session = ScheduleExcelSyncSession.Start(document, options.FilePath, schedule.Name, content);
+            session = ScheduleExcelSyncSession.Start(document, options.FilePath, sessionName, content);
             ScheduleExcelSyncManager.Add(application, session);
         }
         catch (Exception exception)

@@ -6,10 +6,16 @@ namespace HCB.RevitAddin.Features.ScheduleExcel;
 /// </summary>
 internal static class ScheduleExcelFormat
 {
-    public const int FormatVersion = 2;
+    /// <summary>v3: several schedules per workbook (per-schedule metadata sheets "_hcb_meta_1"...).</summary>
+    public const int FormatVersion = 3;
 
-    /// <summary>Oldest file layout this version can sync (v2 added the lock column).</summary>
+    /// <summary>Oldest file layout this version can sync (v2 added the lock column; v2 = one schedule).</summary>
     public const int MinFormatVersion = 2;
+
+    /// <summary>Per-schedule hidden sheet name: "_hcb_fields_2" for the second schedule.</summary>
+    public static string PartSheet(string baseName, int index) => $"{baseName}_{index}";
+
+    public static string PartTable(int index) => $"{TableName}_{index}";
     public const string ToolId = "HCB.ScheduleExcel";
 
     public const string LegendSheet = "Legenda";

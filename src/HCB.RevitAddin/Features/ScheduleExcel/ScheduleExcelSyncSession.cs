@@ -22,14 +22,15 @@ internal sealed class ScheduleExcelSyncSession
     private static readonly TimeSpan IdleLimit = TimeSpan.FromHours(2);
 
     private readonly object _gate = new();
-    private readonly Dictionary<string, string[]> _baseline;
+    /// <summary>Schedule UniqueId -> row key -> comparable values last known to be in Revit.</summary>
+    private readonly Dictionary<string, Dictionary<string, string[]>> _baselines;
     private readonly ExternalEvent _externalEvent;
     private readonly FileSystemWatcher _watcher;
     private readonly Timer _debounce;
     private readonly Timer _monitor;
     private readonly ScheduleExcelOverlay _overlay;
 
-    private ScheduleExcelWorkbookContent? _pending;
+    private ScheduleExcelWorkbook? _pending;
     private string _lastHash;
     private bool _stopped;
     private bool _excelSeen;
@@ -38,13 +39,16 @@ internal sealed class ScheduleExcelSyncSession
     private int _syncCount;
     private int _changeCount;
 
-    private ScheduleExcelSyncSession(Document document, string filePath, string scheduleName, ScheduleExcelWorkbookContent initial)
+    private ScheduleExcelSyncSession(Document document, string filePath, string scheduleName, ScheduleExcelWorkbook initial)
     {
         Document = document;
         FilePath = Path.GetFullPath(filePath);
         ScheduleName = scheduleName;
         _lastHash = initial.Hash;
-        _baseline = initial.Snapshot.ToDictionary(pair => pair.Key, pair => (string[])pair.Value.Clone(), StringComparer.Ordinal);
+        _baselines = initial.Parts.ToDictionary(
+            part => part.Get("ScheduleUniqueId"),
+            part => part.Snapshot.ToDictionary(pair => pair.Key, pair => (string[])pair.Value.Clone(), StringComparer.Ordinal),
+            StringComparer.Ordinal);
 
         _externalEvent = ExternalEvent.Create(new SyncHandler(this));
         _debounce = new Timer(_ => Guard("Odczyt pliku", ReadChangedFile), null, Timeout.Infinite, Timeout.Infinite);
@@ -94,7 +98,7 @@ internal sealed class ScheduleExcelSyncSession
     }
 
     /// <summary>Must run in a Revit API context (command): ExternalEvent.Create needs it.</summary>
-    public static ScheduleExcelSyncSession Start(Document document, string filePath, string scheduleName, ScheduleExcelWorkbookContent initial)
+    public static ScheduleExcelSyncSession Start(Document document, string filePath, string scheduleName, ScheduleExcelWorkbook initial)
     {
         var session = new ScheduleExcelSyncSession(document, filePath, scheduleName, initial);
         ScheduleExcelLog.Info($"Start sesji: '{scheduleName}' <-> {session.FilePath} (model '{document.Title}').");
@@ -152,7 +156,7 @@ internal sealed class ScheduleExcelSyncSession
             }
         }
 
-        ScheduleExcelWorkbookContent content;
+        ScheduleExcelWorkbook content;
         try
         {
             content = ScheduleExcelWorkbookReader.Read(bytes);
@@ -208,52 +212,77 @@ internal sealed class ScheduleExcelSyncSession
         }
     }
 
-    /// <summary>Revit thread (ExternalEvent): diff against the baseline and write edits in one transaction.</summary>
+    /// <summary>Revit thread (ExternalEvent): diff every schedule against its baseline, write all edits in one transaction.</summary>
     private void ApplyPending(UIApplication application)
     {
-        ScheduleExcelWorkbookContent? content;
+        ScheduleExcelWorkbook? workbook;
         lock (_gate)
         {
-            content = _pending;
+            workbook = _pending;
             _pending = null;
         }
 
-        if (content == null || IsStopped)
+        if (workbook == null || IsStopped)
         {
             return;
         }
 
         _lastActivity = DateTime.Now;
-        string? invalid = ScheduleExcelApplier.Validate(Document, content);
-        if (invalid != null)
+        var batches = new List<(ScheduleExcelWorkbookContent Content, IReadOnlyList<ScheduleExcelEdit> Edits)>();
+        var skipped = new List<ScheduleExcelSkip>();
+        var rejected = new List<string>();
+        foreach (ScheduleExcelWorkbookContent part in workbook.Parts)
         {
-            Finish(content.Hash);
-            ScheduleExcelLog.Info($"Synchronizacja odrzucona: {invalid}");
-            _overlay.SetStatus("Nie zsynchronizowano.", invalid, isError: true);
+            string? invalid = ScheduleExcelApplier.Validate(Document, part);
+            if (invalid != null)
+            {
+                rejected.Add(invalid);
+                continue;
+            }
+
+            if (!_baselines.TryGetValue(part.Get("ScheduleUniqueId"), out Dictionary<string, string[]>? baseline))
+            {
+                rejected.Add($"Zestawienie '{part.Get("ScheduleName")}' nie należy do tej sesji.");
+                continue;
+            }
+
+            ScheduleExcelChangeSet changes = ScheduleExcelChangeSet.Compute(part, baseline);
+            skipped.AddRange(changes.Skipped);
+            if (changes.Edits.Count > 0)
+            {
+                batches.Add((part, changes.Edits));
+            }
+        }
+
+        int editCount = batches.Sum(batch => batch.Edits.Count);
+        if (rejected.Count > 0)
+        {
+            ScheduleExcelLog.Info($"Synchronizacja odrzucona dla części pliku: {string.Join(" | ", rejected)}");
+        }
+
+        if (editCount == 0)
+        {
+            Finish(workbook.Hash);
+            LogSkipped(skipped);
+            _overlay.SetStatus(
+                rejected.Count > 0 ? "Nie zsynchronizowano." : $"{DateTime.Now:HH:mm:ss} - zapis bez zmian do Revit.",
+                string.Join(Environment.NewLine, rejected.Take(2).Concat([Describe(skipped)]).Where(text => text.Length > 0)),
+                isError: rejected.Count > 0);
             return;
         }
 
-        ScheduleExcelChangeSet changes = ScheduleExcelChangeSet.Compute(content, _baseline);
-        if (changes.Edits.Count == 0)
-        {
-            Finish(content.Hash);
-            _overlay.SetStatus($"{DateTime.Now:HH:mm:ss} - zapis bez zmian do Revit.", Describe(changes.Skipped));
-            LogSkipped(changes.Skipped);
-            return;
-        }
-
-        if (changes.Edits.Count > ConfirmAboveEdits)
+        if (editCount > ConfirmAboveEdits)
         {
             var dialog = new TaskDialog("HCB Excel Sync")
             {
-                MainInstruction = $"Zapisać {changes.Edits.Count} zmian do Revit?",
+                MainInstruction = $"Zapisać {editCount} zmian do Revit?",
                 MainContent = $"Plik: {Path.GetFileName(FilePath)}\nTo dużo zmian w jednym zapisie. Całość będzie można cofnąć jednym Ctrl+Z.",
                 CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No,
                 DefaultButton = TaskDialogResult.No
             };
             if (dialog.Show() != TaskDialogResult.Yes)
             {
-                Finish(content.Hash);
+                Finish(workbook.Hash);
                 _overlay.SetStatus("Anulowano zapis do Revit.", "Zapisz plik ponownie, aby spróbować jeszcze raz.");
                 return;
             }
@@ -264,21 +293,23 @@ internal sealed class ScheduleExcelSyncSession
             _overlay.SetStatus("Sprawdzanie własności elementów...", string.Empty);
         }
 
-        ScheduleExcelApplyResult result = ScheduleExcelApplier.Apply(Document, content, changes.Edits);
+        ScheduleExcelApplyResult result = ScheduleExcelApplier.Apply(Document, batches);
         foreach (ScheduleExcelEdit edit in result.Applied)
         {
-            if (_baseline.TryGetValue(edit.RowKey, out string[]? row) && edit.FieldPosition < row.Length)
+            if (_baselines.TryGetValue(edit.Schedule, out Dictionary<string, string[]>? baseline)
+                && baseline.TryGetValue(edit.RowKey, out string[]? row)
+                && edit.FieldPosition < row.Length)
             {
                 row[edit.FieldPosition] = edit.NewText;
             }
         }
 
-        Finish(content.Hash);
+        Finish(workbook.Hash);
         _syncCount++;
         _changeCount += result.Applied.Count;
 
-        List<ScheduleExcelSkip> skipped = [.. changes.Skipped, .. result.Skipped];
-        ScheduleExcelLog.Info($"Synchronizacja '{result.TransactionName}': zmian {result.Applied.Count}, zapisów parametrów {result.ParameterWrites}, pominięto {skipped.Count}, hash {content.Hash[..12]}.");
+        skipped.AddRange(result.Skipped);
+        ScheduleExcelLog.Info($"Synchronizacja '{result.TransactionName}': zmian {result.Applied.Count}, zapisów parametrów {result.ParameterWrites}, pominięto {skipped.Count}, hash {workbook.Hash[..12]}.");
         LogSkipped(skipped);
 
         if (result.Error.Length > 0)
@@ -316,7 +347,7 @@ internal sealed class ScheduleExcelSyncSession
     {
         foreach (ScheduleExcelSkip skip in skipped)
         {
-            ScheduleExcelLog.Info($"  pominięto {skip.RowKey} / {skip.Column}: {skip.Reason}");
+            ScheduleExcelLog.Info($"  pominięto {skip.Schedule} / {skip.RowKey} / {skip.Column}: {skip.Reason}");
         }
     }
 

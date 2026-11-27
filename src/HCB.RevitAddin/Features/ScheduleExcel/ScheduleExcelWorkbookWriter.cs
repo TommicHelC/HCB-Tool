@@ -20,27 +20,56 @@ internal static class ScheduleExcelWorkbookWriter
 
     private const double MaxColumnWidth = 45;
 
-    public static void Write(ScheduleExcelData data, ScheduleExcelExportOptions options)
+    // Yes/No cells hold text with a Tak/Nie drop-down: Excel booleans would show PRAWDA/FAŁSZ and offer no list.
+    private const string YesText = "Tak";
+    private const string NoText = "Nie";
+
+    public static void Write(ScheduleExcelData data, ScheduleExcelExportOptions options) => Write([data], options);
+
+    /// <summary>One visible sheet per schedule, then the legend, then the very hidden metadata sheets.</summary>
+    public static void Write(IReadOnlyList<ScheduleExcelData> schedules, ScheduleExcelExportOptions options)
     {
         using var workbook = new XLWorkbook();
-        IXLWorksheet sheet = workbook.Worksheets.Add(ToSheetName(data.ScheduleName));
-        WriteDataSheet(sheet, data, options);
-        WriteLegend(workbook.Worksheets.Add(ScheduleExcelFormat.LegendSheet), data, options);
-        WriteMeta(workbook.Worksheets.Add(ScheduleExcelFormat.MetaSheet), data, sheet.Name);
-        WriteFields(workbook.Worksheets.Add(ScheduleExcelFormat.FieldsSheet), data);
-        WriteRows(workbook.Worksheets.Add(ScheduleExcelFormat.RowsSheet), data);
-        WriteSnapshot(workbook.Worksheets.Add(ScheduleExcelFormat.SnapshotSheet), data);
-
-        foreach (string name in new[] { ScheduleExcelFormat.MetaSheet, ScheduleExcelFormat.FieldsSheet, ScheduleExcelFormat.RowsSheet, ScheduleExcelFormat.SnapshotSheet })
+        var dataSheets = new List<IXLWorksheet>();
+        var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (int index = 0; index < schedules.Count; index++)
         {
-            workbook.Worksheet(name).Visibility = XLWorksheetVisibility.VeryHidden;
+            IXLWorksheet sheet = workbook.Worksheets.Add(UniqueSheetName(schedules[index].ScheduleName, usedNames));
+            WriteDataSheet(sheet, schedules[index], options, ScheduleExcelFormat.PartTable(index + 1));
+            dataSheets.Add(sheet);
         }
 
-        sheet.SetTabActive();
+        WriteLegend(workbook.Worksheets.Add(ScheduleExcelFormat.LegendSheet), schedules, options);
+
+        var hidden = new List<IXLWorksheet>();
+        IXLWorksheet meta = workbook.Worksheets.Add(ScheduleExcelFormat.MetaSheet);
+        WriteKeyValues(meta, GlobalMeta(schedules));
+        hidden.Add(meta);
+        for (int index = 0; index < schedules.Count; index++)
+        {
+            int part = index + 1;
+            ScheduleExcelData data = schedules[index];
+            IXLWorksheet partMeta = workbook.Worksheets.Add(ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.MetaSheet, part));
+            WriteKeyValues(partMeta, PartMeta(data, dataSheets[index].Name, ScheduleExcelFormat.PartTable(part)));
+            IXLWorksheet fields = workbook.Worksheets.Add(ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.FieldsSheet, part));
+            WriteFields(fields, data);
+            IXLWorksheet rows = workbook.Worksheets.Add(ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.RowsSheet, part));
+            WriteRows(rows, data);
+            IXLWorksheet snapshot = workbook.Worksheets.Add(ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.SnapshotSheet, part));
+            WriteSnapshot(snapshot, data);
+            hidden.AddRange([partMeta, fields, rows, snapshot]);
+        }
+
+        foreach (IXLWorksheet sheet in hidden)
+        {
+            sheet.Visibility = XLWorksheetVisibility.VeryHidden;
+        }
+
+        dataSheets[0].SetTabActive();
         workbook.SaveAs(options.FilePath);
     }
 
-    private static void WriteDataSheet(IXLWorksheet sheet, ScheduleExcelData data, ScheduleExcelExportOptions options)
+    private static void WriteDataSheet(IXLWorksheet sheet, ScheduleExcelData data, ScheduleExcelExportOptions options, string tableName)
     {
         int columnCount = data.Columns.Count;
         int firstColumn = ScheduleExcelFormat.FirstValueColumn;
@@ -54,7 +83,7 @@ internal static class ScheduleExcelWorkbookWriter
         int lastRow = Math.Max(ScheduleExcelFormat.FirstDataRow, sheet.LastRowUsed()?.RowNumber() ?? ScheduleExcelFormat.FirstDataRow);
 
         IXLTable table = sheet.Range(ScheduleExcelFormat.HeaderRow, ScheduleExcelFormat.KeyColumn, lastRow, lastColumn)
-            .CreateTable(ScheduleExcelFormat.TableName);
+            .CreateTable(tableName);
         table.Theme = XLTableTheme.None;
         table.ShowRowStripes = false;
         table.ShowAutoFilter = true;
@@ -104,6 +133,7 @@ internal static class ScheduleExcelWorkbookWriter
         sheet.Column(ScheduleExcelFormat.KeyColumn).Hide();
         sheet.Column(ScheduleExcelFormat.LockColumn).Hide();
         AddReadOnlyHighlight(sheet, data, lastColumn, lastRow);
+        AddYesNoLists(sheet, data, dataRows);
 
         if (options.ProtectReadOnlyCells)
         {
@@ -164,6 +194,28 @@ internal static class ScheduleExcelWorkbookWriter
             .WhenIsTrue(formula);
         format.Fill.SetBackgroundColor(XLColor.FromHtml("#D9D9D9"));
         format.Font.SetFontColor(XLColor.FromHtml("#808080"));
+    }
+
+    private static void AddYesNoLists(IXLWorksheet sheet, ScheduleExcelData data, IReadOnlyList<int> dataRows)
+    {
+        if (dataRows.Count == 0)
+        {
+            return;
+        }
+
+        for (int index = 0; index < data.Columns.Count; index++)
+        {
+            ScheduleExcelColumn column = data.Columns[index];
+            if (column.ValueKind != ScheduleExcelValueKind.YesNo || column.IsReadOnly)
+            {
+                continue;
+            }
+
+            int excelColumn = ScheduleExcelFormat.FirstValueColumn + index;
+            sheet.Range(dataRows[0], excelColumn, dataRows[^1], excelColumn)
+                .CreateDataValidation()
+                .List($"\"{YesText},{NoText}\"", true);
+        }
     }
 
     private static void WriteTitle(IXLWorksheet sheet, ScheduleExcelData data, int firstColumn, int lastColumn)
@@ -369,7 +421,7 @@ internal static class ScheduleExcelWorkbookWriter
                 cell.Style.NumberFormat.Format = column.NumberFormat;
             }
 
-            if (value.Value is bool)
+            if (column.ValueKind == ScheduleExcelValueKind.YesNo)
             {
                 cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
             }
@@ -463,26 +515,36 @@ internal static class ScheduleExcelWorkbookWriter
         return string.Join(Environment.NewLine, lines);
     }
 
-    private static void WriteLegend(IXLWorksheet sheet, ScheduleExcelData data, ScheduleExcelExportOptions options)
+    private static void WriteLegend(IXLWorksheet sheet, IReadOnlyList<ScheduleExcelData> schedules, ScheduleExcelExportOptions options)
     {
         int row = 1;
-        sheet.Cell(row, 1).Value = "Eksport zestawienia HCB";
+        sheet.Cell(row, 1).Value = "Eksport zestawień HCB";
         sheet.Cell(row, 1).Style.Font.Bold = true;
         sheet.Cell(row, 1).Style.Font.FontSize = 14;
         row += 2;
 
         foreach ((string label, string value) in new[]
         {
-            ("Zestawienie", data.ScheduleName),
-            ("Model", data.DocumentTitle),
-            ("Data eksportu", DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)),
-            ("Wiersze / elementy", $"{data.Rows.Count} / {data.ElementCount}"),
-            ("Tryb", data.IsItemized ? "każdy element w osobnym wierszu" : "wiersze grupowane jak w zestawieniu")
+            ("Model", schedules[0].DocumentTitle),
+            ("Data eksportu", DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture))
         })
         {
             sheet.Cell(row, 1).Value = label;
             sheet.Cell(row, 2).Value = value;
             sheet.Cell(row, 1).Style.Font.Bold = true;
+            row++;
+        }
+
+        row++;
+        sheet.Cell(row, 1).Value = "Zestawienie";
+        sheet.Cell(row, 2).Value = "Wiersze / elementy, tryb";
+        sheet.Range(row, 1, row, 2).Style.Font.Bold = true;
+        row++;
+        foreach (ScheduleExcelData data in schedules)
+        {
+            sheet.Cell(row, 1).Value = data.ScheduleName;
+            sheet.Cell(row, 2).Value = $"{data.Rows.Count} / {data.ElementCount}, "
+                + (data.IsItemized ? "każdy element w osobnym wierszu" : "wiersze grupowane jak w zestawieniu");
             row++;
         }
 
@@ -527,26 +589,38 @@ internal static class ScheduleExcelWorkbookWriter
         sheet.Cell(row, 2).Value = description;
     }
 
-    private static void WriteMeta(IXLWorksheet sheet, ScheduleExcelData data, string dataSheetName)
+    private static (string Key, string Value)[] GlobalMeta(IReadOnlyList<ScheduleExcelData> schedules)
     {
-        var entries = new (string Key, string Value)[]
-        {
+        ScheduleExcelData first = schedules[0];
+        return
+        [
             ("Tool", ScheduleExcelFormat.ToolId),
             ("FormatVersion", ScheduleExcelFormat.FormatVersion.ToString(CultureInfo.InvariantCulture)),
+            ("ScheduleCount", schedules.Count.ToString(CultureInfo.InvariantCulture)),
+            ("DocumentTitle", first.DocumentTitle),
+            ("DocumentPath", first.DocumentPath),
+            ("DocumentId", first.DocumentId),
+            ("ExportedAtUtc", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture))
+        ];
+    }
+
+    private static (string Key, string Value)[] PartMeta(ScheduleExcelData data, string dataSheetName, string tableName)
+    {
+        return
+        [
             ("DataSheet", dataSheetName),
-            ("TableName", ScheduleExcelFormat.TableName),
+            ("TableName", tableName),
             ("ScheduleName", data.ScheduleName),
             ("ScheduleUniqueId", data.ScheduleUniqueId),
-            ("DocumentTitle", data.DocumentTitle),
-            ("DocumentPath", data.DocumentPath),
-            ("DocumentId", data.DocumentId),
             ("IsItemized", data.IsItemized ? "1" : "0"),
             ("RowCount", data.Rows.Count.ToString(CultureInfo.InvariantCulture)),
-            ("ElementCount", data.ElementCount.ToString(CultureInfo.InvariantCulture)),
-            ("ExportedAtUtc", DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture))
-        };
+            ("ElementCount", data.ElementCount.ToString(CultureInfo.InvariantCulture))
+        ];
+    }
 
-        for (int index = 0; index < entries.Length; index++)
+    private static void WriteKeyValues(IXLWorksheet sheet, IReadOnlyList<(string Key, string Value)> entries)
+    {
+        for (int index = 0; index < entries.Count; index++)
         {
             sheet.Cell(index + 1, 1).Value = entries[index].Key;
             sheet.Cell(index + 1, 2).Value = Truncate(entries[index].Value);
@@ -634,7 +708,7 @@ internal static class ScheduleExcelWorkbookWriter
         {
             null => Blank.Value,
             double number => number,
-            bool flag => flag,
+            bool flag => flag ? YesText : NoText,
             _ => Truncate(Convert.ToString(value, CultureInfo.CurrentCulture) ?? string.Empty)
         };
     }
@@ -642,6 +716,19 @@ internal static class ScheduleExcelWorkbookWriter
     private static string Truncate(string text)
     {
         return text.Length <= ScheduleExcelFormat.MaxCellText ? text : text[..ScheduleExcelFormat.MaxCellText];
+    }
+
+    private static string UniqueSheetName(string scheduleName, HashSet<string> used)
+    {
+        string name = ToSheetName(scheduleName);
+        string candidate = name;
+        for (int number = 2; !used.Add(candidate); number++)
+        {
+            string suffix = $" ({number})";
+            candidate = (name.Length + suffix.Length > 31 ? name[..(31 - suffix.Length)] : name) + suffix;
+        }
+
+        return candidate;
     }
 
     private static string ToSheetName(string scheduleName)

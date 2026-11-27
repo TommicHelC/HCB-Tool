@@ -28,7 +28,22 @@ public sealed class ScheduleExcelFieldInfo
     public bool IsReadOnly { get; init; }
 }
 
-/// <summary>Everything a sync needs from the file: metadata, element map, export snapshot and current cells.</summary>
+/// <summary>A whole workbook: one part per exported schedule.</summary>
+public sealed class ScheduleExcelWorkbook
+{
+    public string Hash { get; init; } = string.Empty;
+
+    public Dictionary<string, string> Meta { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public List<ScheduleExcelWorkbookContent> Parts { get; } = [];
+
+    public string Get(string key) => Meta.TryGetValue(key, out string? value) ? value : string.Empty;
+}
+
+/// <summary>
+/// One schedule of the workbook - everything a sync needs: metadata (workbook + schedule), element map,
+/// export snapshot and current cells.
+/// </summary>
 public sealed class ScheduleExcelWorkbookContent
 {
     public string Hash { get; init; } = string.Empty;
@@ -78,28 +93,26 @@ internal static class ScheduleExcelWorkbookReader
 
     public static string ComputeHash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes));
 
-    public static ScheduleExcelWorkbookContent Read(byte[] bytes)
+    /// <summary>Reads every schedule in the workbook. v2 files hold one schedule in un-numbered sheets.</summary>
+    public static ScheduleExcelWorkbook Read(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes, writable: false);
         using var workbook = new XLWorkbook(stream);
-        var content = new ScheduleExcelWorkbookContent { Hash = ComputeHash(bytes) };
+        string hash = ComputeHash(bytes);
 
-        if (!workbook.TryGetWorksheet(ScheduleExcelFormat.MetaSheet, out IXLWorksheet meta))
+        if (!workbook.TryGetWorksheet(ScheduleExcelFormat.MetaSheet, out IXLWorksheet metaSheet))
         {
             throw new InvalidDataException("To nie jest plik zestawienia HCB (brak arkusza metadanych).");
         }
 
-        foreach (IXLRow row in meta.RowsUsed())
-        {
-            content.Meta[row.Cell(1).GetString()] = row.Cell(2).GetString();
-        }
-
-        if (content.Get("Tool") != ScheduleExcelFormat.ToolId)
+        Dictionary<string, string> meta = ReadKeyValues(metaSheet);
+        string Get(string key) => meta.TryGetValue(key, out string? value) ? value : string.Empty;
+        if (Get("Tool") != ScheduleExcelFormat.ToolId)
         {
             throw new InvalidDataException("To nie jest plik zestawienia HCB.");
         }
 
-        if (!int.TryParse(content.Get("FormatVersion"), out int version) || version > ScheduleExcelFormat.FormatVersion)
+        if (!int.TryParse(Get("FormatVersion"), out int version) || version > ScheduleExcelFormat.FormatVersion)
         {
             throw new InvalidDataException("Plik pochodzi z nowszej wersji dodatku HCB. Zaktualizuj dodatek.");
         }
@@ -109,18 +122,80 @@ internal static class ScheduleExcelWorkbookReader
             throw new InvalidDataException("Plik pochodzi ze starszej wersji dodatku HCB. Wyeksportuj zestawienie ponownie.");
         }
 
-        ReadFields(workbook.Worksheet(ScheduleExcelFormat.FieldsSheet), content);
-        ReadRowElements(workbook.Worksheet(ScheduleExcelFormat.RowsSheet), content);
-        ReadSnapshot(workbook.Worksheet(ScheduleExcelFormat.SnapshotSheet), content);
+        var result = new ScheduleExcelWorkbook { Hash = hash };
+        foreach ((string key, string value) in meta)
+        {
+            result.Meta[key] = value;
+        }
+
+        if (version < 3)
+        {
+            result.Parts.Add(ReadPart(workbook, hash, meta, null, ScheduleExcelFormat.MetaSheet, ScheduleExcelFormat.FieldsSheet,
+                ScheduleExcelFormat.RowsSheet, ScheduleExcelFormat.SnapshotSheet));
+            return result;
+        }
+
+        int count = int.TryParse(Get("ScheduleCount"), out int parsed) ? parsed : 0;
+        for (int index = 1; index <= count; index++)
+        {
+            string partMeta = ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.MetaSheet, index);
+            result.Parts.Add(ReadPart(workbook, hash, meta, partMeta,
+                partMeta,
+                ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.FieldsSheet, index),
+                ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.RowsSheet, index),
+                ScheduleExcelFormat.PartSheet(ScheduleExcelFormat.SnapshotSheet, index)));
+        }
+
+        return result;
+    }
+
+    private static ScheduleExcelWorkbookContent ReadPart(
+        XLWorkbook workbook,
+        string hash,
+        Dictionary<string, string> globalMeta,
+        string? partMetaSheet,
+        string metaSheet,
+        string fieldsSheet,
+        string rowsSheet,
+        string snapshotSheet)
+    {
+        var content = new ScheduleExcelWorkbookContent { Hash = hash };
+        foreach ((string key, string value) in globalMeta)
+        {
+            content.Meta[key] = value;
+        }
+
+        if (partMetaSheet != null)
+        {
+            foreach ((string key, string value) in ReadKeyValues(workbook.Worksheet(partMetaSheet)))
+            {
+                content.Meta[key] = value;
+            }
+        }
+
+        ReadFields(workbook.Worksheet(fieldsSheet), content);
+        ReadRowElements(workbook.Worksheet(rowsSheet), content);
+        ReadSnapshot(workbook.Worksheet(snapshotSheet), content);
 
         string dataSheetName = content.Get("DataSheet");
         if (!workbook.TryGetWorksheet(dataSheetName, out IXLWorksheet data))
         {
-            throw new InvalidDataException($"Brak arkusza danych '{dataSheetName}'. Nie zmieniaj nazwy arkusza.");
+            throw new InvalidDataException($"Brak arkusza danych '{dataSheetName}'. Nie zmieniaj nazw arkuszy.");
         }
 
         ReadCurrent(data, content);
         return content;
+    }
+
+    private static Dictionary<string, string> ReadKeyValues(IXLWorksheet sheet)
+    {
+        var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (IXLRow row in sheet.RowsUsed())
+        {
+            values[row.Cell(1).GetString()] = row.Cell(2).GetString();
+        }
+
+        return values;
     }
 
     private static void ReadFields(IXLWorksheet sheet, ScheduleExcelWorkbookContent content)

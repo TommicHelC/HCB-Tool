@@ -41,32 +41,47 @@ public sealed class ScheduleExcelImportCommand : IExternalCommand
             return Result.Cancelled;
         }
 
-        ScheduleExcelWorkbookContent? content = ScheduleExcelWorkflow.ReadWorkbook(dialog.FileName, Title);
-        if (content == null)
+        ScheduleExcelWorkbook? workbook = ScheduleExcelWorkflow.ReadWorkbook(dialog.FileName, Title);
+        if (workbook == null)
         {
             return Result.Failed;
         }
 
-        string? invalid = ScheduleExcelApplier.Validate(document, content);
-        if (invalid != null)
+        var batches = new List<(ScheduleExcelWorkbookContent Content, IReadOnlyList<ScheduleExcelEdit> Edits)>();
+        var skipped = new List<ScheduleExcelSkip>();
+        var rejected = new List<string>();
+        foreach (ScheduleExcelWorkbookContent part in workbook.Parts)
         {
-            TaskDialog.Show(Title, invalid);
-            return Result.Cancelled;
+            string? invalid = ScheduleExcelApplier.Validate(document, part);
+            if (invalid != null)
+            {
+                rejected.Add(invalid);
+                continue;
+            }
+
+            ScheduleExcelChangeSet changes = ScheduleExcelChangeSet.Compute(part, part.Snapshot);
+            skipped.AddRange(changes.Skipped);
+            if (changes.Edits.Count > 0)
+            {
+                batches.Add((part, changes.Edits));
+            }
         }
 
-        ScheduleExcelChangeSet changes = ScheduleExcelChangeSet.Compute(content, content.Snapshot);
-        if (changes.Edits.Count == 0)
+        int editCount = batches.Sum(batch => batch.Edits.Count);
+        string rejectedText = rejected.Count > 0 ? "\n\nPominięte zestawienia:\n- " + string.Join("\n- ", rejected) : string.Empty;
+        if (editCount == 0)
         {
-            TaskDialog.Show(Title, "W pliku nie ma zmian do zapisania w Revit."
-                + (changes.Skipped.Count > 0 ? "\n\nPominięte:\n" + ScheduleExcelWorkflow.DescribeSkipped(changes.Skipped) : string.Empty));
+            TaskDialog.Show(Title, "W pliku nie ma zmian do zapisania w Revit." + rejectedText
+                + (skipped.Count > 0 ? "\n\nPominięte:\n" + ScheduleExcelWorkflow.DescribeSkipped(skipped) : string.Empty));
             return Result.Cancelled;
         }
 
         var confirm = new TaskDialog(Title)
         {
-            MainInstruction = $"Zapisać {changes.Edits.Count} zmian do Revit?",
-            MainContent = $"Zestawienie: {content.Get("ScheduleName")}\nPlik: {Path.GetFileName(dialog.FileName)}"
-                + (changes.Skipped.Count > 0 ? $"\n\nPominięte ({changes.Skipped.Count}):\n" + ScheduleExcelWorkflow.DescribeSkipped(changes.Skipped, 5) : string.Empty),
+            MainInstruction = $"Zapisać {editCount} zmian do Revit?",
+            MainContent = string.Join("\n", batches.Select(batch => $"{batch.Content.Get("ScheduleName")}: {batch.Edits.Count} zmian"))
+                + $"\nPlik: {Path.GetFileName(dialog.FileName)}" + rejectedText
+                + (skipped.Count > 0 ? $"\n\nPominięte ({skipped.Count}):\n" + ScheduleExcelWorkflow.DescribeSkipped(skipped, 5) : string.Empty),
             CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No,
             DefaultButton = TaskDialogResult.Yes
         };
@@ -75,12 +90,12 @@ public sealed class ScheduleExcelImportCommand : IExternalCommand
             return Result.Cancelled;
         }
 
-        ScheduleExcelApplyResult result = ScheduleExcelApplier.Apply(document, content, changes.Edits);
-        List<ScheduleExcelSkip> skipped = [.. changes.Skipped, .. result.Skipped];
+        ScheduleExcelApplyResult result = ScheduleExcelApplier.Apply(document, batches);
+        skipped.AddRange(result.Skipped);
         ScheduleExcelLog.Info($"Import {dialog.FileName}: zmian {result.Applied.Count}, zapisów parametrów {result.ParameterWrites}, pominięto {skipped.Count}.");
         foreach (ScheduleExcelSkip skip in skipped)
         {
-            ScheduleExcelLog.Info($"  pominięto {skip.RowKey} / {skip.Column}: {skip.Reason}");
+            ScheduleExcelLog.Info($"  pominięto {skip.Schedule} / {skip.RowKey} / {skip.Column}: {skip.Reason}");
         }
 
         string report = result.Error.Length > 0

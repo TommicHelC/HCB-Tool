@@ -63,11 +63,24 @@ internal static class ScheduleExcelApplier
         ScheduleExcelWorkbookContent content,
         IReadOnlyList<ScheduleExcelEdit> edits)
     {
-        var result = new ScheduleExcelApplyResult { TransactionName = $"HCB Excel Sync {DateTime.Now:HH:mm:ss}" };
-        var lookups = new Dictionary<int, ScheduleExcelParameterLookup?>();
-        var operations = new List<Operation>();
-        var claimed = new Dictionary<(long TargetId, int Position), string>();
+        return Apply(document, [(content, edits)]);
+    }
 
+    /// <summary>Edits of several schedules (one workbook) in one transaction: one Ctrl+Z undoes the whole save.</summary>
+    public static ScheduleExcelApplyResult Apply(
+        Document document,
+        IReadOnlyList<(ScheduleExcelWorkbookContent Content, IReadOnlyList<ScheduleExcelEdit> Edits)> batches)
+    {
+        var result = new ScheduleExcelApplyResult { TransactionName = $"HCB Excel Sync {DateTime.Now:HH:mm:ss}" };
+        var operations = new List<Operation>();
+
+        // Keyed by parameter id, not by schedule: two sheets setting one type parameter must agree too.
+        var claimed = new Dictionary<(long TargetId, long ParameterId), string>();
+
+        foreach ((ScheduleExcelWorkbookContent content, IReadOnlyList<ScheduleExcelEdit> edits) in batches)
+        {
+        var lookups = new Dictionary<int, ScheduleExcelParameterLookup?>();
+        string scheduleName = content.Get("ScheduleName");
         foreach (ScheduleExcelEdit edit in edits)
         {
             ScheduleExcelFieldInfo field = content.Fields[edit.FieldPosition];
@@ -79,7 +92,7 @@ internal static class ScheduleExcelApplier
 
             if (lookup == null)
             {
-                result.Skipped.Add(new ScheduleExcelSkip(edit.RowKey, column, "Nie znaleziono parametru w modelu."));
+                result.Skipped.Add(new ScheduleExcelSkip(edit.RowKey, column, "Nie znaleziono parametru w modelu.") { Schedule = scheduleName });
                 continue;
             }
 
@@ -119,7 +132,7 @@ internal static class ScheduleExcelApplier
                     break;
                 }
 
-                if (claimed.TryGetValue((target.Id.Value, edit.FieldPosition), out string? other) && other != edit.NewText)
+                if (claimed.TryGetValue((target.Id.Value, field.ParameterId), out string? other) && other != edit.NewText)
                 {
                     problem = "Inny wiersz ustawia temu samemu typowi inną wartość.";
                     break;
@@ -135,15 +148,16 @@ internal static class ScheduleExcelApplier
 
             if (problem != null)
             {
-                result.Skipped.Add(new ScheduleExcelSkip(edit.RowKey, column, problem));
+                result.Skipped.Add(new ScheduleExcelSkip(edit.RowKey, column, problem) { Schedule = scheduleName });
                 continue;
             }
 
             foreach ((long targetId, (Element target, Parameter parameter)) in targets)
             {
-                claimed[(targetId, edit.FieldPosition)] = edit.NewText;
-                operations.Add(new Operation(edit, column, target, parameter, unit, field.ValueKind));
+                claimed[(targetId, field.ParameterId)] = edit.NewText;
+                operations.Add(new Operation(edit, column, scheduleName, target, parameter, unit, field.ValueKind));
             }
+        }
         }
 
         if (operations.Count == 0)
@@ -176,7 +190,7 @@ internal static class ScheduleExcelApplier
                 }
 
                 failedEdits.Add(operation.Edit);
-                result.Skipped.Add(new ScheduleExcelSkip(operation.Edit.RowKey, operation.Column, error));
+                result.Skipped.Add(new ScheduleExcelSkip(operation.Edit.RowKey, operation.Column, error) { Schedule = operation.Schedule });
             }
 
             if (result.ParameterWrites == 0)
@@ -220,7 +234,7 @@ internal static class ScheduleExcelApplier
         var owned = new HashSet<long>(checkedOut.Select(id => id.Value));
         foreach (Operation operation in operations.Where(operation => !owned.Contains(operation.Target.Id.Value)).ToList())
         {
-            result.Skipped.Add(new ScheduleExcelSkip(operation.Edit.RowKey, operation.Column, "Element zajęty przez innego użytkownika (worksharing)."));
+            result.Skipped.Add(new ScheduleExcelSkip(operation.Edit.RowKey, operation.Column, "Element zajęty przez innego użytkownika (worksharing).") { Schedule = operation.Schedule });
             operations.Remove(operation);
         }
     }
@@ -255,6 +269,7 @@ internal static class ScheduleExcelApplier
     private sealed record Operation(
         ScheduleExcelEdit Edit,
         string Column,
+        string Schedule,
         Element Target,
         Parameter Parameter,
         ForgeTypeId? Unit,

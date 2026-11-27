@@ -1,7 +1,6 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using Microsoft.Win32;
 
 namespace HCB.RevitAddin.Features.ScheduleExcel.UI;
@@ -20,6 +19,9 @@ public sealed class ScheduleExcelListItem
     public string Name { get; }
 
     public string Info { get; }
+
+    /// <summary>Ticked for export; several schedules go to one workbook, one sheet each.</summary>
+    public bool IsChecked { get; set; }
 }
 
 public partial class ScheduleExcelExportWindow : Window
@@ -31,7 +33,7 @@ public partial class ScheduleExcelExportWindow : Window
         string description,
         string primaryButton,
         IReadOnlyList<ScheduleExcelListItem> items,
-        long? preselectedId,
+        IReadOnlyCollection<long> preselectedIds,
         string folder,
         bool openAfterExport,
         bool protectReadOnlyCells,
@@ -44,17 +46,39 @@ public partial class ScheduleExcelExportWindow : Window
         Header.Description = description;
         FooterBar.PrimaryButtonText = primaryButton;
         _items = items;
+        foreach (ScheduleExcelListItem item in _items)
+        {
+            item.IsChecked = preselectedIds.Contains(item.Id);
+        }
+
         ScheduleListBox.ItemsSource = _items;
-        ScheduleListBox.SelectedItem = _items.FirstOrDefault(item => item.Id == preselectedId) ?? _items.FirstOrDefault();
-        ScheduleListBox.ScrollIntoView(ScheduleListBox.SelectedItem);
+        ScheduleListBox.SelectedItem = _items.FirstOrDefault(item => item.IsChecked) ?? _items.FirstOrDefault();
+        if (ScheduleListBox.SelectedItem != null)
+        {
+            ScheduleListBox.ScrollIntoView(ScheduleListBox.SelectedItem);
+        }
+
         FolderTextBox.Text = folder;
         OpenAfterExportCheckBox.IsChecked = openAfterExport;
         ProtectCheckBox.IsChecked = protectReadOnlyCells;
         ExpandGroupsCheckBox.IsChecked = expandGroups;
-        FooterBar.StatusText = $"Zestawień w modelu: {_items.Count}.";
+        UpdateStatus();
     }
 
-    public ScheduleExcelListItem? SelectedSchedule => ScheduleListBox.SelectedItem as ScheduleExcelListItem;
+    /// <summary>Ticked schedules; when none is ticked, the highlighted one.</summary>
+    public IReadOnlyList<ScheduleExcelListItem> SelectedSchedules
+    {
+        get
+        {
+            List<ScheduleExcelListItem> ticked = _items.Where(item => item.IsChecked).ToList();
+            if (ticked.Count == 0 && ScheduleListBox.SelectedItem is ScheduleExcelListItem highlighted)
+            {
+                ticked.Add(highlighted);
+            }
+
+            return ticked;
+        }
+    }
 
     public string Folder => FolderTextBox.Text.Trim();
 
@@ -67,25 +91,33 @@ public partial class ScheduleExcelExportWindow : Window
     private void SearchTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
     {
         string filter = SearchTextBox.Text.Trim();
-        ScheduleExcelListItem? selected = SelectedSchedule;
         List<ScheduleExcelListItem> visible = filter.Length == 0
             ? _items.ToList()
             : _items.Where(item => item.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)).ToList();
         ScheduleListBox.ItemsSource = visible;
-        ScheduleListBox.SelectedItem = visible.Contains(selected!) ? selected : visible.FirstOrDefault();
+        ScheduleListBox.SelectedItem = visible.FirstOrDefault(item => item.IsChecked) ?? visible.FirstOrDefault();
     }
 
     private void ScheduleListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ScheduleInfoText.Text = SelectedSchedule?.Info ?? string.Empty;
+        UpdateStatus();
     }
 
-    private void ScheduleListBox_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void ScheduleCheckBox_OnClick(object sender, RoutedEventArgs e)
     {
-        if (SelectedSchedule != null)
+        UpdateStatus();
+    }
+
+    private void UpdateStatus()
+    {
+        int ticked = _items.Count(item => item.IsChecked);
+        ScheduleInfoText.Text = (ScheduleListBox.SelectedItem as ScheduleExcelListItem)?.Info ?? string.Empty;
+        FooterBar.StatusText = ticked switch
         {
-            ExportButton_OnClick(sender, e);
-        }
+            0 => $"Zestawień w modelu: {_items.Count}. Zaznacz jedno lub kilka.",
+            1 => "Zaznaczono 1 zestawienie.",
+            _ => $"Zaznaczono {ticked} zestawień - każde trafi do osobnego arkusza jednego pliku."
+        };
     }
 
     private void BrowseButton_OnClick(object sender, RoutedEventArgs e)
@@ -104,9 +136,9 @@ public partial class ScheduleExcelExportWindow : Window
 
     private void ExportButton_OnClick(object sender, RoutedEventArgs e)
     {
-        if (SelectedSchedule == null)
+        if (SelectedSchedules.Count == 0)
         {
-            FooterBar.StatusText = "Wybierz zestawienie.";
+            FooterBar.StatusText = "Zaznacz co najmniej jedno zestawienie.";
             return;
         }
 

@@ -4,10 +4,18 @@ using HCB.RevitAddin.Features.ScheduleExcel.Models;
 namespace HCB.RevitAddin.Features.ScheduleExcel;
 
 /// <summary>One cell the user changed: new value already converted to the column's kind.</summary>
-public sealed record ScheduleExcelEdit(string RowKey, int FieldPosition, object? NewValue, string NewText, string BaselineText);
+public sealed record ScheduleExcelEdit(string RowKey, int FieldPosition, object? NewValue, string NewText, string BaselineText)
+{
+    /// <summary>UniqueId of the schedule the edit belongs to (a workbook can hold several schedules).</summary>
+    public string Schedule { get; init; } = string.Empty;
+}
 
 /// <summary>A change that will not be written, with a short Polish reason.</summary>
-public sealed record ScheduleExcelSkip(string RowKey, string Column, string Reason);
+public sealed record ScheduleExcelSkip(string RowKey, string Column, string Reason)
+{
+    /// <summary>Schedule name, shown when a workbook holds several schedules.</summary>
+    public string Schedule { get; init; } = string.Empty;
+}
 
 /// <summary>
 /// Compares the current Excel cells with the baseline (export snapshot, then updated after each applied sync)
@@ -87,6 +95,19 @@ internal sealed class ScheduleExcelChangeSet
 
                 result.Edits.Add(new ScheduleExcelEdit(rowKey, position, value, text, baseText));
             }
+        }
+
+        // Tag every result with its schedule: one sync can cover several sheets.
+        string scheduleId = content.Get("ScheduleUniqueId");
+        string scheduleName = content.Get("ScheduleName");
+        for (int index = 0; index < result.Edits.Count; index++)
+        {
+            result.Edits[index] = result.Edits[index] with { Schedule = scheduleId };
+        }
+
+        for (int index = 0; index < result.Skipped.Count; index++)
+        {
+            result.Skipped[index] = result.Skipped[index] with { Schedule = scheduleName };
         }
 
         return result;
